@@ -1,0 +1,7 @@
+#pragma once
+
+namespace tests
+{
+	const char* CurrentWorkingDirectory = "@CMAKE_CURRENT_BINARY_DIR@";
+	const char* TestConfigurationFile = "@CMAKE_CURRENT_BINARY_DIR@/testconfig.ini";
+}
