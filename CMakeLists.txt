@@ -31,6 +31,7 @@ add_compile_options("-fno-elide-constructors"
 add_definitions(-DBOOST_LOG_DYN_LINK)
 find_package(Boost 1.79 REQUIRED COMPONENTS thread system filesystem
 	program_options log)
+find_package(RadeonProRenderSDK REQUIRED COMPONENTS tahoe)
 
 add_subdirectory(src)
 

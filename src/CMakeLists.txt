@@ -17,5 +17,6 @@ target_link_libraries(rprf PRIVATE
 )
 
 add_executable(rpr ${SOURCES} ${HEADERS} main.cpp) 
-target_link_libraries(rpr rprf)
+target_link_libraries(rpr rprf RadeonProRenderSDK::RPR)
+
 
