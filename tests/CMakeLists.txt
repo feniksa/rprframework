@@ -7,6 +7,7 @@ set(HEADERS
 set (TESTS
 	Dummy
 	Renderer
+	Northstar
 )
 
 foreach(test ${TESTS})

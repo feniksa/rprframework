@@ -18,7 +18,8 @@ if (${FORCE_COLORED_OUTPUT})
 endif ()
 
 add_compile_options("-fno-elide-constructors"
-                "-pedantic-errors"
+	# fix for math/matrix.h ugly anonymous union
+    #"-pedantic-errors"
                 "-Wextra"
                 "-Wall"
                 "-Winit-self"
@@ -33,6 +34,7 @@ find_package(Boost 1.79 REQUIRED COMPONENTS thread system filesystem
 	program_options log)
 find_package(RadeonProRenderSDK REQUIRED COMPONENTS tahoe)
 
+add_subdirectory(math)
 add_subdirectory(src)
 
 enable_testing()
