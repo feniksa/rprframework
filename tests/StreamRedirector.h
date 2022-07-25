@@ -3,6 +3,9 @@
 #include <ostream>
 #include <sstream>
 
+namespace tests
+{
+
 class StreamRedirect
 {
 public:
@@ -40,4 +43,4 @@ private:
 	std::streambuf*  m_oldBuffer;
 };
 
-
+} // namespace

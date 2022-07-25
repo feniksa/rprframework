@@ -2,6 +2,10 @@ find_package(GTest REQUIRED)
 
 set(HEADERS
 	StreamRedirector.h
+	CommonData.h
+)
+set(SOURCES
+	CommonData.cpp
 )
 
 set (TESTS
@@ -19,7 +23,7 @@ foreach(test ${TESTS})
 		set (TEST_SOURCES ${TEST_SOURCES} Test${test}.cpp)
 endforeach()
 
-add_executable(tests_main ${TEST_SOURCES} ${HEADERS})
+add_executable(tests_main ${TEST_SOURCES} ${HEADERS} ${SOURCES})
 target_link_libraries(tests_main 
 	rprf
 	GTest::gtest
