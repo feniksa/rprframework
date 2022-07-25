@@ -89,7 +89,7 @@ TEST_F(TestNorthstar, scene_creation)
 	ASSERT_TRUE(!m_tempDir.empty());
 
 	auto gpus = getAvailableDevices(*m_plugin, "");
-	Context context(*m_plugin, m_shaderCachePath.c_str(), GetCreationFlags(gpus));
+	Context context(*m_plugin, m_shaderCachePath.string(), GetCreationFlags(gpus));
 
 	Scene scene(context);
 	context.setScene(scene);
@@ -130,7 +130,7 @@ TEST_F(TestNorthstar, scene_creation)
 	context.render();
 	context.resolve(&frameBuffer, &frameBufferResolved, false);
 
-	frameBufferResolved.saveToFile((m_tempDir / "scene_creation00.png").c_str());
+	frameBufferResolved.saveToFile((m_tempDir / "scene_creation00.png").string());
 
 	//------------------------------------------------------------------------------------------
 	Shape plane(context,
@@ -167,6 +167,6 @@ TEST_F(TestNorthstar, scene_creation)
 	context.render();
 	context.resolve(&frameBuffer, &frameBufferResolved, true);
 
-	frameBufferResolved.saveToFile((m_tempDir / "scene_creation01.png").c_str());
+	frameBufferResolved.saveToFile((m_tempDir / "scene_creation01.png").string());
 
 }

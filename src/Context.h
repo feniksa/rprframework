@@ -13,7 +13,7 @@ class FrameBuffer;
 class Context : public ContextObject<rpr_context>
 {
 public:
-	Context(const Plugin& plugin, const char* cachePath = nullptr, int createFlags = RPR_CREATION_FLAGS_ENABLE_GPU0);
+	Context(const Plugin& plugin, const std::string_view& cachePath = nullptr, int createFlags = RPR_CREATION_FLAGS_ENABLE_GPU0);
 
 	void setScene(const Scene& scene);
 	void setAOV(const FrameBuffer& frameBuffer);

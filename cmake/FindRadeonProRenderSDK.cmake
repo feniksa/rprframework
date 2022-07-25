@@ -1,16 +1,20 @@
 find_path(RPR_INCLUDE_DIR 
 	NAME RadeonProRender.h
-	HINTS /usr /usr/local/include
-    ENV RPR_SDK
-    PATH_SUFFIXES RadeonProRender/inc
+	HINTS /usr /usr/local/include 
+	ENV RPR_SDK_ROOT
+    	PATH_SUFFIXES RadeonProRender/inc
 )
 
 find_library(RPR_LIBRARY 
 	NAMES
 	RadeonProRender64
-	HINTS /usr/lib64 /usr/loca/lib64
-	PATH_SUFFIXES RadeonProRender/binUbuntu18
+	HINTS /usr/lib64 /usr/loca/lib64 
+	ENV RPR_SDK_ROOT
+	PATH_SUFFIXES RadeonProRender/binUbuntu18 
+	              RadeonProRender/libWin64
 )
+
+message(STATUS ${RPR_LIBRARY})
 
 macro(process_rpr_version)
 	if(RPR_INCLUDE_DIR)
@@ -35,7 +39,9 @@ macro(find_tahoe)
 		NAMES
 		Tahoe64
 		HINTS /usr/lib64 /usr/loca/lib64
+		ENV RPR_SDK_ROOT
 		PATH_SUFFIXES RadeonProRender/binUbuntu18
+	     		      RadeonProRender/libWin64
 	)
 
 	if(NOT TARGET RadeonProRenderSDK::tahoe)
@@ -51,7 +57,10 @@ macro(find_northstar)
 		NAMES
 		Northstar64
 		HINTS /usr/lib64 /usr/loca/lib64
+		ENV RPR_SDK_ROOT
 		PATH_SUFFIXES RadeonProRender/binUbuntu18
+	     		      RadeonProRender/libWin64
+
 	)
 
 	if(NOT TARGET RadeonProRenderSDK::northstar)
@@ -65,7 +74,9 @@ macro(find_hybrid)
 		NAMES
 		Hybrid
 		HINTS /usr/lib64 /usr/loca/lib64
+		ENV RPR_SDK_ROOT
 		PATH_SUFFIXES RadeonProRender/binUbuntu18
+	     		      RadeonProRender/libWin64
 	)
 
 	if(NOT TARGET RadeonProRenderSDK::hybrid)
@@ -105,7 +116,6 @@ find_package_handle_standard_args(RadeonProRenderSDK
 	REQUIRED_VARS RPR_LIBRARY RPR_INCLUDE_DIR
     VERSION_VAR RPR_VERSION_STRING
     HANDLE_COMPONENTS)
-    #REASON_FAILURE_MESSAGE "FFFFFFFFFFFFFUCK")
 
 if(RadeonProRenderSDK_FOUND)
 	set(RadeonProRenderSDK_INCLUDE_DIRS ${RPR_INCLUDE_DIR})

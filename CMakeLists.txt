@@ -17,17 +17,20 @@ if (${FORCE_COLORED_OUTPUT})
     endif ()
 endif ()
 
-add_compile_options("-fno-elide-constructors"
-	# fix for math/matrix.h ugly anonymous union
-    #"-pedantic-errors"
-                "-Wextra"
+if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+	add_compile_options(
+		"-fno-elide-constructors"
                 "-Wall"
+ 		# fix for math/matrix.h ugly anonymous union
+ 		#"-pedantic-errors"
+		"-Wextra"
                 "-Winit-self"
                 "-Wold-style-cast"
                 "-Woverloaded-virtual"
                 "-Wuninitialized"
                 "-Wmissing-declarations"
                 "-Winit-self")
+ endif()
 
 add_definitions(-DBOOST_LOG_DYN_LINK)
 find_package(Boost 1.79 REQUIRED COMPONENTS thread system filesystem

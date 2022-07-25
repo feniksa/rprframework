@@ -9,7 +9,7 @@
 namespace rprf
 {
 
-Context::Context(const Plugin& plugin, const char* cachePath, int createFlags)
+Context::Context(const Plugin& plugin, const std::string_view& cachePath, int createFlags)
 : m_createFlags(createFlags)
 {
 	int status;
@@ -18,7 +18,7 @@ Context::Context(const Plugin& plugin, const char* cachePath, int createFlags)
 	ids.push_back(plugin.id());
 
 	rpr_context context;
-	status = rprCreateContext(RPR_API_VERSION, ids.data(), ids.size(), m_createFlags, NULL, cachePath, &context);
+	status = rprCreateContext(RPR_API_VERSION, ids.data(), ids.size(), m_createFlags, NULL, cachePath.data(), &context);
 	check(status);
 
 	setInstance(std::move(context));
