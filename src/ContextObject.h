@@ -13,7 +13,7 @@ template <class T>
 class ContextObject
 {
 public:
-	ContextObject(T data = nullptr);
+	explicit ContextObject(T data = nullptr);
 	ContextObject(ContextObject&& object)  noexcept;
 	virtual ~ContextObject();
 
@@ -39,7 +39,6 @@ private:
 	T m_instance;
 };
 
-
 template <class T>
 ContextObject<T>::ContextObject(T dataPointer)
 : m_instance(dataPointer)
@@ -59,8 +58,6 @@ ContextObject<T>::~ContextObject()
 	}
 }
 
-
-
 template <class T>
 ContextObject<T>::ContextObject(ContextObject&& object) noexcept
 {
@@ -70,14 +67,14 @@ ContextObject<T>::ContextObject(ContextObject&& object) noexcept
 
 template <class T>
 ContextObject<T>& ContextObject<T>::operator=(ContextObject&& context)
-	{
-		if (m_instance)
-			destroy();
+{
+	if (m_instance)
+		destroy();
 
-		m_instance = std::move(context.m_instance);
-		context.m_instance = nullptr ;
-		return *this;
-	}
+	m_instance = std::move(context.m_instance);
+	context.m_instance = nullptr ;
+	return *this;
+}
 
 template <class T>
 void ContextObject<T>::setInstance(T&& instance)

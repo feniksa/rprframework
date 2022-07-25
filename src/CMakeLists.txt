@@ -18,6 +18,9 @@ set(HEADERS
 	LightSpot.h
 	FrameBuffer.h
 	FrameBufferSysmem.h
+	MaterialSystem.h
+	MaterialNode.h
+	MaterialNodeType.h
 )
 
 set(SOURCES
@@ -38,6 +41,8 @@ set(SOURCES
 	LightSpot.cpp
 	FrameBuffer.cpp
 	FrameBufferSysmem.cpp
+	MaterialSystem.cpp
+	MaterialNode.cpp
 )
 
 add_library(rprf STATIC ${SOURCES} ${HEADERS})

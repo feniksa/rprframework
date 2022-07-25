@@ -25,7 +25,7 @@ public:
 	bool isDirty()     const noexcept { return m_bufferVersion != m_bufferSysmemVersion; }
 	void invalidateCounter() noexcept { m_bufferVersion = 0; m_bufferSysmemVersion = 0; }
 
-	bool save(const std::wstring& fileName) const;
+	bool save(const std::string_view& fileName) const;
 
 	unsigned int width()  const noexcept { return m_width;  }
 	unsigned int height() const noexcept { return m_height; }

@@ -15,7 +15,7 @@ public:
 	size_t data(void* buffer, size_t size) const;
 	void data(std::vector<std::byte>* buffer) const;
 
-	void saveToFile(const std::wstring& fileName) const;
+	void saveToFile(const std::string_view& fileName) const;
 
 	void clear();
 

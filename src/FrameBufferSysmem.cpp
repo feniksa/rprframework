@@ -38,7 +38,7 @@ FrameBuffer& FrameBufferSysmem::rprFrameBufferSysmem()
 	return *m_frameBuffer;
 }
 
-bool FrameBufferSysmem::save(const std::wstring& fileName) const
+bool FrameBufferSysmem::save(const std::string_view& fileName) const
 {
 	if (!m_frameBuffer)
 		return false;

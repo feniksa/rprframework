@@ -7,7 +7,7 @@
 namespace rprf
 {
 
-//class MaterialNode;
+class MaterialNode;
 
 class Shape : public ContextObject<rpr_shape>
 {
@@ -20,9 +20,10 @@ public:
 		rpr_int const * texcoord_indices, rpr_int tidx_stride,
 		rpr_int const * num_face_vertices, size_t num_faces,
 		bool visibility = true);
-	//Shape(const Shape& other)
+
+	Shape(const Shape& other);
 	void setTransform(const rprf_math::matrix& transform, bool transpose);
-	//void setMaterial(const MaterialNode&);
+	void setMaterial(const MaterialNode&);
 	void setVisibility(bool visibility);
 private:
 	Context& m_context;

@@ -20,8 +20,8 @@ public:
 	void unsetAOV();
 	void resolve(FrameBuffer* src, FrameBuffer* dst, bool noDisplayGamma = true);
 
-	void setParameter1u(int name, unsigned int value);
-	void setParameter1f(int name, float value);
+	void setParameter1u(unsigned int name, unsigned int value);
+	void setParameter1f(unsigned int name, float value);
 
 	void render();
 

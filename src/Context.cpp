@@ -49,20 +49,18 @@ void Context::unsetAOV()
 	check(status);
 }
 
-void Context::setParameter1u(int name, unsigned int value)
+void Context::setParameter1u(unsigned int name, unsigned int value)
 {
 	int status;
 	status = rprContextSetParameterByKey1u(*this, name, value);
 	check(status);
 }
 
-
-void Context::setParameter1f(int name, float value)
+void Context::setParameter1f(unsigned int name, float value)
 {
 	int status;
 	status = rprContextSetParameterByKey1f(*this, name, value);
 	check(status);
-
 }
 
 void Context::render()

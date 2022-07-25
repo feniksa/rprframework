@@ -14,5 +14,6 @@ struct vertex
 extern const vertex cube_data[];
 extern const rpr_int indices[];
 extern const rpr_int num_face_vertices[];
+extern vertex plane_data[];
 
 } // namespace

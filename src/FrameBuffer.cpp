@@ -20,7 +20,7 @@ FrameBuffer::FrameBuffer(Context& context, const int width, const int height, in
 	assert(m_numComponents <= 4);
 
 	format.num_components = m_numComponents;
-	format.type = static_cast<int>(m_componentType);
+	format.type = static_cast<unsigned int>(m_componentType);
 
 	rpr_framebuffer_desc desc;
 	desc.fb_width = width;
@@ -40,10 +40,10 @@ void FrameBuffer::clear()
 	check(status);
 }
 
-void FrameBuffer::saveToFile(const std::wstring& name) const
+void FrameBuffer::saveToFile(const std::string_view& name) const
 {
 	int status;
-	status = rprFrameBufferSaveToFile(instance(), std::string(name.begin(), name.end()).c_str());
+	status = rprFrameBufferSaveToFile(instance(), name.data());
 	check(status);
 }
 

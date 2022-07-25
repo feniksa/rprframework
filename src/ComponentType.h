@@ -8,7 +8,7 @@ namespace rprf
 	enum class ComponentsType
 	{
 		Uint8   = RPR_COMPONENT_TYPE_UINT8,
-		Uint32   = RPR_COMPONENT_TYPE_UINT32,
+		Uint32  = RPR_COMPONENT_TYPE_UINT32,
 		Float16 = RPR_COMPONENT_TYPE_FLOAT16,
 		Float32 = RPR_COMPONENT_TYPE_FLOAT32,
 	};
