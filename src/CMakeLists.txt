@@ -21,6 +21,7 @@ set(HEADERS
 	MaterialSystem.h
 	MaterialNode.h
 	MaterialNodeType.h
+	Image.h
 )
 
 set(SOURCES
@@ -43,6 +44,7 @@ set(SOURCES
 	FrameBufferSysmem.cpp
 	MaterialSystem.cpp
 	MaterialNode.cpp
+	Image.cpp
 )
 
 add_library(rprf STATIC ${SOURCES} ${HEADERS})

@@ -1,6 +1,6 @@
 #include "MaterialNode.h"
 #include "MaterialSystem.h"
-//#include "Image.h"
+#include "Image.h"
 #include "FrameBuffer.h"
 #include "Error.h"
 
@@ -41,9 +41,9 @@ void MaterialNode::setParameterNode(unsigned int parameter, const MaterialNode& 
 
 void MaterialNode::setParameterImage(unsigned int parameter, const Image& image)
 {
-	/*rpr_int status;
-	status = rprMaterialNodeSetInputImageData(*this, parameter, image.instance());
-	check(status);*/
+	rpr_int status;
+	status = rprMaterialNodeSetInputImageDataByKey(*this, parameter, image.instance());
+	check(status);
 }
 
 void MaterialNode::setParameterFrameBuffer(unsigned int parameter, const FrameBuffer& frameBuffer)
@@ -52,6 +52,5 @@ void MaterialNode::setParameterFrameBuffer(unsigned int parameter, const FrameBu
 	status = rprMaterialNodeSetInputBufferDataByKey(*this, parameter, frameBuffer.instance());
 	check(status);
 }
-
 
 }
