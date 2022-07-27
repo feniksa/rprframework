@@ -103,9 +103,9 @@ TEST_F(TestNorthstar, scene_creation)
 	scene.setCamera(camera);
 
 	Shape cube(context,
-			reinterpret_cast<rpr_float const*>(&cube_data[0]),                         24, sizeof(vertex),
-			reinterpret_cast<rpr_float const*>(&cube_data[0] + sizeof(rpr_float) * 3), 24, sizeof(vertex),
-			reinterpret_cast<rpr_float const*>(&cube_data[0] + sizeof(rpr_float) * 6), 24, sizeof(vertex),
+			reinterpret_cast<rpr_float const*>(&cube_data[0]), 24, sizeof(vertex),
+			reinterpret_cast<rpr_float const*>((char*)&cube_data[0] + sizeof(rpr_float) * 3), 24, sizeof(vertex),
+			reinterpret_cast<rpr_float const*>((char*)&cube_data[0] + sizeof(rpr_float) * 6), 24, sizeof(vertex),
 			static_cast<rpr_int const*>(indices), sizeof(rpr_int),
 			static_cast<rpr_int const*>(indices), sizeof(rpr_int),
 			static_cast<rpr_int const*>(indices), sizeof(rpr_int),
@@ -135,8 +135,8 @@ TEST_F(TestNorthstar, scene_creation)
 	//------------------------------------------------------------------------------------------
 	Shape plane(context,
 			reinterpret_cast<rpr_float const*>(&plane_data[0]), 4, sizeof(vertex),
-			reinterpret_cast<rpr_float const*>(&plane_data[0] + sizeof(rpr_float) * 3), 4, sizeof(vertex),
-			reinterpret_cast<rpr_float const*>(&plane_data[0] + sizeof(rpr_float) * 6), 4, sizeof(vertex),
+			reinterpret_cast<rpr_float const*>((char*)&plane_data[0] + sizeof(rpr_float) * 3), 4, sizeof(vertex),
+			reinterpret_cast<rpr_float const*>((char*)&plane_data[0] + sizeof(rpr_float) * 6), 4, sizeof(vertex),
 			static_cast<rpr_int const*>(indices), sizeof(rpr_int),
 			static_cast<rpr_int const*>(indices), sizeof(rpr_int),
 			static_cast<rpr_int const*>(indices), sizeof(rpr_int),
@@ -145,7 +145,9 @@ TEST_F(TestNorthstar, scene_creation)
 	scene.attachShape(plane);
 
 	Shape cubeInstance(cube);
-	cubeInstance.setTransform(rprf_math::translation(rprf_math::float3(2, 1, -3)) * rprf_math::rotation_y(0.5), true);
+	cubeInstance.setTransform(
+		rprf_math::translation(rprf_math::float3(2, 1, -3)) * 
+		rprf_math::rotation_y(0.5), true);
 	scene.attachShape(cubeInstance);
 
 	MaterialSystem materialSystem(context);
@@ -155,11 +157,11 @@ TEST_F(TestNorthstar, scene_creation)
 	cube.setMaterial(diffuse1);
 
 	MaterialNode diffuse2(materialSystem, MaterialNodeType::Diffuse);
-	diffuse1.setParameter4f(RPR_MATERIAL_INPUT_COLOR, 1.0f, 0.5f, 0.0f, 0.0f);
+	diffuse2.setParameter4f(RPR_MATERIAL_INPUT_COLOR, 1.0f, 0.5f, 0.0f, 0.0f);
 	cubeInstance.setMaterial(diffuse2);
 
 	MaterialNode diffuse3(materialSystem, MaterialNodeType::Diffuse);
-	diffuse1.setParameter4f(RPR_MATERIAL_INPUT_COLOR, 0.1f, 0.8f, 1.0f, 0.0f);
+	diffuse3.setParameter4f(RPR_MATERIAL_INPUT_COLOR, 0.1f, 0.8f, 1.0f, 0.0f);
 	plane.setMaterial(diffuse3);
 
 	frameBuffer.clear();
