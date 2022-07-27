@@ -78,7 +78,7 @@ TEST_F(TestNorthstar, context_creation)
 	auto gpus = getAvailableDevices(*m_plugin, "");
  	printAvailableDevices(gpus, std::cout);
 
-	Context context(*m_plugin, nullptr, GetCreationFlags(gpus));
+	Context context(*m_plugin, m_shaderCachePath.string(), GetCreationFlags(gpus));
 	EXPECT_TRUE(context.instance());
 }
 
