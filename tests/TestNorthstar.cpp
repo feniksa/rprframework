@@ -39,13 +39,13 @@ struct TestNorthstar : public ::testing::Test
 			std::filesystem::create_directory(m_tempDir);
 		}
 		m_shaderCachePath = m_tempDir / "cache";
+
+		std::cout << "Temporary directory: \t" << m_tempDir <<  "\n";
 	}
 
     void SetUp()
     {
-		std::string dynlibname = "libNorthstar64.so";
-		//std::string dynlibname = "libTahoe64.so";
-		m_plugin = std::make_unique<Plugin>(dynlibname);
+		m_plugin = std::make_unique<Plugin>(Plugin::Type::Northstar);
     }
 
     void TearDown()

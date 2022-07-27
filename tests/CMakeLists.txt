@@ -44,3 +44,8 @@ configure_file(testconfig.ini.in ${CMAKE_CURRENT_BINARY_DIR}/testconfig.ini @ONL
 foreach(resource ${RESOURCES})
     configure_file(${resource} ${CMAKE_CURRENT_BINARY_DIR}/${resource} COPYONLY)
 endforeach()
+
+foreach(dll ${RadeonProRender_DLLS})
+	message(STATUS ${dll})
+	configure_file(${dll} ${CMAKE_CURRENT_BINARY_DIR} COPYONLY)
+endforeach()

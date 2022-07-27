@@ -21,4 +21,46 @@ Plugin::Plugin(const std::string_view& libraryName)
 	}
 }
 
+Plugin::Plugin(Type type)
+	: Plugin(GetDynamicLibraryName(type))
+{
+}
+
+
+#ifdef _WIN32
+const char* Plugin::GetDynamicLibraryName(Type type) 
+{
+	switch (type) 
+	{
+		case Type::Tahoe:
+			return "Tahoe64.dll";
+		case Type::Northstar:
+			return "Northstar64.dll";
+		case Type::Hybrid:
+			return "Hybrid.dll";
+		default:
+			return "";
+	}
+	return "";
+}
+#else
+const char* Plugin::GetDynamicLibraryName(Type type) 
+{
+	switch (type) 
+	{
+		case Type::Tahoe:
+			return "libTahoe64.so";
+		case Type::Northstar:
+			return "libNorthstar64.so";
+		case Type::Hybrid:
+			return "libHybrid.so";
+		default:
+			return "";
+	}
+	return "";
+}
+
+#endif
+
+
 } // rpr

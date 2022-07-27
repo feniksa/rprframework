@@ -14,7 +14,19 @@ find_library(RPR_LIBRARY
 	              RadeonProRender/libWin64
 )
 
-message(STATUS ${RPR_LIBRARY})
+set(RadeonProRender_DLLS "")
+if (WIN32)
+	find_file(RadeonProRenderSDK_radeonprorender_dll 
+		NAMES "RadeonProRender64.dll"
+		HINTS
+		ENV RPR_SDK_ROOT
+		PATH_SUFFIXES RadeonProRender/binWin64)
+
+	if (RadeonProRenderSDK_radeonprorender_dll)
+		list(APPEND RadeonProRender_DLLS ${RadeonProRenderSDK_radeonprorender_dll})
+	endif()
+
+endif()
 
 macro(process_rpr_version)
 	if(RPR_INCLUDE_DIR)
@@ -44,12 +56,24 @@ macro(find_tahoe)
 	     		      RadeonProRender/libWin64
 	)
 
+	if (WIN32)
+		find_file(RadeonProRenderSDK_tahoe_dll 
+			NAMES "Tahoe.dll"
+			HINTS
+			ENV RPR_SDK_ROOT
+			PATH_SUFFIXES RadeonProRender/binWin64)
+		if (RadeonProRenderSDK_tahoe_dll)
+			list(APPEND RadeonProRender_DLLS ${RadeonProRenderSDK_tahoe_dll})
+		endif()
+	endif()
+
+
 	if(NOT TARGET RadeonProRenderSDK::tahoe)
-    	add_library(RadeonProRenderSDK::tahoe INTERFACE IMPORTED)		
-    	set_target_properties(RadeonProRenderSDK::tahoe PROPERTIES
+    		add_library(RadeonProRenderSDK::tahoe INTERFACE IMPORTED)		
+    		set_target_properties(RadeonProRenderSDK::tahoe PROPERTIES
 			#INTERFACE_INCLUDE_DIRECTORIES "${RPR_INCLUDE_DIR}"
 			INTERFACE_LINK_LIBRARIES "${RPR_TAHOE_LIBRARY}")
-    endif()
+    	endif()
 endmacro()
 
 macro(find_northstar)
@@ -63,11 +87,22 @@ macro(find_northstar)
 
 	)
 
+	if (WIN32)
+		find_file(RadeonProRenderSDK_northstar_dll 
+			NAMES "Northstar64.dll"
+			HINTS
+			ENV RPR_SDK_ROOT
+			PATH_SUFFIXES RadeonProRender/binWin64)
+		if (RadeonProRenderSDK_northstar_dll)
+			list(APPEND RadeonProRender_DLLS ${RadeonProRenderSDK_northstar_dll})
+		endif()
+	endif()
+
 	if(NOT TARGET RadeonProRenderSDK::northstar)
-    	add_library(RadeonProRenderSDK::northstar INTERFACE IMPORTED)		
-    	set_target_properties(RadeonProRenderSDK::northstar PROPERTIES
+    		add_library(RadeonProRenderSDK::northstar INTERFACE IMPORTED)		
+    		set_target_properties(RadeonProRenderSDK::northstar PROPERTIES
 			INTERFACE_LINK_LIBRARIES "${RPR_NORTHSTAR_LIBRARY}")
-    endif()
+	endif()
 endmacro()
 macro(find_hybrid)
 	find_library(RPR_HYBRID_LIBRARY 
@@ -78,6 +113,18 @@ macro(find_hybrid)
 		PATH_SUFFIXES RadeonProRender/binUbuntu18
 	     		      RadeonProRender/libWin64
 	)
+
+	if (WIN32)
+		find_file(RadeonProRenderSDK_hybrid_dll 
+			NAMES "Hybrid.dll"
+			HINTS
+			ENV RPR_SDK_ROOT
+			PATH_SUFFIXES RadeonProRender/binWin64)
+		if (RadeonProRenderSDK_hybrid_dll)
+			list(APPEND RadeonProRender_DLLS ${RadeonProRenderSDK_hybrid_dll})
+		endif()
+	endif()
+
 
 	if(NOT TARGET RadeonProRenderSDK::hybrid)
     	add_library(RadeonProRenderSDK::hybrid INTERFACE IMPORTED)		
@@ -106,8 +153,9 @@ foreach(component IN LISTS RadeonProRenderSDK_FIND_COMPONENTS)
 	if(TARGET RadeonProRenderSDK::${component})
  		set(RadeonProRenderSDK_${component}_FOUND TRUE)
 	else()
-    	set(RadeonProRenderSDK_${component}_FOUND FALSE)
+	    	set(RadeonProRenderSDK_${component}_FOUND FALSE)
 	endif()
+
 
 endforeach()
 unset(component)

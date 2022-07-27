@@ -35,7 +35,7 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "GN
 add_definitions(-DBOOST_LOG_DYN_LINK)
 find_package(Boost 1.79 REQUIRED COMPONENTS thread system filesystem
 	program_options log)
-find_package(RadeonProRenderSDK REQUIRED COMPONENTS tahoe)
+find_package(RadeonProRenderSDK REQUIRED COMPONENTS northstar tahoe)
 
 add_subdirectory(math)
 add_subdirectory(src)
