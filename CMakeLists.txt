@@ -38,7 +38,7 @@ find_package(Boost 1.79 REQUIRED COMPONENTS thread system filesystem
 find_package(RadeonProRenderSDK REQUIRED COMPONENTS northstar tahoe)
 
 add_subdirectory(math)
-add_subdirectory(src)
+add_subdirectory(rprf)
 
 enable_testing()
 add_subdirectory(tests)

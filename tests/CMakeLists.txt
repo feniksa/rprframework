@@ -31,7 +31,7 @@ target_link_libraries(tests_main
 )
 target_include_directories(tests_main
 	PRIVATE
-	${CMAKE_SOURCE_DIR}/src
+	${CMAKE_SOURCE_DIR}/rprf
 	${CMAKE_CURRENT_BINARY_DIR}
 )
 
