@@ -1,7 +1,9 @@
 #pragma once
 
+#include <filesystem>
+
 namespace tests
 {
-	constexpr const char* CurrentWorkingDirectory = "@CMAKE_CURRENT_BINARY_DIR@";
-	constexpr const char* TestConfigurationFile = "@CMAKE_CURRENT_BINARY_DIR@/testconfig.ini";
+	static const std::filesystem::path CurrentWorkingDirectory = "@CMAKE_CURRENT_BINARY_DIR@";
+	static const std::filesystem::path TestConfigurationFile = "@CMAKE_CURRENT_BINARY_DIR@/testconfig.ini";
 }

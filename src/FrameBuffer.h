@@ -3,6 +3,7 @@
 #include "Context.h"
 #include "ComponentType.h"
 #include <vector>
+#include <filesystem>
 
 namespace rprf
 {
@@ -15,11 +16,11 @@ public:
 	size_t data(void* buffer, size_t size) const;
 	void data(std::vector<std::byte>* buffer) const;
 
-	void saveToFile(const std::string_view& fileName) const;
+	void saveToFile(const std::filesystem::path& path) const;
 
 	void clear();
 
-	size_t bufferSize() const;
+	std::size_t bufferSize() const;
 
 	int numComponents() const            { return m_numComponents; }
 	ComponentsType componentType() const { return m_componentType; }

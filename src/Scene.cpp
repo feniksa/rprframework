@@ -38,5 +38,18 @@ void Scene::setCamera(const Camera& camera)
 	check(status);
 }
 
+void Scene::detachShape(const Shape& light)
+{
+	int status;
+	status = rprSceneDetachShape(*this, light.instance());
+	check(status);
+}
+
+void Scene::detachLight(const Light& light)
+{
+	int status;
+	status = rprSceneDetachLight(*this, light.instance());
+	check(status);
+}
 
 }

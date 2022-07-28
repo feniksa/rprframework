@@ -5,13 +5,15 @@
 namespace rprf
 {
 
-Image::Image(Context& context, const char* fileName)
+Image::Image(Context& context, const std::filesystem::path& fileName)
 {
 	int status;
 	rpr_image image;
 
-	status = rprContextCreateImageFromFile(context.instance(), fileName, &image);
-	check(status);
+	std::string filePath = fileName.string();
+
+	status = rprContextCreateImageFromFile(context.instance(), filePath.c_str(), &image);
+	check(status, filePath);
 
 	setInstance(std::move(image));
 }

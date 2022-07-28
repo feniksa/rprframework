@@ -1,5 +1,6 @@
 #include "Error.h"
 #include <unordered_map>
+#include <sstream>
 
 namespace rprf
 {
@@ -9,12 +10,27 @@ Error::Error(rpr_int status)
   m_status(status)
 {
 }
-
-void check(rpr_int status)
+Error::Error(rpr_int status, std::string_view message)
+	: std::runtime_error(getErrorMessage(message, status)),
+	m_status(status)
 {
-	if (status != RPR_SUCCESS)
-		throw Error(status);
 }
+
+std::string Error::getErrorMessage(std::string_view message, rpr_int status)
+{
+	std::stringstream s;
+	switch (status)
+	{
+	case RPR_ERROR_IO_ERROR:
+		s << as_string(status) << ": Can't process file: " << message << "\n";
+		break;
+	default:
+		s << as_string(status) << ": " << message << "\n";
+		break;
+	}
+	return s.str();
+}
+
 
 const char* Error::as_string(rpr_int status) noexcept
 {

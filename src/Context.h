@@ -2,7 +2,7 @@
 
 #include "ContextObject.h"
 #include <RadeonProRender.h>
-#include <cstdint>
+#include <filesystem>
 
 namespace rprf
 {
@@ -13,7 +13,7 @@ class FrameBuffer;
 class Context : public ContextObject<rpr_context>
 {
 public:
-	Context(const Plugin& plugin, const std::string_view& cachePath = "", int createFlags = RPR_CREATION_FLAGS_ENABLE_GPU0);
+	Context(const Plugin& plugin, const std::filesystem::path& cachePath = "", int createFlags = RPR_CREATION_FLAGS_ENABLE_GPU0);
 
 	void setScene(const Scene& scene);
 	void setAOV(const FrameBuffer& frameBuffer);

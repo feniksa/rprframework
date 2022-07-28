@@ -17,6 +17,10 @@ public:
 	void attachShape(const Shape& shape);
 	void attachLight(const Light& light);
 	void setCamera(const Camera& camera);
+
+
+	void detachShape(const Shape& shape);
+	void detachLight(const Light& light);
 };
 
 }

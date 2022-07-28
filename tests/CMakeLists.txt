@@ -35,17 +35,32 @@ target_include_directories(tests_main
 	${CMAKE_CURRENT_BINARY_DIR}
 )
 
-set (RESOURCES
-)
-
 configure_file(Environment.h.in ${CMAKE_CURRENT_BINARY_DIR}/Environment.h @ONLY)
 configure_file(testconfig.ini.in ${CMAKE_CURRENT_BINARY_DIR}/testconfig.ini @ONLY)
 
-foreach(resource ${RESOURCES})
-    configure_file(${resource} ${CMAKE_CURRENT_BINARY_DIR}/${resource} COPYONLY)
+foreach(dll ${RadeonProRender_DLLS})	
+	configure_file(${dll} ${CMAKE_CURRENT_BINARY_DIR} COPYONLY)
+	add_custom_command(
+                TARGET tests_main POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E copy_if_different "${dll}" "${CMAKE_CURRENT_BINARY_DIR}/${file_name}"
+                COMMENT "Copying dll's: ${dll}")    
 endforeach()
 
-foreach(dll ${RadeonProRender_DLLS})
-	message(STATUS ${dll})
-	configure_file(${dll} ${CMAKE_CURRENT_BINARY_DIR} COPYONLY)
+file(GLOB RESOURCES_textures Resources/Textures/*)
+foreach(resource ${RESOURCES_textures})
+	get_filename_component(file_name "${resource}" NAME)
+	add_custom_command(
+                TARGET tests_main POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E copy_if_different "${resource}" "${CMAKE_CURRENT_BINARY_DIR}/Resources/Textures/${file_name}"
+                COMMENT "Copying resource file: ${resource}")    
 endforeach()
+
+file(GLOB RESOURCES_meshes Resources/Meshes/*)
+foreach(resource ${RESOURCES_meshes})
+	get_filename_component(file_name "${resource}" NAME)
+	add_custom_command(
+                TARGET tests_main POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E copy_if_different "${resource}" "${CMAKE_CURRENT_BINARY_DIR}/Resources/Meshes/${file_name}"
+                COMMENT "Copying resource file: ${resource}")    
+endforeach()
+

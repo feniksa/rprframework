@@ -40,14 +40,14 @@ void FrameBuffer::clear()
 	check(status);
 }
 
-void FrameBuffer::saveToFile(const std::string_view& name) const
+void FrameBuffer::saveToFile(const std::filesystem::path& path) const
 {
 	int status;
-	status = rprFrameBufferSaveToFile(instance(), name.data());
+	status = rprFrameBufferSaveToFile(instance(), path.string().c_str());
 	check(status);
 }
 
-size_t FrameBuffer::bufferSize() const
+std::size_t FrameBuffer::bufferSize() const
 {
 	size_t size;
 	int status;

@@ -1,6 +1,6 @@
 #include "LightEnvironment.h"
 #include "Error.h"
-//#include "Image.h"
+#include "Image.h"
 
 namespace rprf
 {
@@ -16,12 +16,12 @@ LightEnvironment::LightEnvironment(Context& context)
 	setInstance(std::move(light));
 }
 
-/*void LightEnvironment::setImage(Image& image)
+void LightEnvironment::setImage(Image& image)
 {
 	int status;
 	status = rprEnvironmentLightSetImage(*this, image.instance());
 	check(status);
-}*/
+}
 
 void LightEnvironment::setIntensityScale(float intensityScale)
 {
