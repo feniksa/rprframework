@@ -64,8 +64,9 @@ add_executable(rpr ${SOURCES} ${HEADERS} main.cpp)
 target_link_libraries(rpr rprf)
 
 if(FORCE_UPDATE_ENUMS)
-	add_custom_command(
-		TARGET rprf PRE_BUILD
+	add_custom_command(		
+		OUTPUT "${CMAKE_CURRENT_SOURCE_DIR}/RadeonProRenderEnums.h" 
+		#TARGET rprf PRE_BUILD
 		COMMAND python "${CMAKE_SOURCE_DIR}/utils/convert.py"
 		ARGS -i "${RPR_INCLUDE_DIR}/RadeonProRender.h" -o "${CMAKE_CURRENT_SOURCE_DIR}/RadeonProRenderEnums.h"
 	)
