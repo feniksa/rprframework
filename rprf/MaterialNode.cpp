@@ -18,38 +18,38 @@ MaterialNode::MaterialNode(MaterialSystem& matsys, MaterialNodeType type)
 }
 
 
-void MaterialNode::setParameter1u(unsigned int parameter, unsigned int x)
+void MaterialNode::setParameter1u(MaterialInputType parameter, unsigned int x)
 {
 	rpr_int status;
-	status = rprMaterialNodeSetInputUByKey(*this, parameter, x);
+	status = rprMaterialNodeSetInputUByKey(*this, static_cast<int>(parameter), x);
 	check(status);
 }
 
-void MaterialNode::setParameter4f(unsigned int parameter, float x, float y, float z, float w)
+void MaterialNode::setParameter4f(MaterialInputType parameter, float x, float y, float z, float w)
 {
 	rpr_int status;
-	status = rprMaterialNodeSetInputFByKey(*this, parameter, x, y, z, w);
+	status = rprMaterialNodeSetInputFByKey(*this, static_cast<int>(parameter), x, y, z, w);
 	check(status);
 }
 
-void MaterialNode::setParameterNode(unsigned int parameter, const MaterialNode& node)
+void MaterialNode::setParameterNode(MaterialInputType parameter, const MaterialNode& node)
 {
 	rpr_int status;
-	status = rprMaterialNodeSetInputNByKey(*this, parameter, node.instance());
+	status = rprMaterialNodeSetInputNByKey(*this, static_cast<int>(parameter), node.instance());
 	check(status);
 }
 
-void MaterialNode::setParameterImage(unsigned int parameter, const Image& image)
+void MaterialNode::setParameterImage(MaterialInputType parameter, const Image& image)
 {
 	rpr_int status;
-	status = rprMaterialNodeSetInputImageDataByKey(*this, parameter, image.instance());
+	status = rprMaterialNodeSetInputImageDataByKey(*this, static_cast<int>(parameter), image.instance());
 	check(status);
 }
 
-void MaterialNode::setParameterFrameBuffer(unsigned int parameter, const FrameBuffer& frameBuffer)
+void MaterialNode::setParameterFrameBuffer(MaterialInputType parameter, const FrameBuffer& frameBuffer)
 {
 	rpr_int status;
-	status = rprMaterialNodeSetInputBufferDataByKey(*this, parameter, frameBuffer.instance());
+	status = rprMaterialNodeSetInputBufferDataByKey(*this, static_cast<int>(parameter), frameBuffer.instance());
 	check(status);
 }
 

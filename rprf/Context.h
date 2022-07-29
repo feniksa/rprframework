@@ -1,7 +1,7 @@
 #pragma once
 
 #include "ContextObject.h"
-#include <RadeonProRender.h>
+#include "RadeonProRenderEnums.h"
 #include <filesystem>
 
 namespace rprf
@@ -20,8 +20,8 @@ public:
 	void unsetAOV();
 	void resolve(FrameBuffer* src, FrameBuffer* dst, bool noDisplayGamma = true);
 
-	void setParameter1u(unsigned int name, unsigned int value);
-	void setParameter1f(unsigned int name, float value);
+	void setParameter1u(ContextInputType parameter, unsigned int value);
+	void setParameter1f(ContextInputType parameter, float value);
 
 	void render();
 

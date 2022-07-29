@@ -1,3 +1,4 @@
+
 set(HEADERS
 	CameraType.h
 	Camera.h
@@ -20,8 +21,8 @@ set(HEADERS
 	FrameBufferSysmem.h
 	MaterialSystem.h
 	MaterialNode.h
-	MaterialNodeType.h
 	Image.h
+	RadeonProRenderEnums.h
 )
 
 set(SOURCES
@@ -61,3 +62,12 @@ target_link_libraries(rprf PUBLIC
 
 add_executable(rpr ${SOURCES} ${HEADERS} main.cpp) 
 target_link_libraries(rpr rprf)
+
+if(FORCE_UPDATE_ENUMS)
+	add_custom_command(
+		TARGET rprf PRE_BUILD
+		COMMAND python "${CMAKE_SOURCE_DIR}/utils/convert.py"
+		ARGS -i "${RPR_INCLUDE_DIR}/RadeonProRender.h" -o "${CMAKE_CURRENT_SOURCE_DIR}/RadeonProRenderEnums.h"
+	)
+endif()
+

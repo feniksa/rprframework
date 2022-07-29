@@ -127,7 +127,7 @@ TEST_F(TestNorthstar, scene_creation)
 	FrameBuffer frameBufferResolved(frameBuffer.clone());
 
 	context.setAOV(frameBuffer);
-	context.setParameter1u(RPR_CONTEXT_ITERATIONS, 60);
+	context.setParameter1u(ContextInputType::Iterations, 60);
 
 	context.render();
 	context.resolve(&frameBuffer, &frameBufferResolved, false);
@@ -155,15 +155,15 @@ TEST_F(TestNorthstar, scene_creation)
 	MaterialSystem materialSystem(context);
 
 	MaterialNode diffuse1(materialSystem, MaterialNodeType::Diffuse);
-	diffuse1.setParameter4f(RPR_MATERIAL_INPUT_COLOR, 0.6f, 0.4f, 1.0f, 0.0f);
+	diffuse1.setParameter4f(MaterialInputType::Color, 0.6f, 0.4f, 1.0f, 0.0f);
 	cube.setMaterial(diffuse1);
 
 	MaterialNode diffuse2(materialSystem, MaterialNodeType::Diffuse);
-	diffuse2.setParameter4f(RPR_MATERIAL_INPUT_COLOR, 1.0f, 0.5f, 0.0f, 0.0f);
+	diffuse2.setParameter4f(MaterialInputType::Color, 1.0f, 0.5f, 0.0f, 0.0f);
 	cubeInstance.setMaterial(diffuse2);
 
 	MaterialNode diffuse3(materialSystem, MaterialNodeType::Diffuse);
-	diffuse3.setParameter4f(RPR_MATERIAL_INPUT_COLOR, 0.1f, 0.8f, 1.0f, 0.0f);
+	diffuse3.setParameter4f(MaterialInputType::Color, 0.1f, 0.8f, 1.0f, 0.0f);
 	plane.setMaterial(diffuse3);
 
 	frameBuffer.clear();
@@ -177,10 +177,10 @@ TEST_F(TestNorthstar, scene_creation)
 	const Image image1(context, CurrentWorkingDirectory / "Resources/Textures/lead_rusted_Base_Color.jpg");
 
 	MaterialNode imageMaterial1(materialSystem, MaterialNodeType::ImageTexture);
-	imageMaterial1.setParameterImage(RPR_MATERIAL_INPUT_DATA, image1);
+	imageMaterial1.setParameterImage(MaterialInputType::Data, image1);
 
 	MaterialNode diffuse4(materialSystem, MaterialNodeType::Diffuse);
-	diffuse4.setParameterNode(RPR_MATERIAL_INPUT_COLOR, imageMaterial1);
+	diffuse4.setParameterNode(MaterialInputType::Color, imageMaterial1);
 
 	cube.setMaterial(diffuse4);
 
@@ -188,33 +188,33 @@ TEST_F(TestNorthstar, scene_creation)
 	const Image image2(context, CurrentWorkingDirectory / "Resources/Textures/amd.png");
 
 	MaterialNode imageMaterial2(materialSystem, MaterialNodeType::ImageTexture);
-	imageMaterial2.setParameterImage(RPR_MATERIAL_INPUT_DATA, image2);
+	imageMaterial2.setParameterImage(MaterialInputType::Data, image2);
 
 	MaterialNode diffuse5(materialSystem, MaterialNodeType::Diffuse);
-	diffuse5.setParameterNode(RPR_MATERIAL_INPUT_COLOR, imageMaterial2);
+	diffuse5.setParameterNode(MaterialInputType::Color, imageMaterial2);
 
 
 	// create a Lookup material and define it as a "UV Lookup" meaning the output of this material is the UV from the shape.
 	// Lookup nodes are useful to create procedural materials.
 	// UV-Lookup are often used to scale textures on shapes.
 	MaterialNode uv_node(materialSystem, MaterialNodeType::InputLookup);
-	uv_node.setParameter1u(RPR_MATERIAL_INPUT_VALUE, RPR_MATERIAL_NODE_LOOKUP_UV);
+	uv_node.setParameter1u(MaterialInputType::Value, RPR_MATERIAL_NODE_LOOKUP_UV);
 
 
 	// adjust the texture scale by multiplying the the UV by a constant
 	MaterialNode uv_scaled_node(materialSystem, MaterialNodeType::Arithmetic);
-	uv_scaled_node.setParameter1u(RPR_MATERIAL_INPUT_OP, RPR_MATERIAL_NODE_OP_MUL);
-	uv_scaled_node.setParameterNode(RPR_MATERIAL_INPUT_COLOR0, uv_node);
-	uv_scaled_node.setParameter4f(RPR_MATERIAL_INPUT_COLOR1, 4.0f, 12.0f, 0.0f, 0.0f);
+	uv_scaled_node.setParameter1u(MaterialInputType::Op, RPR_MATERIAL_NODE_OP_MUL);
+	uv_scaled_node.setParameterNode(MaterialInputType::Color0, uv_node);
+	uv_scaled_node.setParameter4f(MaterialInputType::Color1, 4.0f, 12.0f, 0.0f, 0.0f);
 
 
 	// apply this modified UV to the image material.
-	imageMaterial2.setParameterNode(RPR_MATERIAL_INPUT_UV, uv_scaled_node);
+	imageMaterial2.setParameterNode(MaterialInputType::Uv, uv_scaled_node);
 	plane.setMaterial(diffuse5);
 
 	// create a simple reflection material and apply it on the cube_instance
 	MaterialNode reflection1(materialSystem, MaterialNodeType::Reflection);
-	reflection1.setParameter4f(RPR_MATERIAL_INPUT_COLOR,1.0f, 1.0f, 1.0f, 0.0f);
+	reflection1.setParameter4f(MaterialInputType::Color,1.0f, 1.0f, 1.0f, 0.0f);
 	cubeInstance.setMaterial(reflection1);
 
 	scene.detachLight(pointLight);
@@ -227,7 +227,7 @@ TEST_F(TestNorthstar, scene_creation)
 
 	scene.attachLight(lightEnvironemt);
 	camera.lookAt(0, 4, 10, 0, 1, 0, 0, 1, 0);
-	context.setParameter1f(RPR_CONTEXT_DISPLAY_GAMMA, 2.2f);
+	context.setParameter1f(ContextInputType::DisplayGamma, 2.2f);
 
 	frameBuffer.clear();
 	context.render();
