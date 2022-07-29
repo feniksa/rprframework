@@ -69,7 +69,7 @@ if(FORCE_UPDATE_ENUMS)
 		#TARGET rprf PRE_BUILD
 		COMMAND python "${CMAKE_SOURCE_DIR}/utils/convert.py"
 		ARGS -i "${RPR_INCLUDE_DIR}/RadeonProRender.h" -o "${CMAKE_CURRENT_SOURCE_DIR}/RadeonProRenderEnums.h"
-		DEPENDS "${RPR_INCLUDE_DIR}/RadeonProRender.h"
+		DEPENDS "${RPR_INCLUDE_DIR}/RadeonProRender.h" "${CMAKE_SOURCE_DIR}/utils/convert.py"
 	)
 endif()
 

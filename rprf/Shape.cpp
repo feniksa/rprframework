@@ -69,4 +69,11 @@ void Shape::setVisibility(bool visibility)
 	check(status);
 }
 
+void Shape::setVisibilityType(ShapeVisibilityType parameter, bool visible)
+{
+	int status;
+	status = rprShapeSetVisibilityFlag(*this, static_cast<unsigned int>(parameter), visible);
+	check(status);
+}
+
 } // namespace

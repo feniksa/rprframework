@@ -234,4 +234,45 @@ TEST_F(TestNorthstar, scene_creation)
 	context.resolve(&frameBuffer, &frameBufferResolved, false);
 
 	frameBufferResolved.saveToFile(m_tempDir / "scene_creation02.png");
+
+	// ----------------------------------------------------------------------
+	// animate scene
+	// ----------------------------------------------------------------------
+	camera.lookAt(0.0f, 4.0f, 9.0f,
+		0.0f, 0.0f, 0.0f, 
+		0.0f, 1.0f, 0.0f);
+
+	cubeInstance.setTransform(
+		rprf_math::translation(rprf_math::float3(1.0f, 1.0f, -3.0f))*
+		rprf_math::rotation_y(0.7f) *
+		rprf_math::scale(rprf_math::float3(1.0f, 1.0f, 4.0f)), true
+	);
+
+	// change scaling of the AMD logo on the floor
+	uv_scaled_node.setParameter4f(MaterialInputType::Color1, 10.0f, 20.0f, 0.0f, 0.0f);
+
+	// replace the material on cuve by an emissive one.
+	MaterialNode emissive(materialSystem, MaterialNodeType::Emissive);
+	emissive.setParameter4f(MaterialInputType::Color, 6.0f, 3.0f, 0.0f, 0.0f);
+
+	cube.setMaterial(emissive);
+	cube.setTransform(
+		rprf_math::translation(rprf_math::float3(-2.0f, 0.7f, 0.0f))*
+		rprf_math::rotation_y(0.0f) *
+		rprf_math::scale(rprf_math::float3(0.5f, 0.5f, 0.5f)), true
+	);
+
+	cube.setVisibilityType(ShapeVisibilityType::Shadow, false);
+
+	// remove the Env light, and use the point light again.
+	scene.attachLight(pointLight);
+	scene.detachLight(lightEnvironemt);
+
+	context.setParameter1u(ContextInputType::Iterations, 120);
+
+	frameBuffer.clear();
+
+	context.render();
+	context.resolve(&frameBuffer, &frameBufferResolved, false);
+	frameBufferResolved.saveToFile(m_tempDir / "scene_creation03.png");
 }

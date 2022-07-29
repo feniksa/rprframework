@@ -2,7 +2,7 @@
 
 #include "Context.h"
 #include "math/matrix.h"
-#include <vector>
+#include "RadeonProRenderEnums.h"
 
 namespace rprf
 {
@@ -25,6 +25,7 @@ public:
 	void setTransform(const rprf_math::matrix& transform, bool transpose);
 	void setMaterial(const MaterialNode&);
 	void setVisibility(bool visibility);
+	void setVisibilityType(ShapeVisibilityType parameter, bool visible);
 private:
 	Context& m_context;
 };

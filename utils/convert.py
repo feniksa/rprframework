@@ -35,6 +35,18 @@ def make_name_context(s:str):
 
     return r
 
+def make_shape_visibility(s:str):
+    r: str = ""
+    words = s.split('_')
+    for l in words:
+        r += l.capitalize()
+
+    if r.isnumeric():
+        r = "Visibility" + r
+
+    return r
+
+
 
 
 # Initialize parser
@@ -66,10 +78,13 @@ if not args.output:
 material_inputs = []
 material_nodetypes = []
 context_input_types = []
+shape_visibility_types = []
 
 prog_material_input = re.compile('#define\s+RPR_MATERIAL_INPUT_([A-Za-z0-9_]+)\s+(0x[0-9abcdefABCDEF]+)')
 prog_material_node = re.compile('#define\s+RPR_MATERIAL_NODE_([A-Za-z0-9_]+)\s+(0x[0-9abcdefABCDEF]+)')
 prog_context = re.compile('#define\s+RPR_CONTEXT_([A-Za-z0-9_]+)\s+(0x[0-9abcdefABCDEF]+)')
+prog_shape_visibility = re.compile('#define\s+RPR_SHAPE_VISIBILITY_([A-Za-z0-9_]+)\s+(0x[0-9abcdefABCDEF]+)')
+
 with open(args.input) as file:
     for line in file:
         txt = line.rstrip()
@@ -94,6 +109,15 @@ with open(args.input) as file:
             define_name = matches[1]
             hex_code = matches[2]
             context_input_types.append(define_name)
+
+        # RPR_SHAPE_VISIBILITY
+        matches = prog_shape_visibility.match(txt)
+        if matches:
+            define_name = matches[1]
+            hex_code = matches[2]
+            shape_visibility_types.append(define_name)
+
+
 
     
 with open(args.output, "w") as fout:
@@ -123,6 +147,14 @@ with open(args.output, "w") as fout:
     for n in material_nodetypes:
         fout.write("\t\t{case}\t\t = RPR_MATERIAL_NODE_{define},\n".format(case=make_name_node(n), define=n))
     fout.write("\t};\n") # end class MaterilNodeType
+
+    fout.write("\n")
+
+    fout.write("\tenum class ShapeVisibilityType {\n") # enum ShapeVisibilityType
+    for n in shape_visibility_types:
+        fout.write("\t\t{case}\t\t = RPR_SHAPE_VISIBILITY_{define},\n".format(case=make_shape_visibility(n), define=n))
+    fout.write("\t};\n") # end class ShapeVisibilityType
+
 
     fout.write("} // namespace\n")
 
