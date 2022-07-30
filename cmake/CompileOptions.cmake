@@ -10,7 +10,8 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "GN
             "-Woverloaded-virtual"
             "-Wuninitialized"
             "-Wmissing-declarations"
-            "-Winit-self")
+            "-Winit-self"
+            "-Wstrict-aliasing")
 endif()
 
 if (${FORCE_COLORED_OUTPUT})

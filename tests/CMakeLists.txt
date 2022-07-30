@@ -12,6 +12,7 @@ set (TESTS
 	Dummy
 	Renderer
 	Northstar
+	Riff
 )
 
 foreach(test ${TESTS})
@@ -26,13 +27,14 @@ endforeach()
 add_executable(tests_main ${TEST_SOURCES} ${HEADERS} ${SOURCES})
 target_link_libraries(tests_main 
 	rprf
+	riff
 	GTest::gtest
 	GTest::gtest_main
 )
 target_include_directories(tests_main
 	PRIVATE
-	${CMAKE_SOURCE_DIR}/rprf
-	${CMAKE_CURRENT_BINARY_DIR}
+	"${CMAKE_SOURCE_DIR}"
+	"${CMAKE_CURRENT_BINARY_DIR}"
 )
 
 configure_file(Environment.h.in ${CMAKE_CURRENT_BINARY_DIR}/Environment.h @ONLY)
