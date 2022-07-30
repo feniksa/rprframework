@@ -24,8 +24,7 @@ Prepare and install prerequisited
    - Unzip somewhere
    - Go to unziped directory and create ```build``` directory
    - Create VS solution file with command
-      ```cmake -G "Visual Studio 17 2022" -A x64 -DCMAKE_INSTALL_PREFIX="c:/libs/gtest" -Dgtest_force_shared_crt=true ..
-```
+      ```cmake -G "Visual Studio 17 2022" -A x64 -DCMAKE_INSTALL_PREFIX="c:/libs/gtest" -Dgtest_force_shared_crt=true ..```
    - Open solution file in studio and compile
       - After compile, rigth click on INSTALL project and select 
 	  *Build* from context menu
@@ -34,5 +33,5 @@ Prepare and install prerequisited
    - Clone RadeonProRenderSDK
      ```git clone https://github.com/GPUOpen-LibrariesAndSDKs/RadeonProRenderSDK.git c:/libs/RadeonProRenderSDK```
    - Setup environment variable ```RPR_SDK_ROOT``` to cloned directory ```c:/libs/RadeonProRenderSDK```
-5. 
+5. Generate Visual Studio 2022 solution file 
     cmake -G "Visual Studio 17 2022" -A x64 ..
