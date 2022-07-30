@@ -18,9 +18,9 @@ struct TestRiff : public ::testing::Test
 
 TEST_F(TestRiff, create_context)
 {
-	int devices = getDeviceCount(BackendType::Openc);
-	std::cout << "Available riff devices: " << devices << "\n";
-	ASSERT_TRUE(devices > 0);
+	auto devices = getAvailableDevices(BackendType::Openc);
+	std::cout << "Available riff devices: " << devices.size() << "\n";
+	ASSERT_TRUE(devices.size() > 0);
 
-	printAvailableDevices(BackendType::Openc, std::cout);
+	printAvailableDevices(devices, std::cout);
 }

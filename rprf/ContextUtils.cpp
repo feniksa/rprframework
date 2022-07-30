@@ -103,8 +103,6 @@ gpu_list_t getAvailableDevices(const Plugin& plugin, const char* cachePath)
 
 std::ostream& printAvailableDevices(const gpu_list_t& devices, std::ostream& stream)
 {
-	stream << "Available GPU's for render:\n";
-
 	for (const auto&[gpu_index, gpu_name] : devices) {
 		stream << GetDeviceIndexInRprNamespace(gpu_index) << ":\t" << gpu_name << "\n";
 	}

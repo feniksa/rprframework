@@ -24,9 +24,7 @@ std::string getDeviceVendor(BackendType backend, int deviceIndex);
 std::size_t getDeviceMemorySize(BackendType backend, int deviceIndex);
 std::string getDeviceName(BackendType backend, int deviceIndex);
 
-std::ostream& printAvailableDevices(BackendType backend, std::ostream& stream);
-
+std::ostream& printAvailableDevices(const gpu_list_t& gpus, std::ostream& stream);
 std::ostream& operator<<(std::ostream& stream, const GpuInfo& gpuInfo);
-
 
 } // namespace

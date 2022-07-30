@@ -1,17 +1,19 @@
 #include "ContextUtils.h"
 #include "Error.h"
 #include <RadeonImageFilters.h>
+#include <iomanip>
 #include <iostream>
 #include <cassert>
 
 namespace
 {
 
-constexpr std::size_t convertBytesToGigabytes(size_t bytes)
+constexpr float convertBytesToGigabytes(size_t bytes)
 {
-	return bytes / 1024 / 1024 / 1024;
+	return static_cast<float>(bytes) / 1024.0f / 1024.0f / 1024.0f;
 }
-}
+
+} // namespace
 
 namespace riff
 {
@@ -139,21 +141,21 @@ int getDeviceCount(BackendType backend)
 
 std::ostream& operator<<(std::ostream& stream, const GpuInfo& gpuInfo)
 {
-	stream << gpuInfo.gpuName << "\n";
-	stream << gpuInfo.vendorName << "\n";
-	stream << convertBytesToGigabytes( gpuInfo.gpuMemorySizeInBytes) << " Gb";
+	stream << gpuInfo.gpuName << " ";
+
+	auto flags = stream.flags();
+	stream << std::fixed << std::setprecision(2) << convertBytesToGigabytes( gpuInfo.gpuMemorySizeInBytes) << " Gb";
+	stream.flags(flags);
 
 	return stream;
 }
 
-std::ostream& printAvailableDevices(BackendType backend, std::ostream& stream)
+std::ostream& printAvailableDevices(const gpu_list_t& gpus, std::ostream& stream)
 {
-	auto gpus = getAvailableDevices(backend);
 	for(const auto& gpu : gpus)
 	{
 		stream << gpu << "\n";
 	}
-
 
 	return stream;
 }
