@@ -48,7 +48,7 @@ foreach(dll ${RadeonProRender_DLLS})
                 COMMENT "Copying rpr dll's: ${dll}")    
 endforeach()
 
-foreach(dll ${RadeonProRender_DLLS})
+foreach(dll ${RadeonImageFilter_DLLS})
 	configure_file(${dll} ${CMAKE_CURRENT_BINARY_DIR} COPYONLY)
 	add_custom_command(
                 TARGET tests_main POST_BUILD

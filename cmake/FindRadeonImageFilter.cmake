@@ -28,6 +28,17 @@ if (WIN32)
 	if (RadeonImageFilter_rif_dll)
 		list(APPEND RadeonImageFilter_DLLS ${RadeonImageFilter_rif_dll})
 	endif()
+
+	find_file(RadeonImageFilter_rif_ml_dll
+			NAMES "RadeonML.dll"
+			HINTS
+			"${RIF_SDK_ROOT}"
+			ENV RIF_SDK_ROOT
+			PATH_SUFFIXES Windows/Dynamic-MT)
+
+	if (RadeonImageFilter_rif_ml_dll)
+		list(APPEND RadeonImageFilter_DLLS ${RadeonImageFilter_rif_ml_dll})
+	endif()
 endif()
 
 function(process_rif_version)
