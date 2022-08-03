@@ -1,6 +1,6 @@
 #pragma once
 
-#include "RadeonImageFilters.h"
+#include <RadeonImageFilters.h>
 #include "Error.h"
 #include <exception>
 #include <stdexcept>

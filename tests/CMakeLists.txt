@@ -45,8 +45,18 @@ foreach(dll ${RadeonProRender_DLLS})
 	add_custom_command(
                 TARGET tests_main POST_BUILD
                 COMMAND ${CMAKE_COMMAND} -E copy_if_different "${dll}" "${CMAKE_CURRENT_BINARY_DIR}/${file_name}"
-                COMMENT "Copying dll's: ${dll}")    
+                COMMENT "Copying rpr dll's: ${dll}")    
 endforeach()
+
+foreach(dll ${RadeonProRender_DLLS})
+	configure_file(${dll} ${CMAKE_CURRENT_BINARY_DIR} COPYONLY)
+	add_custom_command(
+                TARGET tests_main POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E copy_if_different "${dll}" "${CMAKE_CURRENT_BINARY_DIR}/${file_name}"
+                COMMENT "Copying rif dll's: ${dll}")    
+endforeach()
+
+
 
 file(GLOB RESOURCES_textures Resources/Textures/*)
 foreach(resource ${RESOURCES_textures})

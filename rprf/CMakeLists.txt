@@ -49,7 +49,7 @@ set(SOURCES
 )
 
 add_library(rprf STATIC ${SOURCES} ${HEADERS})
-target_include_directories(rprf PUBLIC "${CMAKE_SOURCE_DIR}" Boost::beast Boost::log)
+target_include_directories(rprf PUBLIC "${CMAKE_SOURCE_DIR}" Boost::log)
 target_link_libraries(rprf PUBLIC 
 	rprf_math
 	Boost::system

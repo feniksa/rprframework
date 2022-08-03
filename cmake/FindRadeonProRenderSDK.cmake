@@ -1,6 +1,7 @@
 find_path(RPR_INCLUDE_DIR 
 	NAME RadeonProRender.h
 	HINTS /usr /usr/local/include 
+	"${RPR_SDK_ROOT}"
 	ENV RPR_SDK_ROOT
     	PATH_SUFFIXES RadeonProRender/inc
 )
@@ -9,6 +10,7 @@ find_library(RPR_LIBRARY
 	NAMES
 	RadeonProRender64
 	HINTS /usr/lib64 /usr/loca/lib64 
+	"${RPR_SDK_ROOT}"
 	ENV RPR_SDK_ROOT
 	PATH_SUFFIXES RadeonProRender/binUbuntu18 
 	              RadeonProRender/libWin64
@@ -19,6 +21,7 @@ if (WIN32)
 	find_file(RadeonProRenderSDK_radeonprorender_dll 
 		NAMES "RadeonProRender64.dll"
 		HINTS
+		"${RPR_SDK_ROOT}"
 		ENV RPR_SDK_ROOT
 		PATH_SUFFIXES RadeonProRender/binWin64)
 
@@ -51,6 +54,7 @@ macro(find_tahoe)
 		NAMES
 		Tahoe64
 		HINTS /usr/lib64 /usr/loca/lib64
+		"${RPR_SDK_ROOT}"
 		ENV RPR_SDK_ROOT
 		PATH_SUFFIXES RadeonProRender/binUbuntu18
 	     		      RadeonProRender/libWin64
@@ -60,6 +64,7 @@ macro(find_tahoe)
 		find_file(RadeonProRenderSDK_tahoe_dll 
 			NAMES "Tahoe.dll"
 			HINTS
+			"${RPR_SDK_ROOT}"
 			ENV RPR_SDK_ROOT
 			PATH_SUFFIXES RadeonProRender/binWin64)
 		if (RadeonProRenderSDK_tahoe_dll)
@@ -81,6 +86,7 @@ macro(find_northstar)
 		NAMES
 		Northstar64
 		HINTS /usr/lib64 /usr/loca/lib64
+		"${RPR_SDK_ROOT}"
 		ENV RPR_SDK_ROOT
 		PATH_SUFFIXES RadeonProRender/binUbuntu18
 	     		      RadeonProRender/libWin64
@@ -91,6 +97,7 @@ macro(find_northstar)
 		find_file(RadeonProRenderSDK_northstar_dll 
 			NAMES "Northstar64.dll"
 			HINTS
+			"${RPR_SDK_ROOT}"
 			ENV RPR_SDK_ROOT
 			PATH_SUFFIXES RadeonProRender/binWin64)
 		if (RadeonProRenderSDK_northstar_dll)
@@ -109,6 +116,7 @@ macro(find_hybrid)
 		NAMES
 		Hybrid
 		HINTS /usr/lib64 /usr/loca/lib64
+		"${RPR_SDK_ROOT}"
 		ENV RPR_SDK_ROOT
 		PATH_SUFFIXES RadeonProRender/binUbuntu18
 	     		      RadeonProRender/libWin64
@@ -118,6 +126,7 @@ macro(find_hybrid)
 		find_file(RadeonProRenderSDK_hybrid_dll 
 			NAMES "Hybrid.dll"
 			HINTS
+			"${RPR_SDK_ROOT}"
 			ENV RPR_SDK_ROOT
 			PATH_SUFFIXES RadeonProRender/binWin64)
 		if (RadeonProRenderSDK_hybrid_dll)

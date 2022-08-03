@@ -1,17 +1,19 @@
 find_path(RIF_INCLUDE_DIR 
 	NAME RadeonImageFilters.h
 	HINTS /usr /usr/local/include 
+	"${RIF_SDK_ROOT}"
 	ENV RIF_SDK_ROOT
-    PATH_SUFFIXES RadeonImageFilter/include
+    PATH_SUFFIXES include
 )
 
 find_library(RIF_LIBRARY 
 	NAMES
 	RadeonImageFilters
 	HINTS /usr/lib64 /usr/loca/lib64 
+	"${RIF_SDK_ROOT}"
 	ENV RIF_SDK_ROOT
-	PATH_SUFFIXES Ubuntu20/Dynamic/
-				  Windows/Windows/Dynamic-MT
+	PATH_SUFFIXES 	Ubuntu20/Dynamic/
+			Windows/Dynamic-MT
 )
 
 set(RadeonImageFilter_DLLS "")
@@ -19,8 +21,9 @@ if (WIN32)
 	find_file(RadeonImageFilter_rif_dll 
 		NAMES "RadeonImageFilters.dll"
 		HINTS
+		"${RIF_SDK_ROOT}"
 		ENV RIF_SDK_ROOT
-		PATH_SUFFIXES RadeonImageFilter/Windows/Dynamic-MT)
+		PATH_SUFFIXES Windows/Dynamic-MT)
 
 	if (RadeonImageFilter_rif_dll)
 		list(APPEND RadeonImageFilter_DLLS ${RadeonImageFilter_rif_dll})
@@ -55,11 +58,13 @@ find_package_handle_standard_args(RadeonImageFilter
 if(RadeonImageFilter_FOUND)
 	set(RadeonImageFilter_INCLUDE_DIRS ${RIF_INCLUDE_DIR})
 	set(RadeonImageFilter_LIBRARIES ${RIF_LIBRARY})	
-	
+
 	if(NOT TARGET RadeonImageFillter::RIF)
 		add_library(RadeonImageFilter::RIF INTERFACE IMPORTED)
 		set_target_properties(RadeonImageFilter::RIF PROPERTIES
-			INTERFACE_INCLUDE_DIRECTORIES "${RIF_INCLUDE_DIR}"
-			INTERFACE_LINK_LIBRARIES "${RIF_LIBRARY}")
+				IMPORTED_LINK_INTERFACE_LANGUAGES "C"
+				INTERFACE_LINK_LIBRARIES "${RIF_LIBRARY}"
+				INTERFACE_INCLUDE_DIRECTORIES "${RIF_INCLUDE_DIR}"
+				)
 	endif()
 endif()
