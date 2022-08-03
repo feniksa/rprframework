@@ -41,7 +41,8 @@ configure_file(Environment.h.in ${CMAKE_CURRENT_BINARY_DIR}/Environment.h @ONLY)
 configure_file(testconfig.ini.in ${CMAKE_CURRENT_BINARY_DIR}/testconfig.ini @ONLY)
 
 foreach(dll ${RadeonProRender_DLLS})	
-	configure_file(${dll} ${CMAKE_CURRENT_BINARY_DIR} COPYONLY)
+	#configure_file(${dll} ${CMAKE_CURRENT_BINARY_DIR} COPYONLY)
+	get_filename_component(file_name "${resource}" NAME)
 	add_custom_command(
                 TARGET tests_main POST_BUILD
                 COMMAND ${CMAKE_COMMAND} -E copy_if_different "${dll}" "${CMAKE_CURRENT_BINARY_DIR}/${file_name}"
@@ -49,7 +50,8 @@ foreach(dll ${RadeonProRender_DLLS})
 endforeach()
 
 foreach(dll ${RadeonImageFilter_DLLS})
-	configure_file(${dll} ${CMAKE_CURRENT_BINARY_DIR} COPYONLY)
+	#configure_file(${dll} ${CMAKE_CURRENT_BINARY_DIR} COPYONLY)
+	get_filename_component(file_name "${resource}" NAME)
 	add_custom_command(
                 TARGET tests_main POST_BUILD
                 COMMAND ${CMAKE_COMMAND} -E copy_if_different "${dll}" "${CMAKE_CURRENT_BINARY_DIR}/${file_name}"
