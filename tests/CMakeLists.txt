@@ -3,6 +3,12 @@ find_package(GTest REQUIRED)
 set(HEADERS
 	StreamRedirector.h
 	CommonData.h
+
+	ImageTools/ImageTools.h
+	ImageTools/stb_image.h
+	ImageTools/stb_image_write.h
+	ImageTools/tinyexr.h
+	ImageTools/Half/half.hpp
 )
 set(SOURCES
 	CommonData.cpp
@@ -78,3 +84,11 @@ foreach(resource ${RESOURCES_meshes})
                 COMMENT "Copying resource file: ${resource}")    
 endforeach()
 
+file(GLOB RESOURCES_images Resources/Images/*)
+foreach(resource ${RESOURCES_images})
+	get_filename_component(file_name "${resource}" NAME)
+	add_custom_command(
+			TARGET tests_main POST_BUILD
+			COMMAND ${CMAKE_COMMAND} -E copy_if_different "${resource}" "${CMAKE_CURRENT_BINARY_DIR}/Resources/Images/${file_name}"
+			COMMENT "Copying resource file: ${resource}")
+endforeach()

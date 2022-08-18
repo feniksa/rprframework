@@ -4,13 +4,13 @@ set(HEADERS
 	ContextObject.h
 	ContextUtils.h
 	RadeonImageFilterEnums.h
-)
+	Image.h)
 
 set(SOURCES
 	Error.cpp
 	Context.cpp
 	ContextUtils.cpp
-)
+	Image.cpp)
 
 add_library(riff STATIC ${SOURCES} ${HEADERS})
 target_include_directories(riff PUBLIC "${CMAKE_SOURCE_DIR}")
