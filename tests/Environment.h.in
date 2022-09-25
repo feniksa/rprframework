@@ -5,6 +5,6 @@
 namespace tests
 {
 	static const std::filesystem::path CurrentWorkingDirectory = "@CMAKE_CURRENT_BINARY_DIR@";
-    static const std::filesystem::path ResourcesDirectory = "@CMAKE_CURRENT_BINARY_DIR@/Resources";
+    static const std::filesystem::path ResourcesDirectory = "@CMAKE_CURRENT_BINARY_DIR@/resources";
 	static const std::filesystem::path TestConfigurationFile = "@CMAKE_CURRENT_BINARY_DIR@/testconfig.ini";
 }

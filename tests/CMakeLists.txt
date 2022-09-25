@@ -66,29 +66,29 @@ endforeach()
 
 
 
-file(GLOB RESOURCES_textures Resources/Textures/*)
+file(GLOB RESOURCES_textures resources/textures/*)
 foreach(resource ${RESOURCES_textures})
 	get_filename_component(file_name "${resource}" NAME)
 	add_custom_command(
                 TARGET tests_main POST_BUILD
-                COMMAND ${CMAKE_COMMAND} -E copy_if_different "${resource}" "${CMAKE_CURRENT_BINARY_DIR}/Resources/Textures/${file_name}"
+                COMMAND ${CMAKE_COMMAND} -E copy_if_different "${resource}" "${CMAKE_CURRENT_BINARY_DIR}/resources/textures/${file_name}"
                 COMMENT "Copying resource file: ${resource}")    
 endforeach()
 
-file(GLOB RESOURCES_meshes Resources/Meshes/*)
+file(GLOB RESOURCES_meshes resources/meshes/*)
 foreach(resource ${RESOURCES_meshes})
 	get_filename_component(file_name "${resource}" NAME)
 	add_custom_command(
                 TARGET tests_main POST_BUILD
-                COMMAND ${CMAKE_COMMAND} -E copy_if_different "${resource}" "${CMAKE_CURRENT_BINARY_DIR}/Resources/Meshes/${file_name}"
+                COMMAND ${CMAKE_COMMAND} -E copy_if_different "${resource}" "${CMAKE_CURRENT_BINARY_DIR}/resources/meshes/${file_name}"
                 COMMENT "Copying resource file: ${resource}")    
 endforeach()
 
-file(GLOB RESOURCES_images Resources/Images/*)
+file(GLOB RESOURCES_images resources/images/*)
 foreach(resource ${RESOURCES_images})
 	get_filename_component(file_name "${resource}" NAME)
 	add_custom_command(
 			TARGET tests_main POST_BUILD
-			COMMAND ${CMAKE_COMMAND} -E copy_if_different "${resource}" "${CMAKE_CURRENT_BINARY_DIR}/Resources/Images/${file_name}"
+			COMMAND ${CMAKE_COMMAND} -E copy_if_different "${resource}" "${CMAKE_CURRENT_BINARY_DIR}/resources/images/${file_name}"
 			COMMENT "Copying resource file: ${resource}")
 endforeach()

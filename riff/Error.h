@@ -12,6 +12,8 @@ public:
 	explicit Error(rif_int status);
 	explicit Error(rif_int status, std::string_view message);
 
+    rif_int status() const noexcept { return m_status; }
+
 	static const char* as_string(rif_int status) noexcept;
 private:
 	static std::string getErrorMessage(std::string_view message, rif_int status);

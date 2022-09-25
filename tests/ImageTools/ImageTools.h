@@ -65,7 +65,7 @@ int LoadEXRLikeTiny(float **out_rgba, int *width, int *height, const char *filen
     int idxG = -1;
     int idxB = -1;
     int idxA = -1;
-    int idxY = -1;
+    //int idxY = -1;
 
     for (int c = 0; c < exr_header.num_channels; c++) {
         if (strcmp(exr_header.channels[c].name, "R") == 0)
@@ -80,8 +80,8 @@ int LoadEXRLikeTiny(float **out_rgba, int *width, int *height, const char *filen
         else if (strcmp(exr_header.channels[c].name, "A") == 0)
             idxA = c;
 
-        else if (strcmp(exr_header.channels[c].name, "Y") == 0)
-            idxY = c;
+        /*else if (strcmp(exr_header.channels[c].name, "Y") == 0)
+            idxY = c;*/
 
     }
 

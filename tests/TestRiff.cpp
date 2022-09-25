@@ -8,12 +8,29 @@
 
 #include <gtest/gtest.h>
 
+#ifdef __GNUC__
+#pragma GCC diagnostic ignored "-Wold-style-cast"
+#pragma GCC diagnostic ignored "-Wmissing-declarations"
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+#pragma GCC diagnostic ignored "-Wunused-variable"
+#pragma GCC diagnostic ignored "-Wsign-compare"
+
+#endif
+
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "ImageTools/stb_image_write.h"
 #define STB_IMAGE_IMPLEMENTATION
 #include "ImageTools/stb_image.h"
 
 #include "ImageTools/ImageTools.h"
+
+#ifdef __GNUC__
+#pragma GCC diagnostic warning "-Wold-style-cast"
+#pragma GCC diagnostic warning "-Wmissing-declarations"
+#pragma GCC diagnostic warning "-Wunused-parameter"
+#pragma GCC diagnostic warning "-Wunused-variable"
+#pragma GCC diagnostic warning "-Wsign-compare"
+#endif
 
 #include <sstream>
 
@@ -54,7 +71,7 @@ TEST_F(TestRiff, denoiser)
 
     Context context(BackendType::Openc, devices[0].deviceId);
 
-    Image normalsImage(context, tests::ResourcesDirectory / "Images/normal.exr");
+    Image normalsImage(context, tests::ResourcesDirectory / "images/normal.exr");
     Image vNormalsImage(context, tests::ResourcesDirectory / "images/v_normal.exr");
     Image depthImage(context, tests::ResourcesDirectory / "images/depth.exr");
     Image vDepthImage(context, tests::ResourcesDirectory / "images/v_depth.exr");

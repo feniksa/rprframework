@@ -7,6 +7,7 @@
 #include <stb/stb_image_write.h>
 #include <cassert>
 #include <functional>
+#include <cstring>
 
 #define stbi_check_r(s) if (s == 0) return false;
 
@@ -14,7 +15,7 @@ namespace
 {
     template<typename dstT, typename srcT>
     void CopyAndConvert(dstT *dst, srcT *src, size_t size, dstT factor, bool clamp = false) {
-        for (int i = 0; i < size; ++i) {
+        for (size_t i = 0; i < size; ++i) {
             float val = static_cast<float>(src[i] * factor);
             if (clamp) {
                 val = (val > factor) ? factor : val;
@@ -28,7 +29,7 @@ namespace
 namespace riff
 {
 
-void Image::loadHDR(Context& context, const std::filesystem::path& filePath)
+void Image::loadHDR(Context&, const std::filesystem::path&)
 {
     throw std::runtime_error("not implemented");
 }
@@ -39,6 +40,10 @@ void Image::loadEXR(Context& context, const std::filesystem::path& filePath)
     int height;
     const char* err;
     float* rawRGBA;
+
+    if (!std::filesystem::exists(filePath)) {
+        throw std::runtime_error("riff::Image::loadEXR: can't load file " + filePath.string());
+    }
 
     int ret = LoadEXR(&rawRGBA, &width, &height, filePath.string().c_str(), &err);
     if (ret != TINYEXR_SUCCESS) {
@@ -56,7 +61,7 @@ void Image::loadEXR(Context& context, const std::filesystem::path& filePath)
     CopyAndConvert<float, float>(data.data(), rawRGBA, arraySize, 1.f);
 
     rif_image_desc desc;
-    memset(&desc, 0, sizeof(desc));
+	std::memset(&desc, 0, sizeof(desc));
     desc.type = RIF_COMPONENT_TYPE_FLOAT32;
     desc.image_width = width;
     desc.image_height = height;
@@ -67,9 +72,6 @@ void Image::loadEXR(Context& context, const std::filesystem::path& filePath)
 
 Image::Image(Context& context, const std::filesystem::path& filePath)
 {
-    rif_int status;
-    rif_image image = nullptr;
-
     std::filesystem::path extension = filePath.extension();
 
     if (extension == ".exr") {
