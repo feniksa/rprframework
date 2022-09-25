@@ -18,12 +18,14 @@ public:
 
     void execute();
 
-    void attachFilter(const ImageFilter& filter, const Image& input, Image* output);
-    void detachFilter(const ImageFilter& filter);
+    void attachFilter(ImageFilter* filter, const Image* input, Image* output);
+    void detachFilter(ImageFilter* filter);
     void detachAllFilters(bool ignoreErrors = true);
 private:
+    void detachFilter(rif_image_filter& filter);
+
     Context& m_context;
-    std::vector<const ImageFilter*> m_attachedFilters;
+    std::vector<ImageFilter*> m_attachedFilters;
 };
 
 }

@@ -88,7 +88,7 @@ Image::Image(Context& context, const ImageDescription& imageDescription, void* d
     createRiffImage(context, imageDescription, dataSource);
 }
 
-bool Image::save(const std::filesystem::path& saveFilePath)
+bool Image::saveToFile(const std::filesystem::path& saveFilePath)
 {
     if (!*this) {
         return false;

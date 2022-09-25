@@ -15,7 +15,7 @@ public:
     Image(Context& context, const std::filesystem::path& filePath);
     Image(Context& context, const ImageDescription& imageDescription, void* dataSource = nullptr);
 
-    bool save(const std::filesystem::path& saveFilePath);
+    bool saveToFile(const std::filesystem::path& saveFilePath);
 
     ImageDescription getImageInfo() const;
 private:

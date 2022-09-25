@@ -52,6 +52,20 @@ private:
 
 struct TestRiff : public ::testing::Test
 {
+    std::filesystem::path m_tempDir;
+
+    TestRiff() {
+        m_tempDir = std::filesystem::temp_directory_path();
+        m_tempDir /= "RadeonProRenderTests";
+        m_tempDir /= "TestRiff";
+
+        if (!std::filesystem::exists(m_tempDir)) {
+            //std::filesystem::remove_all(m_tempDir);
+            std::filesystem::create_directory(m_tempDir);
+        }
+        std::cout << "Temporary directory: \t" << m_tempDir <<  "\n";
+    }
+
     void SetUp()
     {
     }
@@ -110,10 +124,10 @@ TEST_F(TestRiff, denoiser)
     bilateralFilter.setParameter1u("radius", 10);
     bilateralFilter.setParameter1u("inputsNum", inputs.size());
 
-    queue.attachFilter(bilateralFilter, colorImage, outputImage.get());
+    queue.attachFilter(&bilateralFilter, &colorImage, outputImage.get());
 
     queue.execute();
 
-    outputImage->save("c:/temp/test.png");
+    outputImage->saveToFile(m_tempDir / "denoiser.png");
 
 }

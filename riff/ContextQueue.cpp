@@ -46,30 +46,45 @@ void ContextQueue::execute()
     check(status);
 }
 
-void ContextQueue::attachFilter(const ImageFilter& filter, const Image& input, Image* output)
+void ContextQueue::attachFilter(ImageFilter* filter, const Image* input, Image* output)
 {
     assert(filter);
+    assert(filter->instance());
     assert(output);
 
     if (!output)
         throw std::runtime_error("parameter output should be initialized");
 
     rif_int status;
-    status = rifCommandQueueAttachImageFilter(*this, filter, input, output->instance());
+    status = rifCommandQueueAttachImageFilter(*this, filter->instance(),
+                                              input->instance(), output->instance());
     check(status);
 
-    m_attachedFilters.push_back(&filter);
+    filter->registerQueue(this);
+    m_attachedFilters.push_back(filter);
 }
 
-void ContextQueue::detachFilter(const ImageFilter &filter)
+void ContextQueue::detachFilter(rif_image_filter& filter)
 {
-    auto it = std::find(m_attachedFilters.begin(), m_attachedFilters.end(), &filter);
+    assert(filter);
+
+    rif_int status;
+    status = rifCommandQueueDetachImageFilter(*this, filter);
+    check(status);
+}
+
+void ContextQueue::detachFilter(ImageFilter* filter)
+{
+    auto it = std::find(m_attachedFilters.begin(), m_attachedFilters.end(), filter);
     if (it == m_attachedFilters.end())
         throw std::runtime_error("Filter not found");
 
-    rif_int status;
-    status = rifCommandQueueDetachImageFilter(*this, (*it)->instance());
-    check(status);
+    rif_image_filter rawFilter = (*it)->instance();
+    assert(rawFilter);
+
+    detachFilter(rawFilter);
+
+    filter->unregisterQueue(this);
 
     m_attachedFilters.erase(it);
 }
@@ -77,24 +92,37 @@ void ContextQueue::detachFilter(const ImageFilter &filter)
 void ContextQueue::detachAllFilters(bool ignoreErrors)
 {
     const char* errorMsg = "Warning: can't detach some filter from queue. Error: ";
+    decltype(m_attachedFilters) m_badFilters;
+    m_badFilters.reserve(m_attachedFilters.size());
 
-    for (const ImageFilter* filter: m_attachedFilters)
+    std::stringstream errorStream;
+
+    for (auto iterator = m_attachedFilters.begin(); iterator != m_attachedFilters.end(); ++iterator)
     {
+        ImageFilter* filter = *iterator;
+        assert(filter);
+
         try {
-            detachFilter(*filter);
+            rif_image_filter rawFilter = (*filter).instance();
+            assert(rawFilter);
+
+            detachFilter(rawFilter);
+            filter->unregisterQueue(this);
         }
         catch (const std::exception& e) {
-            if (ignoreErrors)
-                std::cerr << errorMsg << e.what();
-            else
-                throw;
+             errorStream << errorMsg << e.what();
+             m_badFilters.push_back(filter);
         }
         catch(...) {
-            if (ignoreErrors)
-                std::cerr << errorMsg << "Unknown";
-            else
-                throw;
+            errorStream << errorMsg << "Unknown";
+            m_badFilters.push_back(filter);
         }
+    }
+    m_attachedFilters.clear();
+
+    if (!m_badFilters.empty()) {
+        std::swap(m_attachedFilters, m_badFilters);
+        throw std::runtime_error(errorStream.str());
     }
 }
 

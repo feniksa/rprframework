@@ -36,6 +36,7 @@ struct TestNorthstar : public ::testing::Test
 	{
 		m_tempDir = std::filesystem::temp_directory_path();
 		m_tempDir /= "RadeonProRenderTests";
+        m_tempDir /= "Northstar";
 
 		if (!std::filesystem::exists(m_tempDir)) {
 			//std::filesystem::remove_all(m_tempDir);

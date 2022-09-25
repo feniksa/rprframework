@@ -1,6 +1,9 @@
 #include "ImageFilter.h"
 #include "Context.h"
 #include "Image.h"
+#include "ContextQueue.h"
+
+#include <cassert>
 
 namespace riff
 {
@@ -51,6 +54,50 @@ void ImageFilter::setParameterImageArray(const char* key, rif_image* images, siz
 
     status = rifImageFilterSetParameterImageArray(*this, key, images, size);
     check(status);
+}
+
+ImageFilter::~ImageFilter() noexcept
+{
+    const char* errorMsg = "ImageFilter::~ImageFilter() error: ";
+    try {
+        destroy();
+    } catch (const std::exception& e){
+        std::cerr << errorMsg << e.what();
+    }
+    catch (...) {
+        std::cerr << errorMsg << "Unknown error";
+    }
+}
+
+void ImageFilter::destroy()
+{
+    for(ContextQueue* queue : m_attachedToQueues) {
+        queue->detachFilter(this);
+    }
+    m_attachedToQueues.clear();
+
+    ContextObject<rif_image_filter>::destroy();
+}
+
+void ImageFilter::registerQueue(ContextQueue* queue)
+{
+    auto it = std::find(m_attachedToQueues.begin(), m_attachedToQueues.end(), queue);
+    if (it != m_attachedToQueues.end())
+        return;
+
+    m_attachedToQueues.push_back(queue);
+}
+void ImageFilter::unregisterQueue(ContextQueue* queue)
+{
+    auto it = std::find(m_attachedToQueues.begin(), m_attachedToQueues.end(), queue);
+    if (it == m_attachedToQueues.end()) {
+        throw std::runtime_error("ImageFilter: queue already unregistered");
+    }
+
+    ContextQueue* foundQueue = (*it);
+    assert(foundQueue);
+
+    m_attachedToQueues.erase(it);
 }
 
 } // namespace riff

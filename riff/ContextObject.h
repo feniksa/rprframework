@@ -13,16 +13,16 @@ template <class T>
 class ContextObject
 {
 public:
-	explicit ContextObject(T data = nullptr);
+	explicit ContextObject(T data = nullptr) noexcept;
 	ContextObject(ContextObject&& object)  noexcept;
-	virtual ~ContextObject();
+	virtual ~ContextObject() noexcept;
 
 	T& instance() noexcept { return m_instance; }
 	const T& instance() const noexcept { return m_instance; }
 
 	operator T() const noexcept { return m_instance; }
 
-	void destroy();
+	virtual void destroy();
 
 	// we don't allow to copy context object
 	ContextObject(const ContextObject&)            = delete;
@@ -37,14 +37,14 @@ private:
 };
 
 template <class T>
-ContextObject<T>::ContextObject(T dataPointer)
+ContextObject<T>::ContextObject(T dataPointer) noexcept
 : m_instance(dataPointer)
 {
     static_assert(std::is_pointer<T>::value);
 }
 
 template <class T>
-ContextObject<T>::~ContextObject()
+ContextObject<T>::~ContextObject() noexcept
 {
 	try {
 		destroy();

@@ -13041,10 +13041,10 @@ int SaveEXR(const float *data, int width, int height, int components,
 
     if (save_as_fp16 > 0) {
       header.requested_pixel_types[i] =
-          TINYEXR_PIXELTYPE_HALF;  // save with half(fp16) pixel format
+          TINYEXR_PIXELTYPE_HALF;  // saveToFile with half(fp16) pixel format
     } else {
       header.requested_pixel_types[i] =
-          TINYEXR_PIXELTYPE_FLOAT;  // save with float(fp32) pixel format(i.e.
+          TINYEXR_PIXELTYPE_FLOAT;  // saveToFile with float(fp32) pixel format(i.e.
                                     // no precision reduction)
     }
   }
