@@ -75,13 +75,59 @@ struct TestRiff : public ::testing::Test
     }
 };
 
-TEST_F(TestRiff, denoiser)
+TEST_F(TestRiff, denoiser_bilaterial)
 {
 	auto devices = getAvailableDevices(BackendType::Openc);
 	std::cout << "Available riff devices: " << devices.size() << "\n";
 	ASSERT_TRUE(devices.size() > 0);
 
 	printAvailableDevices(devices, std::cout);
+
+    Context context(BackendType::Openc, devices[0].deviceId);
+
+    Image normalsImage(context, tests::ResourcesDirectory / "images/normal.exr");
+    Image depthImage(context, tests::ResourcesDirectory / "images/depth.exr");
+    Image colorImage(context, tests::ResourcesDirectory / "images/color.exr");
+    Image transitionImage(context, tests::ResourcesDirectory / "images/transition.exr");
+    Image outputImage;
+
+    ASSERT_TRUE(normalsImage);
+    ASSERT_TRUE(depthImage);
+    ASSERT_TRUE(colorImage);
+    ASSERT_TRUE(transitionImage);
+    ASSERT_FALSE(outputImage);
+
+    // test load functionality for exr image
+
+    std::vector<rif_image> inputs = { colorImage, normalsImage, depthImage, transitionImage };
+    std::vector<float> sigmas = { 0.01f, 0.01f, 0.01f, 0.01f };
+
+    ContextQueue queue(context);
+
+    ImageDescription desc = colorImage.getImageInfo();
+    desc.type = RIF_COMPONENT_TYPE_UINT8;
+    outputImage.create(context, desc);
+
+    // denoise Bilateral
+    ImageFilter bilateralFilter(context, ImageFilterType::BilateralDenoise);
+    bilateralFilter.setParameterImageArray("inputs", inputs);
+    bilateralFilter.setParameterFloatArray("sigmas", sigmas);
+    bilateralFilter.setParameter1u("radius", 10);
+    bilateralFilter.setParameter1u("inputsNum", inputs.size());
+
+    queue.attachFilter(&bilateralFilter, &colorImage, &outputImage);
+    queue.execute();
+
+    outputImage.saveToFile(m_tempDir / "denoiser_bilaterial.png");
+}
+
+TEST_F(TestRiff, denoiser_lwr)
+{
+    auto devices = getAvailableDevices(BackendType::Openc);
+    std::cout << "Available riff devices: " << devices.size() << "\n";
+    ASSERT_TRUE(devices.size() > 0);
+
+    printAvailableDevices(devices, std::cout);
 
     Context context(BackendType::Openc, devices[0].deviceId);
 
@@ -118,16 +164,73 @@ TEST_F(TestRiff, denoiser)
     outputImage = std::make_unique<Image>(context, desc);
 
     // denoise Bilateral
-    ImageFilter bilateralFilter(context, ImageFilterType::BilateralDenoise);
-    bilateralFilter.setParameterImageArray("inputs", inputs);
-    bilateralFilter.setParameterFloatArray("sigmas", sigmas);
-    bilateralFilter.setParameter1u("radius", 10);
-    bilateralFilter.setParameter1u("inputsNum", inputs.size());
+    ImageFilter lwrDenoise(context, ImageFilterType::LWR_Denoise);
+    lwrDenoise.setParameterImage("vColorImg", vColorImage);
+    lwrDenoise.setParameterImage("transImg", transitionImage);
+    lwrDenoise.setParameterImage("vTransImg", vTransitionImage);
+    lwrDenoise.setParameterImage("normalsImg", normalsImage);
+    lwrDenoise.setParameterImage("depthImg", depthImage);
+    lwrDenoise.setParameterImage("vDepthImg", vDepthImage);
 
-    queue.attachFilter(&bilateralFilter, &colorImage, outputImage.get());
-
+    queue.attachFilter(&lwrDenoise, &colorImage, outputImage.get());
     queue.execute();
 
-    outputImage->saveToFile(m_tempDir / "denoiser.png");
-
+    outputImage->saveToFile(m_tempDir / "denoiser_lwr.png");
 }
+
+TEST_F(TestRiff, denoiser_eaw)
+{
+    auto devices = getAvailableDevices(BackendType::Openc);
+    std::cout << "Available riff devices: " << devices.size() << "\n";
+    ASSERT_TRUE(devices.size() > 0);
+
+    printAvailableDevices(devices, std::cout);
+
+    Context context(BackendType::Openc, devices[0].deviceId);
+
+    Image normalsImage(context, tests::ResourcesDirectory / "images/normal.exr");
+    Image vNormalsImage(context, tests::ResourcesDirectory / "images/v_normal.exr");
+    Image depthImage(context, tests::ResourcesDirectory / "images/depth.exr");
+    Image vDepthImage(context, tests::ResourcesDirectory / "images/v_depth.exr");
+    Image colorImage(context, tests::ResourcesDirectory / "images/color.exr");
+    Image vColorImage(context, tests::ResourcesDirectory / "images/v_color.exr");
+    Image transitionImage(context, tests::ResourcesDirectory / "images/transition.exr");
+    Image vTransitionImage(context, tests::ResourcesDirectory / "images/v_transition.exr");
+
+    std::unique_ptr<Image> outputImage;
+
+    ASSERT_TRUE(normalsImage);
+    ASSERT_TRUE(vNormalsImage);
+    ASSERT_TRUE(depthImage);
+    ASSERT_TRUE(vDepthImage);
+    ASSERT_TRUE(colorImage);
+    ASSERT_TRUE(vColorImage);
+    ASSERT_TRUE(transitionImage);
+    ASSERT_TRUE(vTransitionImage);
+    ASSERT_FALSE(outputImage);
+
+    // test load functionality for exr image
+
+    std::vector<rif_image> inputs = { colorImage, normalsImage, depthImage, transitionImage };
+    std::vector<float> sigmas = { 0.01f, 0.01f, 0.01f, 0.01f };
+
+    ContextQueue queue(context);
+
+    ImageDescription desc = colorImage.getImageInfo();
+    desc.type = RIF_COMPONENT_TYPE_UINT8;
+    outputImage = std::make_unique<Image>(context, desc);
+
+    // denoise Bilateral
+    ImageFilter lwrDenoise(context, ImageFilterType::EawDenoise);
+    lwrDenoise.setParameterImage("colorVar", vColorImage);
+    lwrDenoise.setParameterImage("transImg", transitionImage);
+    lwrDenoise.setParameterImage("normalsImg", normalsImage);
+    lwrDenoise.setParameterImage("depthImg", depthImage);
+
+
+    queue.attachFilter(&lwrDenoise, &colorImage, outputImage.get());
+    queue.execute();
+
+    outputImage->saveToFile(m_tempDir / "denoiser_eaw.png");
+}
+

@@ -67,7 +67,7 @@ void Image::loadEXR(Context& context, const std::filesystem::path& filePath)
     desc.image_height = height;
     desc.num_components = num_components;
 
-    createRiffImage(context, desc, data.data());
+    create(context, desc, data.data());
 }
 
 Image::Image(Context& context, const std::filesystem::path& filePath)
@@ -85,7 +85,7 @@ Image::Image(Context& context, const std::filesystem::path& filePath)
 
 Image::Image(Context& context, const ImageDescription& imageDescription, void* dataSource)
 {
-    createRiffImage(context, imageDescription, dataSource);
+    create(context, imageDescription, dataSource);
 }
 
 bool Image::saveToFile(const std::filesystem::path& saveFilePath)
@@ -122,7 +122,7 @@ bool Image::saveToFile(const std::filesystem::path& saveFilePath)
     return true;
 }
 
-void Image::createRiffImage(Context& context, const ImageDescription& imageDescription, void* dataSource)
+void Image::create(Context& context, const ImageDescription& imageDescription, void* dataSource)
 {
     rif_int status;
     rif_image image;

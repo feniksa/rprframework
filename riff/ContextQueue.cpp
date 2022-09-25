@@ -50,10 +50,11 @@ void ContextQueue::attachFilter(ImageFilter* filter, const Image* input, Image* 
 {
     assert(filter);
     assert(filter->instance());
+    assert(input);
     assert(output);
 
     if (!output)
-        throw std::runtime_error("parameter output should be initialized");
+        throw std::runtime_error("Output image is not allocated");
 
     rif_int status;
     status = rifCommandQueueAttachImageFilter(*this, filter->instance(),
