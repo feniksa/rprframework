@@ -20,7 +20,7 @@ public:
 
     void attachFilter(ImageFilter* filter, const Image* input, Image* output);
     void detachFilter(ImageFilter* filter);
-    void detachAllFilters(bool ignoreErrors = true);
+    void detachAllFilters();
 private:
     void detachFilter(rif_image_filter& filter);
 

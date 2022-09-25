@@ -29,7 +29,7 @@ ContextQueue::~ContextQueue() noexcept
     const char* errorMsg = "ContextQueue::~ContextQueue error: ";
 
     try {
-        detachAllFilters(true);
+        detachAllFilters();
     } catch (const std::exception& e) {
         std::cerr << errorMsg << e.what();
     }
@@ -89,7 +89,7 @@ void ContextQueue::detachFilter(ImageFilter* filter)
     m_attachedFilters.erase(it);
 }
 
-void ContextQueue::detachAllFilters(bool ignoreErrors)
+void ContextQueue::detachAllFilters()
 {
     const char* errorMsg = "Warning: can't detach some filter from queue. Error: ";
     decltype(m_attachedFilters) m_badFilters;
