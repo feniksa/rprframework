@@ -43,6 +43,7 @@ template <class T>
 ContextObject<T>::ContextObject(T dataPointer)
 : m_instance(dataPointer)
 {
+    static_assert(std::is_pointer<T>::value);
 }
 
 template <class T>
@@ -68,11 +69,10 @@ ContextObject<T>::ContextObject(ContextObject&& object) noexcept
 template <class T>
 ContextObject<T>& ContextObject<T>::operator=(ContextObject&& context)
 {
-	if (m_instance)
-		destroy();
+	destroy();
 
-	m_instance = std::move(context.m_instance);
-	context.m_instance = nullptr ;
+    std::swap(m_instance, context.m_instance);
+
 	return *this;
 }
 
@@ -80,10 +80,9 @@ template <class T>
 void ContextObject<T>::setInstance(T&& instance)
 {
 	destroy();
-	m_instance = instance;
-	instance = nullptr;
-}
 
+    std::swap(m_instance, instance);
+}
 
 template <class T>
 void ContextObject<T>::destroy()
@@ -98,4 +97,4 @@ void ContextObject<T>::destroy()
 	m_instance = nullptr;
 }
 
-}
+} // namespace
