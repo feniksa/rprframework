@@ -20,6 +20,7 @@ public:
     void setParameterImage(const char* key, const Image& image);
     void setParameterImageArray(const char* key, std::vector<rif_image> & images);
     void setParameterFloatArray(const char* key, std::vector<float>& data);
+    void setParameterString(const char* key, const char* value);
 
     void destroy() override;
 private:

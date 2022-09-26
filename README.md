@@ -22,7 +22,7 @@ Prepare and install prerequisited
 3. Install and compile google tests
    - Download [gtest](https://github.com/google/googletest)
    - Unzip somewhere
-   - Go to unziped directory and create ```build``` directory
+   - Go to unziped directory and allocate ```build``` directory
    - Create VS solution file with command
       ```cmake -G "Visual Studio 17 2022" -A x64 -DCMAKE_INSTALL_PREFIX="c:/libs/gtest" -Dgtest_force_shared_crt=true ..```
    - Open solution file in studio and compile

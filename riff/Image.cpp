@@ -29,63 +29,22 @@ namespace
 namespace riff
 {
 
-void Image::loadHDR(Context&, const std::filesystem::path&)
+Image::Image(Context& context)
+: m_context(context)
 {
-    throw std::runtime_error("not implemented");
-}
-
-void Image::loadEXR(Context& context, const std::filesystem::path& filePath)
-{
-    int width;
-    int height;
-    const char* err;
-    float* rawRGBA;
-
-    if (!std::filesystem::exists(filePath)) {
-        throw std::runtime_error("riff::Image::loadEXR: can't load file " + filePath.string());
-    }
-
-    int ret = LoadEXR(&rawRGBA, &width, &height, filePath.string().c_str(), &err);
-    if (ret != TINYEXR_SUCCESS) {
-        throw std::runtime_error(err);
-    }
-
-    const int num_components = 4;
-    const int arraySize = width * height * num_components;
-
-    assert(arraySize > 0);
-    assert(num_components);
-
-    std::vector<float> data(arraySize);
-
-    CopyAndConvert<float, float>(data.data(), rawRGBA, arraySize, 1.f);
-
-    rif_image_desc desc;
-	std::memset(&desc, 0, sizeof(desc));
-    desc.type = RIF_COMPONENT_TYPE_FLOAT32;
-    desc.image_width = width;
-    desc.image_height = height;
-    desc.num_components = num_components;
-
-    create(context, desc, data.data());
 }
 
 Image::Image(Context& context, const std::filesystem::path& filePath)
+: Image(context)
 {
-    std::filesystem::path extension = filePath.extension();
-
-    if (extension == ".exr") {
-        loadEXR(context, filePath);
-    } else if (extension == ".hdr" ) {
-        loadHDR(context, filePath);
-    } else {
-        throw std::runtime_error("Unsupported file");
-    }
+    if (!load(filePath))
+        throw std::runtime_error("Can't load image: " + filePath.string());
 }
 
 Image::Image(Context& context, const ImageDescription& imageDescription, void* dataSource)
+: Image(context)
 {
-    create(context, imageDescription, dataSource);
+    allocate(imageDescription, dataSource);
 }
 
 bool Image::saveToFile(const std::filesystem::path& saveFilePath)
@@ -122,12 +81,33 @@ bool Image::saveToFile(const std::filesystem::path& saveFilePath)
     return true;
 }
 
-void Image::create(Context& context, const ImageDescription& imageDescription, void* dataSource)
+bool Image::load(const std::filesystem::path& filePath)
+{
+    if (!std::filesystem::exists(filePath)) {
+        return false;
+    }
+
+    std::filesystem::path extension = filePath.extension();
+
+    if (extension == ".exr") {
+        return loadEXR(filePath);
+    } else if (extension == ".hdr" ) {
+        return loadHDR(filePath);
+    } else if (extension == ".png") {
+        return loadPNG(filePath);
+    } else {
+        return false;
+    }
+
+    return true;
+}
+
+void Image::allocate(const ImageDescription& imageDescription, void* dataSource)
 {
     rif_int status;
     rif_image image;
 
-    status = rifContextCreateImage(context, &imageDescription, dataSource, &image);
+    status = rifContextCreateImage(m_context, &imageDescription, dataSource, &image);
     check(status);
 
     setInstance(std::move(image));
@@ -147,5 +127,119 @@ ImageDescription Image::getImageInfo() const
 
     return desc;
 }
+
+bool Image::loadHDR(const std::filesystem::path& filePath)
+{
+    int width;
+    int height;
+    int num_components;
+    float* rawData;
+
+    rawData = stbi_loadf(filePath.string().c_str(), &width, &height, &num_components, 0);
+    if (!rawData)
+        return false;
+
+    std::unique_ptr<float> rawDataPtr(rawData);
+
+    const int arraySize = width * height * num_components;
+
+    assert(arraySize > 0);
+    assert(num_components);
+
+    std::vector<float> data(arraySize);
+
+    CopyAndConvert<float, float>(data.data(), rawDataPtr.get(), arraySize, 1.f);
+
+    rif_image_desc desc;
+    std::memset(&desc, 0, sizeof(desc));
+    desc.type = RIF_COMPONENT_TYPE_FLOAT32;
+    desc.image_width = width;
+    desc.image_height = height;
+    desc.num_components = num_components;
+
+    allocate(desc, data.data());
+
+    return true;
+}
+
+
+bool Image::loadJPG(const std::filesystem::path& filePath)
+{
+    ImageJpg colorImg;
+
+    ReadJpg(path.c_str(), colorImg);
+    width = colorImg.Width;
+    height = colorImg.Height;
+    num = colorImg.BPP;
+    int arraySize = width * height;
+    data = new float[arraySize * num];
+    CopyAndConvert<float, float>((float *) data, &colorImg.Pixels[0], width * height * num, 1.f);
+    desc.type = RIF_COMPONENT_TYPE_FLOAT32;
+    return true;
+}
+
+bool Image::loadPNG(const std::filesystem::path& filePath)
+{
+    int width;
+    int height;
+    int num_components;
+    float* rawData;
+    rawData = reinterpret_cast<float *>(stbi_load(filePath.string().c_str(), &width, &height, &num_components, 0));
+    if (!rawData) {
+        return false;
+    }
+
+    std::unique_ptr<float> rawDataPtr(rawData);
+
+    assert(num_components);
+
+    rif_image_desc desc;
+    std::memset(&desc, 0, sizeof(desc));
+    desc.type = RIF_COMPONENT_TYPE_UINT8;
+    desc.image_width = width;
+    desc.image_height = height;
+    desc.num_components = num_components;
+
+    allocate(desc, rawDataPtr.get());
+
+    return true;
+}
+
+bool Image::loadEXR(const std::filesystem::path& filePath)
+{
+    int width;
+    int height;
+    const char* err;
+    float* rawRGBA;
+
+    int ret = LoadEXR(&rawRGBA, &width, &height, filePath.string().c_str(), &err);
+    if (ret != TINYEXR_SUCCESS) {
+        throw std::runtime_error(err);
+    }
+
+    std::unique_ptr<float> rawDatraPtr(rawRGBA);
+
+    const int num_components = 4;
+    const int arraySize = width * height * num_components;
+
+    assert(arraySize > 0);
+    assert(num_components);
+
+    std::vector<float> data(arraySize);
+
+    CopyAndConvert<float, float>(data.data(), rawDatraPtr.get(), arraySize, 1.f);
+
+    rif_image_desc desc;
+    std::memset(&desc, 0, sizeof(desc));
+    desc.type = RIF_COMPONENT_TYPE_FLOAT32;
+    desc.image_width = width;
+    desc.image_height = height;
+    desc.num_components = num_components;
+
+    allocate(desc, data.data());
+
+    return true;
+}
+
 
 } // namespace

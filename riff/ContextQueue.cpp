@@ -19,7 +19,7 @@ ContextQueue::ContextQueue(riff::Context &context)
     check(status);
 
     if (!queue)
-        throw std::runtime_error("ContextCommandQueue returned nullptr after create");
+        throw std::runtime_error("ContextCommandQueue returned nullptr after allocate");
 
     setInstance(std::move(queue));
 }
@@ -55,6 +55,11 @@ void ContextQueue::attachFilter(ImageFilter* filter, const Image* input, Image* 
 
     if (!output)
         throw std::runtime_error("Output image is not allocated");
+
+    if (!output->instance()) {
+        ImageDescription desc = input->getImageInfo();
+        output->allocate(desc);
+    }
 
     rif_int status;
     status = rifCommandQueueAttachImageFilter(*this, filter->instance(),

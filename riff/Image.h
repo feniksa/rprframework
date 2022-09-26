@@ -12,20 +12,25 @@ class Context;
 class Image : public ContextObject<rif_image>
 {
 public:
-    Image() = default;
+    Image(Context& context);
 
     Image(Context& context, const std::filesystem::path& filePath);
     Image(Context& context, const ImageDescription& imageDescription, void* dataSource = nullptr);
 
-    void create(Context& context, const ImageDescription& imageDescription, void* dataSource = nullptr);
+    [[nodiscard]]
+    bool load(const std::filesystem::path& filePath);
+    void allocate(const ImageDescription& imageDescription, void* dataSource = nullptr);
 
     bool saveToFile(const std::filesystem::path& saveFilePath);
 
     ImageDescription getImageInfo() const;
 private:
+    bool loadHDR(const std::filesystem::path& filePath);
+    bool loadEXR(const std::filesystem::path& filePath);
+    bool loadPNG(const std::filesystem::path& filePath);
+    bool loadJPG(const std::filesystem::path& filePath);
 
-    void loadHDR(Context& context, const std::filesystem::path& filePath);
-    void loadEXR(Context& context, const std::filesystem::path& filePath);
+    Context& m_context;
 };
 
 }

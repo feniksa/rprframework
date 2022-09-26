@@ -42,6 +42,8 @@ enum class ImageFilterType
     //machine learning based denoising filters
     AiDenoise          = RIF_IMAGE_FILTER_AI_DENOISE,
     AiUpscale          = RIF_IMAGE_FILTER_AI_UPSCALE,
+
+    UserDefined        = RIF_IMAGE_FILTER_USER_DEFINED,
 };
 
 } // namespace riff

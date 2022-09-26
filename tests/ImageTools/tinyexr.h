@@ -70,7 +70,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 //   Do this:
 //    #define TINYEXR_IMPLEMENTATION
-//   before you include this file in *one* C or C++ file to create the
+//   before you include this file in *one* C or C++ file to allocate the
 //   implementation.
 //
 //   // i.e. it should look like this:
@@ -695,7 +695,7 @@ namespace miniz {
    mind, with just enough abstraction to
      get the job done with minimal fuss. There are simple API's to retrieve file
    information, read files from
-     existing archives, create new archives, append new files to existing
+     existing archives, allocate new archives, append new files to existing
    archives, or clone archive data from
      one archive to another. It supports archives located in memory or the heap,
    on disk (using stdio.h),
@@ -786,7 +786,7 @@ namespace miniz {
 
    * This is a header file library, like stb_image.c. To get only a header file,
    either cut and paste the
-     below header, or create miniz.h, #define MINIZ_HEADER_FILE_ONLY, and then
+     below header, or allocate miniz.h, #define MINIZ_HEADER_FILE_ONLY, and then
    include miniz.c from it.
 
    * Important: For best perf. be sure to customize the below macros for your
@@ -5069,7 +5069,7 @@ static mz_bool mz_zip_reader_read_central_dir(mz_zip_archive *pZip,
                       cdir_size) != cdir_size)
       return MZ_FALSE;
 
-    // Now create an index into the central directory file records, do some
+    // Now allocate an index into the central directory file records, do some
     // basic sanity checking on each record, and check for zip64 entries (which
     // are not yet supported).
     p = (const mz_uint8 *)pZip->m_pState->m_central_dir.m_p;
@@ -9544,7 +9544,7 @@ bool CompressZfp(std::vector<unsigned char> *outBuf, unsigned int *outSize,
     return false;
   }
 
-  // create input array.
+  // allocate input array.
   field = zfp_field_2d(reinterpret_cast<void *>(const_cast<float *>(inPtr)),
                        zfp_type_float, width, num_lines * num_channels);
 
@@ -12629,7 +12629,7 @@ int ParseEXRMultipartHeaderFromMemory(EXRHeader ***exr_headers,
     size -= info.header_len;
   }
 
-  // allocate memory for EXRHeader and create array of EXRHeader pointers.
+  // allocate memory for EXRHeader and allocate array of EXRHeader pointers.
   (*exr_headers) =
       static_cast<EXRHeader **>(malloc(sizeof(EXRHeader *) * infos.size()));
   for (size_t i = 0; i < infos.size(); i++) {

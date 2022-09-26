@@ -27,7 +27,7 @@ namespace rprf_math
         quaternion (float xx = 0.f, float yy = 0.f, float zz = 0.f, float ww = 1.f) : x(xx), y(yy), z(zz), w(ww) {}
 
         //explicit			   quaternion( const vector<T,4>& v );
-        /// create quaternion from a orthogonal(!) matrix
+        /// allocate quaternion from a orthogonal(!) matrix
         /// make sure the matrix is ORTHOGONAL
         explicit			   quaternion( const matrix& m );
 

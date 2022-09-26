@@ -19,6 +19,29 @@ ImageFilter::ImageFilter(Context& context, ImageFilterType type)
     setInstance(std::move(filter));
 }
 
+ImageFilter::~ImageFilter() noexcept
+{
+    const char* errorMsg = "ImageFilter::~ImageFilter() error: ";
+    try {
+        destroy();
+    } catch (const std::exception& e){
+        std::cerr << errorMsg << e.what();
+    }
+    catch (...) {
+        std::cerr << errorMsg << "Unknown error";
+    }
+}
+
+void ImageFilter::destroy()
+{
+    for(ContextQueue* queue : m_attachedToQueues) {
+        queue->detachFilter(this);
+    }
+    m_attachedToQueues.clear();
+
+    ContextObject<rif_image_filter>::destroy();
+}
+
 void ImageFilter::setParameter1u(const char* key, unsigned int parameter)
 {
     rif_int status;
@@ -56,27 +79,12 @@ void ImageFilter::setParameterImageArray(const char* key, rif_image* images, siz
     check(status);
 }
 
-ImageFilter::~ImageFilter() noexcept
+void ImageFilter::setParameterString(const char* key, const char* value)
 {
-    const char* errorMsg = "ImageFilter::~ImageFilter() error: ";
-    try {
-        destroy();
-    } catch (const std::exception& e){
-        std::cerr << errorMsg << e.what();
-    }
-    catch (...) {
-        std::cerr << errorMsg << "Unknown error";
-    }
-}
+    rif_int status;
 
-void ImageFilter::destroy()
-{
-    for(ContextQueue* queue : m_attachedToQueues) {
-        queue->detachFilter(this);
-    }
-    m_attachedToQueues.clear();
-
-    ContextObject<rif_image_filter>::destroy();
+    status = rifImageFilterSetParameterString(*this, key, value);
+    check(status);
 }
 
 void ImageFilter::registerQueue(ContextQueue* queue)

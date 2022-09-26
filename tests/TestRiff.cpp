@@ -57,10 +57,12 @@ struct TestRiff : public ::testing::Test
     TestRiff() {
         m_tempDir = std::filesystem::temp_directory_path();
         m_tempDir /= "RadeonProRenderTests";
-        m_tempDir /= "TestRiff";
-
         if (!std::filesystem::exists(m_tempDir)) {
-            //std::filesystem::remove_all(m_tempDir);
+            std::filesystem::create_directory(m_tempDir);
+        }
+
+        m_tempDir /= "TestRiff";
+        if (!std::filesystem::exists(m_tempDir)) {
             std::filesystem::create_directory(m_tempDir);
         }
         std::cout << "Temporary directory: \t" << m_tempDir <<  "\n";
@@ -89,7 +91,7 @@ TEST_F(TestRiff, denoiser_bilaterial)
     Image depthImage(context, tests::ResourcesDirectory / "images/depth.exr");
     Image colorImage(context, tests::ResourcesDirectory / "images/color.exr");
     Image transitionImage(context, tests::ResourcesDirectory / "images/transition.exr");
-    Image outputImage;
+    Image outputImage(context);
 
     ASSERT_TRUE(normalsImage);
     ASSERT_TRUE(depthImage);
@@ -106,7 +108,7 @@ TEST_F(TestRiff, denoiser_bilaterial)
 
     ImageDescription desc = colorImage.getImageInfo();
     desc.type = RIF_COMPONENT_TYPE_UINT8;
-    outputImage.create(context, desc);
+    outputImage.allocate(desc);
 
     // denoise Bilateral
     ImageFilter bilateralFilter(context, ImageFilterType::BilateralDenoise);
@@ -131,16 +133,16 @@ TEST_F(TestRiff, denoiser_lwr)
 
     Context context(BackendType::Openc, devices[0].deviceId);
 
-    Image normalsImage(context, tests::ResourcesDirectory / "images/normal.exr");
-    Image vNormalsImage(context, tests::ResourcesDirectory / "images/v_normal.exr");
-    Image depthImage(context, tests::ResourcesDirectory / "images/depth.exr");
-    Image vDepthImage(context, tests::ResourcesDirectory / "images/v_depth.exr");
-    Image colorImage(context, tests::ResourcesDirectory / "images/color.exr");
-    Image vColorImage(context, tests::ResourcesDirectory / "images/v_color.exr");
-    Image transitionImage(context, tests::ResourcesDirectory / "images/transition.exr");
-    Image vTransitionImage(context, tests::ResourcesDirectory / "images/v_transition.exr");
+    Image normalsImage(context, tests::ResourcesDirectory / "images" / "normal.exr");
+    Image vNormalsImage(context, tests::ResourcesDirectory / "images" / "v_normal.exr");
+    Image depthImage(context, tests::ResourcesDirectory / "images" / "depth.exr");
+    Image vDepthImage(context, tests::ResourcesDirectory / "images" / "v_depth.exr");
+    Image colorImage(context, tests::ResourcesDirectory / "images" / "color.exr");
+    Image vColorImage(context, tests::ResourcesDirectory / "images" / "v_color.exr");
+    Image transitionImage(context, tests::ResourcesDirectory / "images" / "transition.exr");
+    Image vTransitionImage(context, tests::ResourcesDirectory / "images" / "v_transition.exr");
 
-    std::unique_ptr<Image> outputImage;
+    Image outputImage(context);
 
     ASSERT_TRUE(normalsImage);
     ASSERT_TRUE(vNormalsImage);
@@ -161,7 +163,7 @@ TEST_F(TestRiff, denoiser_lwr)
 
     ImageDescription desc = colorImage.getImageInfo();
     desc.type = RIF_COMPONENT_TYPE_UINT8;
-    outputImage = std::make_unique<Image>(context, desc);
+    outputImage.allocate(desc);
 
     // denoise Bilateral
     ImageFilter lwrDenoise(context, ImageFilterType::LWR_Denoise);
@@ -172,10 +174,10 @@ TEST_F(TestRiff, denoiser_lwr)
     lwrDenoise.setParameterImage("depthImg", depthImage);
     lwrDenoise.setParameterImage("vDepthImg", vDepthImage);
 
-    queue.attachFilter(&lwrDenoise, &colorImage, outputImage.get());
+    queue.attachFilter(&lwrDenoise, &colorImage, &outputImage);
     queue.execute();
 
-    outputImage->saveToFile(m_tempDir / "denoiser_lwr.png");
+    outputImage.saveToFile(m_tempDir / "denoiser_lwr.png");
 }
 
 TEST_F(TestRiff, denoiser_eaw)
@@ -188,16 +190,16 @@ TEST_F(TestRiff, denoiser_eaw)
 
     Context context(BackendType::Openc, devices[0].deviceId);
 
-    Image normalsImage(context, tests::ResourcesDirectory / "images/normal.exr");
-    Image vNormalsImage(context, tests::ResourcesDirectory / "images/v_normal.exr");
-    Image depthImage(context, tests::ResourcesDirectory / "images/depth.exr");
-    Image vDepthImage(context, tests::ResourcesDirectory / "images/v_depth.exr");
-    Image colorImage(context, tests::ResourcesDirectory / "images/color.exr");
-    Image vColorImage(context, tests::ResourcesDirectory / "images/v_color.exr");
-    Image transitionImage(context, tests::ResourcesDirectory / "images/transition.exr");
-    Image vTransitionImage(context, tests::ResourcesDirectory / "images/v_transition.exr");
+    Image normalsImage(context, tests::ResourcesDirectory / "images" / "normal.exr");
+    Image vNormalsImage(context, tests::ResourcesDirectory / "images" / "v_normal.exr");
+    Image depthImage(context, tests::ResourcesDirectory / "images" / "depth.exr");
+    Image vDepthImage(context, tests::ResourcesDirectory / "images" / "v_depth.exr");
+    Image colorImage(context, tests::ResourcesDirectory / "images" / "color.exr");
+    Image vColorImage(context, tests::ResourcesDirectory / "images" /"v_color.exr");
+    Image transitionImage(context, tests::ResourcesDirectory / "images" / "transition.exr");
+    Image vTransitionImage(context, tests::ResourcesDirectory / "images" / "v_transition.exr");
 
-    std::unique_ptr<Image> outputImage;
+    Image outputImage(context);
 
     ASSERT_TRUE(normalsImage);
     ASSERT_TRUE(vNormalsImage);
@@ -218,7 +220,7 @@ TEST_F(TestRiff, denoiser_eaw)
 
     ImageDescription desc = colorImage.getImageInfo();
     desc.type = RIF_COMPONENT_TYPE_UINT8;
-    outputImage = std::make_unique<Image>(context, desc);
+    outputImage.allocate(desc);
 
     // denoise Bilateral
     ImageFilter lwrDenoise(context, ImageFilterType::EawDenoise);
@@ -228,9 +230,49 @@ TEST_F(TestRiff, denoiser_eaw)
     lwrDenoise.setParameterImage("depthImg", depthImage);
 
 
-    queue.attachFilter(&lwrDenoise, &colorImage, outputImage.get());
+    queue.attachFilter(&lwrDenoise, &colorImage, &outputImage);
     queue.execute();
 
-    outputImage->saveToFile(m_tempDir / "denoiser_eaw.png");
+    outputImage.saveToFile(m_tempDir / "denoiser_eaw.png");
 }
 
+TEST_F(TestRiff, custom_filter)
+{
+    const rif_char code[] =
+            "int2 coord;"
+            "int2 size = GET_BUFFER_SIZE(outputImage);"
+            "GET_COORD_OR_RETURN(coord, size);"
+            "vec4 pixel = ReadPixelTyped(inputImage, coord.x, coord.y);"
+            "vec2 dxy = convert_vec2(coord)/convert_vec2(size) - (vec2)0.5f;"
+            "pixel = mix(1.0f, pixel, exp(-dot(dxy, dxy) * 5));"
+            "WritePixelTyped(outputImage, coord.x, coord.y, pixel);";
+
+    auto devices = getAvailableDevices(BackendType::Openc);
+    std::cout << "Available riff devices: " << devices.size() << "\n";
+    ASSERT_TRUE(devices.size() > 0);
+
+    printAvailableDevices(devices, std::cout);
+
+    Context context(BackendType::Openc, devices[0].deviceId);
+
+    Image inputImage(context, tests::ResourcesDirectory / "images" / "lenna.png");
+
+    Image outputImage(context);
+
+    ASSERT_TRUE(inputImage);
+    ASSERT_FALSE(outputImage);
+
+    ContextQueue queue(context);
+
+    ImageDescription desc = inputImage.getImageInfo();
+    outputImage.allocate(desc);
+
+    ImageFilter userDefined(context, ImageFilterType::UserDefined);
+    userDefined.setParameterString("code", code);
+
+    queue.attachFilter(&userDefined, &inputImage, &outputImage);
+    queue.execute();
+    queue.detachFilter(&userDefined);
+
+    outputImage.saveToFile(m_tempDir / "user_defined.png");
+}

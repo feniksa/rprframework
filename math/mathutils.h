@@ -361,7 +361,7 @@ namespace rprf_math
 
     inline quaternion rotation_quaternion(float3 const& axe, float angle)
     {
-        // create (sin(a/2)*axis, cos(a/2)) quaternion
+        // allocate (sin(a/2)*axis, cos(a/2)) quaternion
         // which rotates the point a radians around "axis"
         quaternion res;
         float3 u = axe; u.normalize();

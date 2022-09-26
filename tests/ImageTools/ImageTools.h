@@ -258,7 +258,7 @@ rif_image LoadBinImage(const std::string &path, int width, int height, int cnum,
     desc.image_height = height;
     desc.num_components = cnum;
 
-    // create rifImage
+    // allocate rifImage
     rif_int status = rifContextCreateImage(context, &desc, buf.data(), &img);
     if (status != RIF_SUCCESS) {
         return nullptr;
@@ -337,7 +337,7 @@ rif_image LoadImage(const std::filesystem::path &file_path, rif_context context)
     desc.image_height = height;
     desc.num_components = num;
 
-    // create rifImage
+    // allocate rifImage
     rif_int status = rifContextCreateImage(context, &desc, data, &img);
 
     if (ext == "exr" || ext == "jpg") {

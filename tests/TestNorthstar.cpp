@@ -36,10 +36,13 @@ struct TestNorthstar : public ::testing::Test
 	{
 		m_tempDir = std::filesystem::temp_directory_path();
 		m_tempDir /= "RadeonProRenderTests";
-        m_tempDir /= "Northstar";
+        if (!std::filesystem::exists(m_tempDir)) {
+            //std::filesystem::remove_all(m_tempDir);
+            std::filesystem::create_directory(m_tempDir);
+        }
 
+        m_tempDir /= "Northstar";
 		if (!std::filesystem::exists(m_tempDir)) {
-			//std::filesystem::remove_all(m_tempDir);
 			std::filesystem::create_directory(m_tempDir);
 		}
 		m_shaderCachePath = m_tempDir / "cache";
@@ -196,8 +199,8 @@ TEST_F(TestNorthstar, scene_creation)
 	diffuse5.setParameterNode(MaterialInputType::Color, imageMaterial2);
 
 
-	// create a Lookup material and define it as a "UV Lookup" meaning the output of this material is the UV from the shape.
-	// Lookup nodes are useful to create procedural materials.
+	// allocate a Lookup material and define it as a "UV Lookup" meaning the output of this material is the UV from the shape.
+	// Lookup nodes are useful to allocate procedural materials.
 	// UV-Lookup are often used to scale textures on shapes.
 	MaterialNode uv_node(materialSystem, MaterialNodeType::InputLookup);
 	uv_node.setParameter1u(MaterialInputType::Value, RPR_MATERIAL_NODE_LOOKUP_UV);
@@ -214,7 +217,7 @@ TEST_F(TestNorthstar, scene_creation)
 	imageMaterial2.setParameterNode(MaterialInputType::Uv, uv_scaled_node);
 	plane.setMaterial(diffuse5);
 
-	// create a simple reflection material and apply it on the cube_instance
+	// allocate a simple reflection material and apply it on the cube_instance
 	MaterialNode reflection1(materialSystem, MaterialNodeType::Reflection);
 	reflection1.setParameter4f(MaterialInputType::Color,1.0f, 1.0f, 1.0f, 0.0f);
 	cubeInstance.setMaterial(reflection1);
