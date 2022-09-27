@@ -17,6 +17,8 @@ public:
     Image(Context& context, const std::filesystem::path& filePath);
     Image(Context& context, const ImageDescription& imageDescription, void* dataSource = nullptr);
 
+    Image copy();
+
     [[nodiscard]]
     bool load(const std::filesystem::path& filePath);
     void allocate(const ImageDescription& imageDescription, void* dataSource = nullptr);

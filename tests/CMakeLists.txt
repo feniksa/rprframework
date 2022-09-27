@@ -3,22 +3,18 @@ find_package(GTest REQUIRED)
 set(HEADERS
 	StreamRedirector.h
 	CommonData.h
+    Utils.h)
 
-	ImageTools/ImageTools.h
-	ImageTools/stb_image.h
-	ImageTools/stb_image_write.h
-	ImageTools/tinyexr.h
-	ImageTools/Half/half.hpp
-)
 set(SOURCES
 	CommonData.cpp
-)
+	Utils.cpp)
 
 set (TESTS
 	Dummy
 	Renderer
 	Northstar
 	Riff
+	Utils
 )
 
 foreach(test ${TESTS})

@@ -17,6 +17,8 @@ public:
     ~ContextQueue() noexcept;
 
     void execute();
+    void flush();
+    void synchronize();
 
     void attachFilter(ImageFilter* filter, const Image* input, Image* output);
     void detachFilter(ImageFilter* filter);

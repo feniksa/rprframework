@@ -46,6 +46,20 @@ void ContextQueue::execute()
     check(status);
 }
 
+void ContextQueue::flush()
+{
+    rif_int status;
+    status = rifFlushQueue(*this);
+    check(status);
+}
+
+void ContextQueue::synchronize()
+{
+    rif_int status;
+    status = rifSyncronizeQueue(*this);
+    check(status);
+}
+
 void ContextQueue::attachFilter(ImageFilter* filter, const Image* input, Image* output)
 {
     assert(filter);

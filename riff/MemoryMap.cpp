@@ -1,4 +1,4 @@
-#include "ReadMemMapped.h"
+#include "MemoryMap.h"
 #include "Error.h"
 #include <iostream>
 #include <cassert>
@@ -6,16 +6,16 @@
 namespace riff
 {
 
-ReadMemMapped::ReadMemMapped(rif_image image)
+MemoryMap::MemoryMap(rif_image image, MemoryMapType mapType)
 : m_image(image)
 {
     if (!m_image)
-        throw std::runtime_error("ReadMemMapped: image is null");
+        throw std::runtime_error("MemoryMap: image is null");
 
-    map();
+    map(mapType);
 }
 
-ReadMemMapped::~ReadMemMapped() noexcept
+MemoryMap::~MemoryMap() noexcept
 {
     const char* errorMsg = "Can't unmap memory. Error: ";
     try {
@@ -27,7 +27,7 @@ ReadMemMapped::~ReadMemMapped() noexcept
     }
 }
 
-void ReadMemMapped::map()
+void MemoryMap::map(MemoryMapType mapType)
 {
     assert(m_image);
 
@@ -35,15 +35,15 @@ void ReadMemMapped::map()
 
     rif_int status;
 
-    status = rifImageMap(m_image, RIF_IMAGE_MAP_READ, &m_data);
+    status = rifImageMap(m_image, static_cast<int>(mapType), &m_data);
     check(status);
 
     if (!m_data) {
-        throw std::runtime_error("ReadMemMapped return null pointer for data. Unexpected behaviour");
+        throw std::runtime_error("MemoryMap return null pointer for data. Unexpected behaviour");
     }
 }
 
-void ReadMemMapped::unmap()
+void MemoryMap::unmap()
 {
     assert(m_image);
 

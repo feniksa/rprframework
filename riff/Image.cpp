@@ -1,6 +1,6 @@
 #include "Image.h"
 #include "Context.h"
-#include "ReadMemMapped.h"
+#include "MemoryMap.h"
 
 #include <tinyexr/tinyexr.h>
 #include <stb/stb_image.h>
@@ -56,7 +56,7 @@ bool Image::saveToFile(const std::filesystem::path& saveFilePath)
     std::filesystem::path ext = saveFilePath.extension();
 
     ImageDescription desc = getImageInfo();
-    ReadMemMapped mappedForReadMemory(*this);
+    MemoryMap mappedForReadMemory(*this, MemoryMapType::Read);
 
     int status;
     if (ext == ".png") {
@@ -113,6 +113,20 @@ void Image::allocate(const ImageDescription& imageDescription, void* dataSource)
     setInstance(std::move(image));
 }
 
+Image Image::copy()
+{
+    const auto& imageInfo = getImageInfo();
+
+    std::vector<std::byte> buffer(imageInfo.num_components * imageInfo.image_height * imageInfo.image_width);
+
+    MemoryMap src(*this, MemoryMapType::Read);
+    std::memcpy(buffer.data(), src.data(), buffer.size());
+
+    Image result(m_context, imageInfo, buffer.data());
+
+    return result;
+}
+
 ImageDescription Image::getImageInfo() const
 {
     rif_image_desc desc;
@@ -165,7 +179,7 @@ bool Image::loadHDR(const std::filesystem::path& filePath)
 
 bool Image::loadJPG(const std::filesystem::path& filePath)
 {
-    ImageJpg colorImg;
+    /*ImageJpg colorImg;
 
     ReadJpg(path.c_str(), colorImg);
     width = colorImg.Width;
@@ -175,7 +189,9 @@ bool Image::loadJPG(const std::filesystem::path& filePath)
     data = new float[arraySize * num];
     CopyAndConvert<float, float>((float *) data, &colorImg.Pixels[0], width * height * num, 1.f);
     desc.type = RIF_COMPONENT_TYPE_FLOAT32;
-    return true;
+    return true;*/
+
+    return false;
 }
 
 bool Image::loadPNG(const std::filesystem::path& filePath)

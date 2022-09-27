@@ -7,48 +7,11 @@
 #include "riff/ImageFilter.h"
 
 #include <gtest/gtest.h>
-
-#ifdef __GNUC__
-#pragma GCC diagnostic ignored "-Wold-style-cast"
-#pragma GCC diagnostic ignored "-Wmissing-declarations"
-#pragma GCC diagnostic ignored "-Wunused-parameter"
-#pragma GCC diagnostic ignored "-Wunused-variable"
-#pragma GCC diagnostic ignored "-Wsign-compare"
-
-#endif
-
-#define STB_IMAGE_WRITE_IMPLEMENTATION
-#include "ImageTools/stb_image_write.h"
-#define STB_IMAGE_IMPLEMENTATION
-#include "ImageTools/stb_image.h"
-
-#include "ImageTools/ImageTools.h"
-
-#ifdef __GNUC__
-#pragma GCC diagnostic warning "-Wold-style-cast"
-#pragma GCC diagnostic warning "-Wmissing-declarations"
-#pragma GCC diagnostic warning "-Wunused-parameter"
-#pragma GCC diagnostic warning "-Wunused-variable"
-#pragma GCC diagnostic warning "-Wsign-compare"
-#endif
+#include "utils.h"
 
 #include <sstream>
 
 using namespace riff;
-
-class RifImageTest : public riff::ContextObject<rif_image>
-{
-public:
-    explicit RifImageTest(riff::Context& context, const std::filesystem::path& path)
-    {
-        rif_image image = ImageTools::LoadImage(path, context);
-        if (!image) {
-            throw std::runtime_error("Can't load image \"" + path.string() + "\"");
-        }
-        setInstance(std::move(image));
-    }
-private:
-};
 
 struct TestRiff : public ::testing::Test
 {
@@ -129,8 +92,6 @@ TEST_F(TestRiff, denoiser_lwr)
     std::cout << "Available riff devices: " << devices.size() << "\n";
     ASSERT_TRUE(devices.size() > 0);
 
-    printAvailableDevices(devices, std::cout);
-
     Context context(BackendType::Openc, devices[0].deviceId);
 
     Image normalsImage(context, tests::ResourcesDirectory / "images" / "normal.exr");
@@ -185,8 +146,6 @@ TEST_F(TestRiff, denoiser_eaw)
     auto devices = getAvailableDevices(BackendType::Openc);
     std::cout << "Available riff devices: " << devices.size() << "\n";
     ASSERT_TRUE(devices.size() > 0);
-
-    printAvailableDevices(devices, std::cout);
 
     Context context(BackendType::Openc, devices[0].deviceId);
 
@@ -251,8 +210,6 @@ TEST_F(TestRiff, custom_filter)
     std::cout << "Available riff devices: " << devices.size() << "\n";
     ASSERT_TRUE(devices.size() > 0);
 
-    printAvailableDevices(devices, std::cout);
-
     Context context(BackendType::Openc, devices[0].deviceId);
 
     Image inputImage(context, tests::ResourcesDirectory / "images" / "lenna.png");
@@ -275,4 +232,107 @@ TEST_F(TestRiff, custom_filter)
     queue.detachFilter(&userDefined);
 
     outputImage.saveToFile(m_tempDir / "user_defined.png");
+}
+
+TEST_F(TestRiff, image_memory_copy)
+{
+    const rif_char code[] =
+            "int2 coord;"
+            "int2 size = GET_BUFFER_SIZE(outputImage);"
+            "GET_COORD_OR_RETURN(coord, size);"
+            "vec4 pixel = ReadPixelTyped(inputImage, coord.x, coord.y);"
+            "WritePixelTyped(outputImage, coord.x, coord.y, pixel);";
+
+    auto devices = getAvailableDevices(BackendType::Openc);
+    ASSERT_TRUE(devices.size() > 0);
+
+    Context context(BackendType::Openc, devices[0].deviceId);
+
+    Image inputImage1(context, tests::ResourcesDirectory / "images" / "lenna.png");
+    Image inputImage2 = inputImage1.copy();
+
+    Image outputImage(context);
+
+    ASSERT_TRUE(inputImage1);
+    ASSERT_TRUE(inputImage2);
+    ASSERT_FALSE(outputImage);
+
+    EXPECT_EQ(inputImage1.getImageInfo().image_height, inputImage2.getImageInfo().image_height);
+    EXPECT_EQ(inputImage1.getImageInfo().image_width, inputImage2.getImageInfo().image_width);
+    EXPECT_EQ(inputImage1.getImageInfo().num_components, inputImage2.getImageInfo().num_components);
+    EXPECT_EQ(inputImage1.getImageInfo().type, inputImage2.getImageInfo().type);
+
+    ContextQueue queue(context);
+
+    ImageDescription desc = inputImage1.getImageInfo();
+    outputImage.allocate(desc);
+
+    ImageFilter userDefined(context, ImageFilterType::UserDefined);
+    userDefined.setParameterString("code", code);
+
+    queue.attachFilter(&userDefined, &inputImage1, &outputImage);
+
+    queue.execute();
+    queue.synchronize();
+    queue.flush();
+
+    queue.detachFilter(&userDefined);
+
+    outputImage.saveToFile(m_tempDir / "image_memory_copy.png");
+
+    EXPECT_TRUE(images_same(tests::ResourcesDirectory / "images" / "lenna.png", m_tempDir / "image_memory_copy.png"));
+}
+
+TEST_F(TestRiff, image_compare_same)
+{
+    const rif_char code[] =
+            "int2 coord;"
+            "int2 size = GET_BUFFER_SIZE(outputImage);"
+            "GET_COORD_OR_RETURN(coord, size);"
+            "vec4 pixel1 = ReadPixelTyped(inputImage, coord.x, coord.y);"
+            "vec4 pixel2 = ReadPixelTyped(inputImage2, coord.x, coord.y);"
+            /*"vec4 pixel = make_vec4(abs_diff(pixel1.x, pixel2.x), abs_diff(pixel1.x, pixel2.x), abs_diff(pixel1.x, pixel2.x));"*/
+            "vec4 pixel = make_vec4(fabs(pixel1.x - pixel2.x), fabs(pixel1.y - pixel2.y), fabs(pixel1.z - pixel2.z), fabs(pixel1.w - pixel2.w));"
+            "WritePixelTyped(outputImage, coord.x, coord.y, pixel);";
+
+    auto devices = getAvailableDevices(BackendType::Openc);
+    std::cout << "Available riff devices: " << devices.size() << "\n";
+    ASSERT_TRUE(devices.size() > 0);
+
+    printAvailableDevices(devices, std::cout);
+
+    Context context(BackendType::Openc, devices[0].deviceId);
+
+    Image inputImage1(context, tests::ResourcesDirectory / "images" / "lenna.png");
+    Image inputImage2 = inputImage1.copy();
+    Image inputImage3(context, tests::ResourcesDirectory / "images" / "lenna_rotated_180.png");
+
+    Image outputImage(context);
+
+    ASSERT_TRUE(inputImage1);
+    ASSERT_TRUE(inputImage2);
+    ASSERT_FALSE(outputImage);
+
+    EXPECT_EQ(inputImage1.getImageInfo().image_height, inputImage2.getImageInfo().image_height);
+    EXPECT_EQ(inputImage1.getImageInfo().image_width, inputImage2.getImageInfo().image_width);
+    EXPECT_EQ(inputImage1.getImageInfo().num_components, inputImage2.getImageInfo().num_components);
+    EXPECT_EQ(inputImage1.getImageInfo().type, inputImage2.getImageInfo().type);
+
+    ContextQueue queue(context);
+
+    ImageDescription desc = inputImage1.getImageInfo();
+    outputImage.allocate(desc);
+
+    ImageFilter userDefined(context, ImageFilterType::UserDefined);
+    userDefined.setParameterString("code", code);
+    userDefined.setParameterImage("inputImage2", inputImage2);
+
+    queue.attachFilter(&userDefined, &inputImage1, &outputImage);
+    queue.execute();
+    outputImage.saveToFile(m_tempDir / "image_diff.png");
+
+    userDefined.setParameterImage("inputImage2", inputImage3);
+    queue.execute();
+    outputImage.saveToFile(m_tempDir / "image_diff2.png");
+
 }

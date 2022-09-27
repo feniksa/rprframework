@@ -17,6 +17,9 @@ find_package(Boost 1.79 REQUIRED COMPONENTS thread system filesystem
 find_package(RadeonProRenderSDK REQUIRED COMPONENTS northstar tahoe)
 find_package(RadeonImageFilter REQUIRED)
 
+add_subdirectory(ThirdParty/miniz)
+add_subdirectory(tinyexrimpl)
+add_subdirectory(stbimpl)
 add_subdirectory(math)
 add_subdirectory(rprf)
 add_subdirectory(riff)
