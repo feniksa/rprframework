@@ -7,7 +7,7 @@
 #include "riff/ImageFilter.h"
 
 #include <gtest/gtest.h>
-#include "utils.h"
+#include "Utils.h"
 
 #include <sstream>
 
