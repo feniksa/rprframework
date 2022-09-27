@@ -1,3 +1,5 @@
+#include "stbimpl.h"
+
 #ifdef __GNUC__
 
 #pragma GCC diagnostic ignored "-Wold-style-cast"

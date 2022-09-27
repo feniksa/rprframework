@@ -1,18 +1,12 @@
-if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-    add_compile_options(
-            "-fno-elide-constructors"
-            "-Wall"
-            # fix for math/matrix.h ugly anonymous union
-            #"-pedantic-errors"
-            "-Wextra"
-            "-Winit-self"
-            "-Wold-style-cast"
-            "-Woverloaded-virtual"
-            "-Wuninitialized"
-            "-Wmissing-declarations"
-            "-Winit-self"
-            "-Wstrict-aliasing")
-endif()
+add_compile_options($<$<COMPILE_LANG_AND_ID:CXX,GNU>:-fno-elide-constructors>)
+add_compile_options($<$<COMPILE_LANG_AND_ID:CXX,GNU>:-Wall>)
+add_compile_options($<$<COMPILE_LANG_AND_ID:CXX,GNU>:-Wextra>)
+add_compile_options($<$<COMPILE_LANG_AND_ID:CXX,GNU>:-Winit-self>)
+add_compile_options($<$<COMPILE_LANG_AND_ID:CXX,GNU>:-Wold-style-cast>)
+add_compile_options($<$<COMPILE_LANG_AND_ID:CXX,GNU>:-Woverloaded-virtual>)
+add_compile_options($<$<COMPILE_LANG_AND_ID:CXX,GNU>:-Wuninitialized>)
+add_compile_options($<$<COMPILE_LANG_AND_ID:CXX,GNU>:-Wmissing-declarations>)
+add_compile_options($<$<COMPILE_LANG_AND_ID:CXX,GNU>:-Wstrict-aliasing>)
 
 if (${FORCE_COLORED_OUTPUT})
     if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")

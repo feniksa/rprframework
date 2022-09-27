@@ -177,7 +177,7 @@ bool Image::loadHDR(const std::filesystem::path& filePath)
 }
 
 
-bool Image::loadJPG(const std::filesystem::path& filePath)
+bool Image::loadJPG(const std::filesystem::path&)
 {
     /*ImageJpg colorImg;
 
