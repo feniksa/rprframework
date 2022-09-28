@@ -16,6 +16,7 @@ using namespace riff;
 struct TestRiff : public ::testing::Test
 {
     std::filesystem::path m_tempDir;
+    std::filesystem::path TestReferenceDirectory = tests::ReferenceDirectory / "TestRiff";
 
     TestRiff() {
         m_tempDir = std::filesystem::temp_directory_path();
@@ -29,6 +30,11 @@ struct TestRiff : public ::testing::Test
             std::filesystem::create_directory(m_tempDir);
         }
         std::cout << "Temporary directory: \t" << m_tempDir <<  "\n";
+    }
+
+    bool image_same_as_ref(std::filesystem::path file) const
+    {
+        return images_same(TestReferenceDirectory / file, m_tempDir / file);
     }
 
     void SetUp()
@@ -83,7 +89,8 @@ TEST_F(TestRiff, denoiser_bilaterial)
     queue.attachFilter(&bilateralFilter, &colorImage, &outputImage);
     queue.execute();
 
-    outputImage.saveToFile(m_tempDir / "denoiser_bilaterial.png");
+    outputImage.saveToFile(m_tempDir / "denoiser_bilaterial0.png");
+    EXPECT_TRUE(image_same_as_ref("denoiser_bilaterial0.png"));
 }
 
 TEST_F(TestRiff, denoiser_lwr)
@@ -138,7 +145,8 @@ TEST_F(TestRiff, denoiser_lwr)
     queue.attachFilter(&lwrDenoise, &colorImage, &outputImage);
     queue.execute();
 
-    outputImage.saveToFile(m_tempDir / "denoiser_lwr.png");
+    outputImage.saveToFile(m_tempDir / "denoiser_lwr0.png");
+    EXPECT_TRUE(image_same_as_ref("denoiser_lwr0.png"));
 }
 
 TEST_F(TestRiff, denoiser_eaw)
@@ -192,7 +200,8 @@ TEST_F(TestRiff, denoiser_eaw)
     queue.attachFilter(&lwrDenoise, &colorImage, &outputImage);
     queue.execute();
 
-    outputImage.saveToFile(m_tempDir / "denoiser_eaw.png");
+    outputImage.saveToFile(m_tempDir / "denoiser_eaw0.png");
+    EXPECT_TRUE(image_same_as_ref("denoiser_eaw0.png"));
 }
 
 TEST_F(TestRiff, custom_filter)
@@ -231,7 +240,8 @@ TEST_F(TestRiff, custom_filter)
     queue.execute();
     queue.detachFilter(&userDefined);
 
-    outputImage.saveToFile(m_tempDir / "user_defined.png");
+    outputImage.saveToFile(m_tempDir / "custom_filter0.png");
+    EXPECT_TRUE(image_same_as_ref("custom_filter0.png"));
 }
 
 TEST_F(TestRiff, image_memory_copy)
@@ -278,9 +288,8 @@ TEST_F(TestRiff, image_memory_copy)
 
     queue.detachFilter(&userDefined);
 
-    outputImage.saveToFile(m_tempDir / "image_memory_copy.png");
-
-    EXPECT_TRUE(images_same(tests::ResourcesDirectory / "images" / "lenna.png", m_tempDir / "image_memory_copy.png"));
+    outputImage.saveToFile(m_tempDir / "image_memory_copy0.png");
+    EXPECT_TRUE(images_same(tests::ResourcesDirectory / "images" / "lenna.png", m_tempDir / "image_memory_copy0.png"));
 }
 
 TEST_F(TestRiff, image_compare_same)
@@ -329,10 +338,11 @@ TEST_F(TestRiff, image_compare_same)
 
     queue.attachFilter(&userDefined, &inputImage1, &outputImage);
     queue.execute();
-    outputImage.saveToFile(m_tempDir / "image_diff.png");
+    outputImage.saveToFile(m_tempDir / "image_compare_same0.png");
+    EXPECT_TRUE(image_same_as_ref("image_compare_same0.png"));
 
     userDefined.setParameterImage("inputImage2", inputImage3);
     queue.execute();
-    outputImage.saveToFile(m_tempDir / "image_diff2.png");
-
+    outputImage.saveToFile(m_tempDir / "image_compare_same1.png");
+    EXPECT_TRUE(image_same_as_ref("image_compare_same1.png"));
 }
