@@ -1,5 +1,6 @@
 #include "Utils.h"
 #include <stb/stb_image.h>
+#include <stb/stb_image_write.h>
 
 MemoryImage::MemoryImage(const char* path)
 {
@@ -14,6 +15,16 @@ bool MemoryImage::load(const char* path)
         return false;
     }
     buffer.reset(pixels);
+
+    return true;
+}
+
+bool MemoryImage::save(const char* path) const
+{
+    int status;
+    status = stbi_write_png(path, width, height, channels_num, buffer.get(), width * channels_num);
+    if (status == 0)
+        return false;
 
     return true;
 }

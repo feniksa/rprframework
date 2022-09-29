@@ -16,6 +16,7 @@ struct MemoryImage
 
     explicit MemoryImage(const char* path);
     bool load(const char* path);
+    bool save(const char* path) const;
 };
 
 bool operator==(const MemoryImage& image1, const MemoryImage& image2);

@@ -34,7 +34,15 @@ struct TestRiff : public ::testing::Test
 
     bool image_same_as_ref(std::filesystem::path file) const
     {
-        return images_same(TestReferenceDirectory / file, m_tempDir / file);
+        bool result;
+
+        result = images_same(TestReferenceDirectory / file, m_tempDir / file);
+        if (!result) {
+            std::cerr << TestReferenceDirectory / file << " != ";
+            std::cerr << m_tempDir / file << "\n";
+        }
+
+        return result;
     }
 
     void SetUp()
