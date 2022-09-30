@@ -2,11 +2,11 @@
 
 struct TestDummy : public ::testing::Test
 {
-    void SetUp()
+    void SetUp() override
     {
     }
 
-    void TearDown()
+    void TearDown() override
     {
     }
 };

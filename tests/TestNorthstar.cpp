@@ -50,14 +50,18 @@ struct TestNorthstar : public ::testing::Test
 		std::cout << "Temporary directory: \t" << m_tempDir <<  "\n";
 	}
 
-    void SetUp()
+    void SetUp() override
     {
 		m_plugin = std::make_unique<Plugin>(Plugin::Type::Northstar);
     }
 
-    void TearDown()
+    void TearDown() override
     {
     	m_plugin.reset();
+
+        if (!::testing::Test::HasFailure()) {
+            std::filesystem::remove_all(m_tempDir);
+        }
     }
 
 
