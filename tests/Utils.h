@@ -40,4 +40,4 @@ private:
 
 bool operator==(const MemoryImage& image1, const MemoryImage& image2);
 bool images_same(const std::filesystem::path& image_path1, const std::filesystem::path& image_path2);
-bool images_same(const std::filesystem::path& image_path1, const std::filesystem::path& image_path2, const std::string& image_diff);
+bool get_image_diff(const std::filesystem::path& image_path1, const std::filesystem::path& image_path2, const std::filesystem::path& image_diff);
