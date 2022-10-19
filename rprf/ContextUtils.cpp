@@ -109,4 +109,45 @@ std::ostream& printAvailableDevices(const gpu_list_t& devices, std::ostream& str
 	return stream;
 }
 
+
+int getContextCreationFlags(int gpu_number)
+{
+    switch(gpu_number) {
+        case 0:
+            return RPR_CREATION_FLAGS_ENABLE_GPU0;
+        case 1:
+            return RPR_CREATION_FLAGS_ENABLE_GPU1;
+        case 2:
+            return RPR_CREATION_FLAGS_ENABLE_GPU2;
+        case 3:
+            return RPR_CREATION_FLAGS_ENABLE_GPU3;
+        case 4:
+            return RPR_CREATION_FLAGS_ENABLE_GPU4;
+        case 5:
+            return RPR_CREATION_FLAGS_ENABLE_GPU5;
+        case 6:
+            return RPR_CREATION_FLAGS_ENABLE_GPU6;
+        case 7:
+            return RPR_CREATION_FLAGS_ENABLE_GPU7;
+        case 8:
+            return RPR_CREATION_FLAGS_ENABLE_GPU8;
+        case 9:
+            return RPR_CREATION_FLAGS_ENABLE_GPU9;
+        case 10:
+            return RPR_CREATION_FLAGS_ENABLE_GPU10;
+        case 11:
+            return RPR_CREATION_FLAGS_ENABLE_GPU11;
+        case 12:
+            return RPR_CREATION_FLAGS_ENABLE_GPU12;
+        case 13:
+            return RPR_CREATION_FLAGS_ENABLE_GPU13;
+        case 14:
+            return RPR_CREATION_FLAGS_ENABLE_GPU14;
+        case 15:
+            return RPR_CREATION_FLAGS_ENABLE_GPU15;
+        default:
+           throw std::runtime_error("getContextCreationFlags: bad gpu number");
+    }
 }
+
+} // namespace

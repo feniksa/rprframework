@@ -1,8 +1,9 @@
 #include "Plugin.h"
 #include <RadeonProRender.h>
 #include <stdexcept>
-#include <cassert>
 #include <sstream>
+#include <algorithm>
+#include <cassert>
 
 namespace rprf
 {
@@ -25,7 +26,6 @@ Plugin::Plugin(Type type)
 	: Plugin(GetDynamicLibraryName(type))
 {
 }
-
 
 #ifdef _WIN32
 const char* Plugin::GetDynamicLibraryName(Type type) 
@@ -62,5 +62,36 @@ const char* Plugin::GetDynamicLibraryName(Type type)
 
 #endif
 
+// tools
+
+std::string to_string(const Plugin::Type type)
+{
+    switch(type)
+    {
+        case Plugin::Type::Hybrid:
+            return "Hybrid";
+        case Plugin::Type::Tahoe:
+            return "Tahoe";
+        case Plugin::Type::Northstar:
+            return "Northstar";
+        default:
+            throw std::runtime_error("rprf::Plugin::to_string(const Plugin::Type) is not know");
+    }
+}
+
+std::pair<Plugin::Type, bool> from_string(std::string type)
+{
+    std::transform(type.begin(), type.end(), type.begin(),
+                   [](unsigned char c){ return std::tolower(c); });
+
+    if (type == "hybrid")
+        return {Plugin::Type::Hybrid, true};
+    if (type == "northstar")
+        return {Plugin::Type::Northstar, true};
+    if (type == "tahoe")
+        return {Plugin::Type::Tahoe, true};
+
+    return {Plugin::Type::Northstar, false};
+}
 
 } // rpr

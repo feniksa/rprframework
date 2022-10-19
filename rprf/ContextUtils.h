@@ -13,4 +13,6 @@ using gpu_list_t = std::map<int, std::string>;
 gpu_list_t getAvailableDevices(const Plugin& plugin, const char* cachePath);
 std::ostream& printAvailableDevices(const gpu_list_t& devices, std::ostream& stream);
 
+int getContextCreationFlags(int gpu_number);
+
 } // namespace

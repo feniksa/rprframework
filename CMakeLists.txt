@@ -11,7 +11,8 @@ option(FORCE_UPDATE_ENUMS "Update Contants.h file" FALSE)
 
 include("${CMAKE_SOURCE_DIR}/cmake/CompileOptions.cmake")
 
-add_definitions(-DBOOST_LOG_DYN_LINK)
+#add_definitions(-DBOOST_LOG_DYN_LINK)
+SET(Boost_USE_STATIC_LIBS ON)
 find_package(Boost 1.79 REQUIRED COMPONENTS thread system filesystem
 	program_options log)
 find_package(RadeonProRenderSDK REQUIRED COMPONENTS northstar tahoe)
@@ -23,6 +24,7 @@ add_subdirectory(stbimpl)
 add_subdirectory(math)
 add_subdirectory(rprf)
 add_subdirectory(riff)
+add_subdirectory(utils)
 
 enable_testing()
 add_subdirectory(tests)

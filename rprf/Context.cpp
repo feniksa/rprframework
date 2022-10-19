@@ -9,7 +9,7 @@
 namespace rprf
 {
 
-Context::Context(const Plugin& plugin, const std::filesystem::path& cachePath, int createFlags)
+Context::Context(const Plugin& plugin, const std::filesystem::path& cachePath, int createFlags, unsigned int rprApiVersion)
 : m_createFlags(createFlags)
 {
 	int status;
@@ -18,7 +18,8 @@ Context::Context(const Plugin& plugin, const std::filesystem::path& cachePath, i
 	ids.push_back(plugin.id());
 
 	rpr_context context;
-	status = rprCreateContext(RPR_API_VERSION, ids.data(), ids.size(), m_createFlags, NULL, cachePath.string().c_str(), &context);
+	status = rprCreateContext(rprApiVersion, ids.data(), ids.size(),
+							  m_createFlags, NULL, cachePath.string().c_str(), &context);
 	check(status);
 
 	setInstance(std::move(context));
