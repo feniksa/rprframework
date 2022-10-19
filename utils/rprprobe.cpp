@@ -56,7 +56,7 @@ int main(int argc, const char **argv) try
 
     Plugin::Type renderer;
     unsigned int gpuDeviceIndex;
-    int createFlags;
+    int createFlags = 0;
 
     // parse requirements for engine
     if (!vm.contains("engine")) {
