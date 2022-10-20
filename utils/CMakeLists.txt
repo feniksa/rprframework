@@ -1,7 +1,6 @@
 add_executable(rpr_probe rprprobe.cpp)
 target_link_libraries(rpr_probe
 	rprf
-	riff
 	Boost::log
 	Boost::system
 	Boost::filesystem
@@ -25,3 +24,13 @@ foreach(dll ${RadeonImageFilter_DLLS})
                 COMMENT "Copying rif dll's: ${dll}")
 endforeach()
 
+
+add_executable(riff_probe riffprobe.cpp)
+target_link_libraries(riff_probe
+	riff
+	Boost::log
+	Boost::system
+	Boost::filesystem
+	Boost::thread
+	Boost::program_options
+)

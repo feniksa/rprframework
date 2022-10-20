@@ -12,8 +12,8 @@ using namespace rprf;
 enum ErrorCode {
     Ok = 0,
     NotEnoughParams = -1,
-    BadEngine = -2,
-    BadGpuIndex = -3,
+    BadCompute = -2,
+    BadDeviceIndex = -3,
     OtherError = -4,
     UnkownError = -5,
 };
@@ -75,7 +75,7 @@ int main(int argc, const char **argv) try
     std::tie(renderer, result) = rprf::from_string(renderName);
     if (!result) { // bad string
         std::cerr << "Unknown renderer engine. Supported renders are:" << allRenderEngines() << "\n";
-        return ErrorCode::BadEngine;
+        return ErrorCode::BadCompute;
     }
 
     if (vm.contains("gpu")) {
@@ -83,7 +83,7 @@ int main(int argc, const char **argv) try
         for (unsigned int index : gpuIndexes) {
             if (index >= 16) {
                 std::cerr << "Bad gpu number " <<  index << ". GPU number should be in range [0-16]" << "\n";
-                return ErrorCode::BadGpuIndex;
+                return ErrorCode::BadDeviceIndex;
             }
             createFlags |= getContextCreationFlags(index);
         }

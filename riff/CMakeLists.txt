@@ -4,13 +4,23 @@ set(HEADERS
 	ContextObject.h
 	ContextUtils.h
 	RadeonImageFilterEnums.h
-	Image.h ContextQueue.cpp ContextQueue.h ImageFilter.cpp ImageFilter.h ImageFilterType.h ImageDescription.h MemoryMap.cpp MemoryMap.h)
+	Image.h
+	ContextQueue.h
+	ImageFilter.h ImageFilterType.h
+	ImageDescription.h
+	MemoryMap.h
+)
 
 set(SOURCES
 	Error.cpp
 	Context.cpp
 	ContextUtils.cpp
-	Image.cpp ContextQueue.cpp ContextQueue.h ImageFilter.cpp ImageFilter.h MemoryMap.cpp MemoryMap.h)
+	Image.cpp
+	ContextQueue.cpp
+	ImageFilter.cpp
+	MemoryMap.cpp
+	RadeonImageFilterEnums.cpp
+)
 
 add_library(riff STATIC ${SOURCES} ${HEADERS})
 target_include_directories(riff PUBLIC "${CMAKE_SOURCE_DIR}" "${CMAKE_SOURCE_DIR}/ThirdParty")
