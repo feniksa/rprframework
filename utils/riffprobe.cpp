@@ -1,4 +1,5 @@
 #include "riff/Context.h"
+#include "riff/ContextUtils.h"
 
 #include <boost/program_options.hpp>
 #include <iostream>
@@ -92,6 +93,10 @@ int main(int argc, const char **argv) try
     BOOST_LOG_TRIVIAL(debug) << "Create riff context " << to_string(backendType);
     riff::Context context(backendType, deviceIndex, "", version);
     BOOST_LOG_TRIVIAL(debug) << "OK";
+
+    std::cout << getDeviceVendor(backendType, static_cast<int>(deviceIndex)) << "\n";
+    std::cout << getDeviceName(backendType, static_cast<int>(deviceIndex)) << "\n";
+    std::cout << getDeviceMemorySize(backendType, static_cast<int>(deviceIndex)) << "\n";
 
     return 0;
 }
