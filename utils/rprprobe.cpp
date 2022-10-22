@@ -26,13 +26,13 @@ std::string allRenderEngines()
    std::stringstream s;
 
    s << to_string(rprf::Plugin::Type::Northstar) << ", ";
-   s << to_string(rprf::Plugin::Type::Hybrid) << ", ";
-   s << to_string(rprf::Plugin::Type::Tahoe) << "";
+   s << to_string(rprf::Plugin::Type::Hybrid)    << ", ";
+   s << to_string(rprf::Plugin::Type::Tahoe)     << "  ";
 
    return s.str();
 }
 
-}
+} // end of namespace
 
 int main(int argc, const char **argv) try
 {
