@@ -4,6 +4,7 @@
 
 #include <boost/program_options.hpp>
 #include <iostream>
+#include <sstream>
 #include <boost/log/trivial.hpp>
 
 namespace po = boost::program_options;
@@ -32,6 +33,31 @@ std::string allRenderEngines()
    return s.str();
 }
 
+std::string gpus_as_string(int creationFlags)
+{
+    std::ostringstream s;
+
+    if (creationFlags & RPR_CREATION_FLAGS_ENABLE_CPU) s << "CPU ";
+    if (creationFlags & RPR_CREATION_FLAGS_ENABLE_GPU0) s << "GPU0 ";
+    if (creationFlags & RPR_CREATION_FLAGS_ENABLE_GPU1) s << "GPU1 ";
+    if (creationFlags & RPR_CREATION_FLAGS_ENABLE_GPU2) s << "GPU2 ";
+    if (creationFlags & RPR_CREATION_FLAGS_ENABLE_GPU3) s << "GPU3 ";
+    if (creationFlags & RPR_CREATION_FLAGS_ENABLE_GPU4) s << "GPU4 ";
+    if (creationFlags & RPR_CREATION_FLAGS_ENABLE_GPU5) s << "GPU5 ";
+    if (creationFlags & RPR_CREATION_FLAGS_ENABLE_GPU6) s << "GPU6 ";
+    if (creationFlags & RPR_CREATION_FLAGS_ENABLE_GPU7) s << "GPU7 ";
+    if (creationFlags & RPR_CREATION_FLAGS_ENABLE_GPU8) s << "GPU8 ";
+    if (creationFlags & RPR_CREATION_FLAGS_ENABLE_GPU9) s << "GPU9 ";
+    if (creationFlags & RPR_CREATION_FLAGS_ENABLE_GPU10) s << "GPU10 ";
+    if (creationFlags & RPR_CREATION_FLAGS_ENABLE_GPU11) s << "GPU11 ";
+    if (creationFlags & RPR_CREATION_FLAGS_ENABLE_GPU12) s << "GPU12 ";
+    if (creationFlags & RPR_CREATION_FLAGS_ENABLE_GPU13) s << "GPU13 ";
+    if (creationFlags & RPR_CREATION_FLAGS_ENABLE_GPU14) s << "GPU14 ";
+    if (creationFlags & RPR_CREATION_FLAGS_ENABLE_GPU15) s << "GPU15 ";
+
+    return s.str();
+}
+
 } // end of namespace
 
 int main(int argc, const char **argv) try
@@ -55,7 +81,6 @@ int main(int argc, const char **argv) try
     }
 
     Plugin::Type renderer;
-    unsigned int gpuDeviceIndex;
     int createFlags = 0;
 
     // parse requirements for engine
@@ -94,6 +119,8 @@ int main(int argc, const char **argv) try
         if (enableCPU) {
             createFlags |= RPR_CREATION_FLAGS_ENABLE_CPU;
         }
+    } else if (createFlags == 0) {
+        createFlags |= RPR_CREATION_FLAGS_ENABLE_CPU;
     }
 
     unsigned int version;
@@ -108,7 +135,7 @@ int main(int argc, const char **argv) try
     Plugin plugin(renderer);
     BOOST_LOG_TRIVIAL(debug) << "OK";
 
-    BOOST_LOG_TRIVIAL(debug) << "Create context";
+    BOOST_LOG_TRIVIAL(debug) << "Create context on: " << gpus_as_string(createFlags);
     rprf::Context context(plugin, "", createFlags, version);
     BOOST_LOG_TRIVIAL(debug) << "OK";
 
