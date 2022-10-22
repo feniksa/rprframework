@@ -68,7 +68,7 @@ int main(int argc, const char **argv) try
             ("help", "show help message")
             ("engine", po::value<std::string>()->default_value("northstar"),("renderer from list " + allRenderEngines()).c_str())
             ("gpu", po::value<std::vector<unsigned int>>(), "gpu indexes to probe")
-            ("cpu", po::value<bool>()->default_value(true), "use cpu cpu")
+            ("cpu", po::value<bool>(), "use cpu cpu")
             ("api", po::value<int>()->default_value(RPR_API_VERSION), "force to use API version");
 
     po::variables_map vm;
