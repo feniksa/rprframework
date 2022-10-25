@@ -4,8 +4,12 @@
 
 #include <boost/program_options.hpp>
 #include <iostream>
-#include <sstream>
+#include <boost/log/core.hpp>
 #include <boost/log/trivial.hpp>
+#include <boost/log/expressions.hpp>
+
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/json_parser.hpp>
 
 namespace po = boost::program_options;
 using namespace rprf;
@@ -13,7 +17,7 @@ using namespace rprf;
 enum ErrorCode {
     Ok = 0,
     NotEnoughParams = -1,
-    BadCompute = -2,
+    BadDevice = -2,
     BadDeviceIndex = -3,
     OtherError = -4,
     UnkownError = -5,
@@ -69,6 +73,7 @@ int main(int argc, const char **argv) try
             ("engine", po::value<std::string>()->default_value("northstar"),("renderer from list " + allRenderEngines()).c_str())
             ("gpu", po::value<std::vector<unsigned int>>(), "gpu indexes to probe")
             ("cpu", po::value<bool>(), "use cpu cpu")
+            ("verbosity", po::value<std::string>(), "verbosity")
             ("api", po::value<int>()->default_value(RPR_API_VERSION), "force to use API version");
 
     po::variables_map vm;
@@ -78,6 +83,16 @@ int main(int argc, const char **argv) try
     if (vm.contains("help")) {
         std::cout << desc << "\n";
         return ErrorCode::Ok;
+    }
+
+    if (vm.contains("verbosity")) {
+        std::string verbosity = vm["verbosity"].as<std::string>();
+
+        boost::log::trivial::severity_level severityLevel;
+        boost::log::trivial::from_string(verbosity.c_str(), verbosity.size(), severityLevel);
+        boost::log::core::get()->set_filter(boost::log::trivial::severity >= severityLevel);
+    } else {
+        boost::log::core::get()->set_filter(boost::log::trivial::severity >= boost::log::trivial::info);
     }
 
     Plugin::Type renderer;
@@ -100,11 +115,12 @@ int main(int argc, const char **argv) try
     std::tie(renderer, result) = rprf::from_string(renderName);
     if (!result) { // bad string
         std::cerr << "Unknown renderer engine. Supported renders are:" << allRenderEngines() << "\n";
-        return ErrorCode::BadCompute;
+        return ErrorCode::BadDevice;
     }
 
+    std::vector<unsigned int> gpuIndexes;
     if (vm.contains("gpu")) {
-        const auto gpuIndexes = vm["gpu"].as<std::vector<unsigned int>>();
+        gpuIndexes = vm["gpu"].as<std::vector<unsigned int>>();
         for (unsigned int index : gpuIndexes) {
             if (index >= 16) {
                 std::cerr << "Bad gpu number " <<  index << ". GPU number should be in range [0-16]" << "\n";
@@ -139,14 +155,64 @@ int main(int argc, const char **argv) try
     rprf::Context context(plugin, "", createFlags, version);
     BOOST_LOG_TRIVIAL(debug) << "OK";
 
+    boost::property_tree::ptree jsonRoot;
+
+    if (createFlags & RPR_CREATION_FLAGS_ENABLE_CPU) {
+        boost::property_tree::ptree jsonChild;
+
+        BOOST_LOG_TRIVIAL(debug) << "Get CPU name: ";
+        std::string cpuName = context.getCpuName();
+        BOOST_LOG_TRIVIAL(debug) << "OK";
+
+        jsonChild.put(std::to_string(0), cpuName);
+
+        jsonRoot.add_child("cpus", jsonChild);
+    }
+
+    for (unsigned int gpuIndex : gpuIndexes) {
+        boost::property_tree::ptree jsonChild;
+
+        BOOST_LOG_TRIVIAL(debug) << "Get GPU name: " << gpuIndex;
+        std::string gpuName = context.getGpuName(gpuIndex);
+        BOOST_LOG_TRIVIAL(debug) << "OK";
+
+        jsonChild.put(std::to_string(gpuIndex), gpuName);
+        jsonRoot.add_child("gpus", jsonChild);
+    }
+
+    jsonRoot.put("status", 0);
+
+    boost::property_tree::write_json(std::cout, jsonRoot);
+
     return 0;
+}
+catch (const Error& error)
+{
+    std::cerr << error.status() << " " << error.what() << "\n";
+
+    boost::property_tree::ptree jsonRoot;
+    jsonRoot.put("status", ErrorCode::BadDevice);
+    boost::property_tree::write_json(std::cout, jsonRoot);
+
+    return ErrorCode::BadDevice;
 }
 catch (const std::exception& e)
 {
     std::cerr << e.what() << "\n";
+
+    boost::property_tree::ptree jsonRoot;
+    jsonRoot.put("status", ErrorCode::OtherError);
+    boost::property_tree::write_json(std::cout, jsonRoot);
+
+
     return ErrorCode::OtherError;
 }
 catch (...) {
     std::cerr << "Unkown error\n";
+
+    boost::property_tree::ptree jsonRoot;
+    jsonRoot.put("status", ErrorCode::UnkownError);
+    boost::property_tree::write_json(std::cout, jsonRoot);
+
     return ErrorCode::UnkownError;
 }

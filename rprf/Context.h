@@ -26,6 +26,9 @@ public:
 
 	void render();
 
+    std::string getCpuName() const;
+    std::string getGpuName(int index) const;
+
 	int createFlags() const { return m_createFlags; }
 private:
 	int m_createFlags;

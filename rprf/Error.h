@@ -13,6 +13,7 @@ public:
 	explicit Error(rpr_int status, std::string_view message);
 
 	static const char* as_string(rpr_int status) noexcept;
+    int status() const noexcept { return m_status; }
 private:
 	static std::string getErrorMessage(std::string_view message, rpr_int status);
 	rpr_int m_status;
