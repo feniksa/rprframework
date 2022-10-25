@@ -50,7 +50,6 @@ std::size_t getDeviceMemorySize(BackendType backend, int deviceIndex)
 std::string getDeviceVendor(BackendType backend, int deviceIndex)
 {
 	rif_int status;
-	std::string deviceVendor;
 #ifndef NDEBUG
 	int deviceCount = getDeviceCount(backend);
 	assert(deviceIndex < deviceCount);
@@ -61,18 +60,22 @@ std::string getDeviceVendor(BackendType backend, int deviceIndex)
 	status = rifGetDeviceInfo(static_cast<int>(backend), deviceIndex, RIF_DEVICE_VENDOR, 0, nullptr, &dataSize);
 	check(status);
 
-	if (dataSize > 0)
-		deviceVendor.resize(dataSize);
-	else
-		return deviceVendor;
+	if (dataSize == 0)
+        return "";
+
+    std::vector<char> buffer(dataSize);
 
 	status = rifGetDeviceInfo(
 			static_cast<int>(backend), deviceIndex, RIF_DEVICE_VENDOR,
-			deviceVendor.size() * sizeof(char), deviceVendor.data(), &dataSize);
+			buffer.size() * sizeof(char), buffer.data(), &dataSize);
 	check(status);
 
-	if (deviceVendor.size() != dataSize)
+	if (buffer.size() != dataSize || dataSize == 0)
 		throw Error(RIF_ERROR_INTERNAL_ERROR, "getAvailableDevices: allocated buffer is not same size as required data");
+
+    std::string deviceVendor;
+    deviceVendor.reserve(buffer.size() - 1);
+    std::copy(buffer.begin(), buffer.end() - 1, std::back_inserter(deviceVendor));
 
 	return deviceVendor;
 }
@@ -100,7 +103,6 @@ gpu_list_t getAvailableDevices(BackendType backend)
 std::string getDeviceName(BackendType backend, int deviceIndex)
 {
 	rif_int status;
-	std::string deviceName;
 #ifndef NDEBUG
 	int deviceCount = getDeviceCount(backend);
 	assert(deviceIndex < deviceCount);
@@ -111,18 +113,22 @@ std::string getDeviceName(BackendType backend, int deviceIndex)
 	status = rifGetDeviceInfo(static_cast<int>(backend), deviceIndex, RIF_DEVICE_NAME, 0, nullptr, &dataSize);
 	check(status);
 
-	if (dataSize > 0)
-		deviceName.resize(dataSize);
-	else
-		return deviceName;
+	if (dataSize == 0)
+        return "";
+
+    std::vector<char> buffer(dataSize);
 
 	status = rifGetDeviceInfo(
 			static_cast<int>(backend), deviceIndex, RIF_DEVICE_NAME,
-			deviceName.size() * sizeof(char), deviceName.data(), &dataSize);
+			buffer.size() * sizeof(char), buffer.data(), &dataSize);
 	check(status);
 
-	if (deviceName.size() != dataSize)
+	if (buffer.size() != dataSize || dataSize == 0)
 		throw Error(RIF_ERROR_INTERNAL_ERROR, "getAvailableDevices: allocated buffer is not same size as required data");
+
+    std::string deviceName;
+    deviceName.reserve(buffer.size() - 1);
+    std::copy(buffer.begin(), buffer.end() - 1, std::back_inserter(deviceName));
 
 	return deviceName;
 }
