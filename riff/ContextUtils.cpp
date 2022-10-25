@@ -110,7 +110,8 @@ std::string getDeviceName(BackendType backend, int deviceIndex)
 
 	size_t dataSize;
 
-	status = rifGetDeviceInfo(static_cast<int>(backend), deviceIndex, RIF_DEVICE_NAME, 0, nullptr, &dataSize);
+	status = rifGetDeviceInfo(static_cast<int>(backend), deviceIndex,
+                              RIF_DEVICE_NAME, 0, nullptr, &dataSize);
 	check(status);
 
 	if (dataSize == 0)
@@ -124,7 +125,8 @@ std::string getDeviceName(BackendType backend, int deviceIndex)
 	check(status);
 
 	if (buffer.size() != dataSize || dataSize == 0)
-		throw Error(RIF_ERROR_INTERNAL_ERROR, "getAvailableDevices: allocated buffer is not same size as required data");
+		throw Error(RIF_ERROR_INTERNAL_ERROR,
+                    "getAvailableDevices: allocated buffer is not same size as required data");
 
     std::string deviceName;
     deviceName.reserve(buffer.size() - 1);
@@ -144,7 +146,6 @@ int getDeviceCount(BackendType backend)
 	return deviceCount;;
 }
 
-
 std::ostream& operator<<(std::ostream& stream, const GpuInfo& gpuInfo)
 {
 	stream << gpuInfo.gpuName << " ";
@@ -158,11 +159,9 @@ std::ostream& operator<<(std::ostream& stream, const GpuInfo& gpuInfo)
 
 std::ostream& printAvailableDevices(const gpu_list_t& gpus, std::ostream& stream)
 {
-	for(const auto& gpu : gpus)
-	{
+	for(const auto& gpu : gpus) {
 		stream << gpu << "\n";
 	}
-
 	return stream;
 }
 

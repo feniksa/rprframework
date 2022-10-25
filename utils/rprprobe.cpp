@@ -188,30 +188,27 @@ int main(int argc, const char **argv) try
 }
 catch (const Error& error)
 {
-    std::cerr << error.status() << " " << error.what() << "\n";
-
     boost::property_tree::ptree jsonRoot;
     jsonRoot.put("status", ErrorCode::BadDevice);
+    jsonRoot.put("errorMessage", error.what());
     boost::property_tree::write_json(std::cout, jsonRoot);
 
     return ErrorCode::BadDevice;
 }
-catch (const std::exception& e)
+catch (const std::exception& error)
 {
-    std::cerr << e.what() << "\n";
-
     boost::property_tree::ptree jsonRoot;
     jsonRoot.put("status", ErrorCode::OtherError);
+    jsonRoot.put("errorMessage", error.what());
     boost::property_tree::write_json(std::cout, jsonRoot);
-
 
     return ErrorCode::OtherError;
 }
-catch (...) {
-    std::cerr << "Unkown error\n";
-
+catch (...)
+{
     boost::property_tree::ptree jsonRoot;
     jsonRoot.put("status", ErrorCode::UnkownError);
+    jsonRoot.put("errorMessage", "Unknown error");
     boost::property_tree::write_json(std::cout, jsonRoot);
 
     return ErrorCode::UnkownError;
