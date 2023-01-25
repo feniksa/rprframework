@@ -53,7 +53,7 @@ macro(find_tahoe)
 	find_library(RPR_TAHOE_LIBRARY 
 		NAMES
 		Tahoe64
-		HINTS /usr/lib64 /usr/loca/lib64
+		HINTS /usr/lib64 /usr/local/lib64
 		"${RPR_SDK_ROOT}"
 		ENV RPR_SDK_ROOT
 		PATH_SUFFIXES RadeonProRender/binUbuntu18
@@ -85,7 +85,7 @@ macro(find_northstar)
 	find_library(RPR_NORTHSTAR_LIBRARY 
 		NAMES
 		Northstar64
-		HINTS /usr/lib64 /usr/loca/lib64
+		HINTS /usr/lib64 /usr/local/lib64
 		"${RPR_SDK_ROOT}"
 		ENV RPR_SDK_ROOT
 		PATH_SUFFIXES RadeonProRender/binUbuntu18
@@ -115,7 +115,7 @@ macro(find_hybrid)
 	find_library(RPR_HYBRID_LIBRARY 
 		NAMES
 		Hybrid
-		HINTS /usr/lib64 /usr/loca/lib64
+		HINTS /usr/lib64 /usr/local/lib64
 		"${RPR_SDK_ROOT}"
 		ENV RPR_SDK_ROOT
 		PATH_SUFFIXES RadeonProRender/binUbuntu18
@@ -142,6 +142,37 @@ macro(find_hybrid)
     endif()
 endmacro()
 
+macro(find_hybridpro)
+	find_library(RPR_HYBRIDPRO_LIBRARY
+			NAMES
+			HybridPro
+			HINTS /usr/lib64 /usr/local/lib64
+			"${RPR_SDK_ROOT}"
+			ENV RPR_SDK_ROOT
+			PATH_SUFFIXES RadeonProRender/binUbuntu18
+			RadeonProRender/libWin64
+			)
+
+	if (WIN32)
+		find_file(RadeonProRenderSDK_hybridpro_dll
+				NAMES "HybridPro.dll"
+				HINTS
+				"${RPR_SDK_ROOT}"
+				ENV RPR_SDK_ROOT
+				PATH_SUFFIXES RadeonProRender/binWin64)
+		if (RadeonProRenderSDK_hybridpro_dll)
+			list(APPEND RadeonProRender_DLLS ${RadeonProRenderSDK_hybridpro_dll})
+		endif()
+	endif()
+
+
+	if(NOT TARGET RadeonProRenderSDK::hybridpro)
+		add_library(RadeonProRenderSDK::hybridpro INTERFACE IMPORTED)
+		set_target_properties(RadeonProRenderSDK::hybridpro PROPERTIES
+				INTERFACE_LINK_LIBRARIES "${RPR_HYBRIDPRO_LIBRARY}")
+	endif()
+endmacro()
+
 process_rpr_version()
 
 
@@ -154,6 +185,8 @@ foreach(component IN LISTS RadeonProRenderSDK_FIND_COMPONENTS)
 		find_northstar()
 	elseif(component STREQUAL "hybrid")
 		find_hybrid()
+	elseif(component STREQUAL "hybridpro")
+		find_hybridpro()
 	else()
 		message(WARNING "${component} is not a valid RadeonProRender component")
 		set(RadeonProRenderSDK_${component}_FOUND false)
