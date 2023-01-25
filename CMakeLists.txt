@@ -8,6 +8,8 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
 
 option(FORCE_COLORED_OUTPUT "Always produce ANSI-colored output (GNU/Clang only)." FALSE)
 option(FORCE_UPDATE_ENUMS "Update Contants.h file" FALSE)
+option(ENABLE_TESTING "Enable testing" TRUE)
+option(BUILD_UTILS "Build utils" TRUE)
 
 include("${CMAKE_SOURCE_DIR}/cmake/CompileOptions.cmake")
 
@@ -23,7 +25,11 @@ add_subdirectory(stbimpl)
 add_subdirectory(math)
 add_subdirectory(rprf)
 add_subdirectory(riff)
-add_subdirectory(utils)
+if (BUILD_UTILS)
+	add_subdirectory(utils)
+endif()
 
-enable_testing()
-add_subdirectory(tests)
+if (ENABLE_TESTING)
+	enable_testing()
+	add_subdirectory(tests)
+endif()
