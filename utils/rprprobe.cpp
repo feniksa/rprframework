@@ -32,6 +32,7 @@ std::string allRenderEngines()
 
    s << to_string(rprf::Plugin::Type::Northstar) << ", ";
    s << to_string(rprf::Plugin::Type::Hybrid)    << ", ";
+   s << to_string(rprf::Plugin::Type::HybridPro)    << ", ";
    s << to_string(rprf::Plugin::Type::Tahoe)     << "  ";
 
    return s.str();

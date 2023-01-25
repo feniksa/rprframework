@@ -38,6 +38,8 @@ const char* Plugin::GetDynamicLibraryName(Type type)
 			return "Northstar64.dll";
 		case Type::Hybrid:
 			return "Hybrid.dll";
+		case Type::HybridPro:
+			return "HybridPro.dll";
 		default:
 			return "";
 	}
@@ -54,6 +56,8 @@ const char* Plugin::GetDynamicLibraryName(Type type)
 			return "libNorthstar64.so";
 		case Type::Hybrid:
 			return "libHybrid.so";
+		case Type::HybridPro:
+			return "libHybridPro.so";
 		default:
 			return "";
 	}
@@ -70,7 +74,9 @@ std::string to_string(const Plugin::Type type)
     {
         case Plugin::Type::Hybrid:
             return "Hybrid";
-        case Plugin::Type::Tahoe:
+		case Plugin::Type::HybridPro:
+			return "HybridPro";
+		case Plugin::Type::Tahoe:
             return "Tahoe";
         case Plugin::Type::Northstar:
             return "Northstar";
@@ -86,6 +92,8 @@ std::pair<Plugin::Type, bool> from_string(std::string type)
 
     if (type == "hybrid")
         return {Plugin::Type::Hybrid, true};
+	if (type == "hybridpro")
+		return {Plugin::Type::HybridPro, true};
     if (type == "northstar")
         return {Plugin::Type::Northstar, true};
     if (type == "tahoe")

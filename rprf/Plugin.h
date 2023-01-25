@@ -9,7 +9,7 @@ namespace rprf
 class Plugin
 {
 public:
-	enum class Type { Tahoe, Northstar, Hybrid };
+	enum class Type { Tahoe, Northstar, Hybrid, HybridPro };
 
 public:
 	explicit Plugin(const std::string_view& libraryName);
