@@ -28,9 +28,9 @@ Plugin::Plugin(Type type)
 }
 
 #ifdef _WIN32
-const char* Plugin::GetDynamicLibraryName(Type type) 
+const char* Plugin::GetDynamicLibraryName(Type type)
 {
-	switch (type) 
+	switch (type)
 	{
 		case Type::Tahoe:
 			return "Tahoe64.dll";
@@ -46,9 +46,9 @@ const char* Plugin::GetDynamicLibraryName(Type type)
 	return "";
 }
 #else
-const char* Plugin::GetDynamicLibraryName(Type type) 
+const char* Plugin::GetDynamicLibraryName(Type type)
 {
-	switch (type) 
+	switch (type)
 	{
 		case Type::Tahoe:
 			return "libTahoe64.so";
@@ -70,36 +70,36 @@ const char* Plugin::GetDynamicLibraryName(Type type)
 
 std::string to_string(const Plugin::Type type)
 {
-    switch(type)
-    {
-        case Plugin::Type::Hybrid:
-            return "Hybrid";
+	switch(type)
+	{
+		case Plugin::Type::Hybrid:
+			return "Hybrid";
 		case Plugin::Type::HybridPro:
 			return "HybridPro";
 		case Plugin::Type::Tahoe:
-            return "Tahoe";
-        case Plugin::Type::Northstar:
-            return "Northstar";
-        default:
-            throw std::runtime_error("rprf::Plugin::to_string(const Plugin::Type) is not know");
-    }
+			return "Tahoe";
+		case Plugin::Type::Northstar:
+			return "Northstar";
+		default:
+			throw std::runtime_error("rprf::Plugin::to_string(const Plugin::Type) is not know");
+	}
 }
 
 std::pair<Plugin::Type, bool> from_string(std::string type)
 {
-    std::transform(type.begin(), type.end(), type.begin(),
-                   [](unsigned char c){ return std::tolower(c); });
+	std::transform(type.begin(), type.end(), type.begin(),
+				   [](unsigned char c){ return std::tolower(c); });
 
-    if (type == "hybrid")
-        return {Plugin::Type::Hybrid, true};
+	if (type == "hybrid")
+		return {Plugin::Type::Hybrid, true};
 	if (type == "hybridpro")
 		return {Plugin::Type::HybridPro, true};
-    if (type == "northstar")
-        return {Plugin::Type::Northstar, true};
-    if (type == "tahoe")
-        return {Plugin::Type::Tahoe, true};
+	if (type == "northstar")
+		return {Plugin::Type::Northstar, true};
+	if (type == "tahoe")
+		return {Plugin::Type::Tahoe, true};
 
-    return {Plugin::Type::Northstar, false};
+	return {Plugin::Type::Northstar, false};
 }
 
 } // rpr
