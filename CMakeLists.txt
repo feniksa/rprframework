@@ -16,7 +16,7 @@ include("${CMAKE_SOURCE_DIR}/cmake/CompileOptions.cmake")
 #add_definitions(-DBOOST_LOG_DYN_LINK)
 find_package(Boost 1.79 REQUIRED COMPONENTS thread system filesystem
 	program_options log)
-find_package(RadeonProRenderSDK REQUIRED COMPONENTS northstar tahoe hybrid hybridpro)
+find_package(RadeonProRenderSDK 2.2.17 REQUIRED COMPONENTS northstar tahoe hybrid hybridpro)
 find_package(RadeonImageFilter REQUIRED)
 
 add_subdirectory(ThirdParty/miniz)
