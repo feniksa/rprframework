@@ -22,6 +22,12 @@
 #include <algorithm>
 #include <filesystem>
 
+#include <RadeonProRender_Baikal.h>
+
+#include <Windows.h>
+#include <tchar.h>
+#include <wchar.h>
+
 using namespace rprf;
 using namespace tests;
 
@@ -52,7 +58,7 @@ struct TestNorthstar : public ::testing::Test
 
     void SetUp() override
     {
-		m_plugin = std::make_unique<Plugin>(Plugin::Type::Northstar);
+		m_plugin = std::make_unique<Plugin>(Plugin::Type::HybridPro);
     }
 
     void TearDown() override
@@ -86,11 +92,37 @@ TEST_F(TestNorthstar, context_creation)
 {
 	ASSERT_TRUE(m_plugin);
 
-	auto gpus = getAvailableDevices(*m_plugin, "");
- 	printAvailableDevices(gpus, std::cout);
+	/*auto gpus = getAvailableDevices(*m_plugin, "");
+ 	printAvailableDevices(gpus, std::cout);*/
 
-	Context context(*m_plugin, m_shaderCachePath, GetCreationFlags(gpus));
+	Context context(*m_plugin, m_shaderCachePath, RPR_CREATION_FLAGS_ENABLE_GPU0);
 	EXPECT_TRUE(context.instance());
+
+
+    HMODULE hDll = LoadLibrary(_T("HybridPro.dll"));
+    if (!hDll || hDll == INVALID_HANDLE_VALUE) {
+        throw std::runtime_error("bad_dll");
+    }
+
+    // address of loaded dll
+    //_tprintf(_T("library loaded at 0x%x\n"), hDll);
+
+
+        // load AddFunc and casting to appropriate type
+    void* ptr = GetProcAddress(hDll, "rprGetSupportedDevices");
+
+    return;
+
+    /*size_t count = 0;
+    int status = rprGetSupportedDevices(nullptr, &count);
+
+    EXPECT_EQ(status, 0);
+    EXPECT_TRUE(count > 0);
+
+    std::vector<int> devices;
+    devices.resize(count);
+    status = rprGetSupportedDevices(devices.data(), &count);
+    EXPECT_EQ(status, 0);*/
 }
 
 TEST_F(TestNorthstar, scene_creation)
