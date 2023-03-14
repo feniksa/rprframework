@@ -1,6 +1,15 @@
 #include "rprf/Plugin.h"
 #include "rprf/Context.h"
 #include "rprf/ContextUtils.h"
+#include "rprf/Scene.h"
+
+#include "rprf/Camera.h"
+#include "rprf/FrameBuffer.h"
+#include "rprf/Shape.h"
+#include "rprf/LightPoint.h"
+#include "math/mathutils.h"
+
+#include "CubeData.h"
 
 #include <boost/program_options.hpp>
 #include <iostream>
@@ -69,11 +78,15 @@ std::string gpus_as_string(int creationFlags)
 
 int main(int argc, const char **argv) try
 {
+    using namespace utils;
+
     bool probeName;
     std::string renderName;
     std::vector<unsigned int> gpuIndexes;
     bool enableCPU;
     unsigned int apiVersion;
+    bool renderCube;
+    std::string outfile;
 
     // Declare the supported options.
     po::options_description desc("Generic options");
@@ -84,6 +97,8 @@ int main(int argc, const char **argv) try
             ("cpu", po::value<bool>(&enableCPU)->default_value(false), "use cpu")
             ("name", po::value<bool>(&probeName)->default_value(true), "get gpu name from context")
             ("verbosity", po::value<std::string>(), "verbosity")
+            ("renderCube", po::value<bool>(&renderCube)->default_value(false), "make actual render of cube")
+            ("out", po::value<std::string>(&outfile), "output filename (if renderCube is true)")
             ("api", po::value<unsigned int>(&apiVersion)->default_value(RPR_API_VERSION), "force to use API version");
 
     po::variables_map vm;
@@ -169,6 +184,61 @@ int main(int argc, const char **argv) try
 
         jsonChild.put(std::to_string(gpuIndex), gpuName);
         jsonRoot.add_child("gpus", jsonChild);
+    }
+
+    if (renderCube) {
+        BOOST_LOG_TRIVIAL(debug) << "Construct cube resource for render";
+        rprf::Scene scene(context);
+        context.setScene(scene);
+
+        // camera
+        rprf::Camera camera(context);
+        camera.lookAt(
+                0, 5, 10,
+                0, 0, 0,
+                0, 1, 0);
+        scene.setCamera(camera);
+
+        rprf::Shape cube(context,
+                   reinterpret_cast<rpr_float const *>(&cube_data[0]), 24, sizeof(vertex),
+                   reinterpret_cast<rpr_float const *>((char *) &cube_data[0] + sizeof(rpr_float) * 3), 24,
+                   sizeof(vertex),
+                   reinterpret_cast<rpr_float const *>((char *) &cube_data[0] + sizeof(rpr_float) * 6), 24,
+                   sizeof(vertex),
+                   static_cast<rpr_int const *>(indices), sizeof(rpr_int),
+                   static_cast<rpr_int const *>(indices), sizeof(rpr_int),
+                   static_cast<rpr_int const *>(indices), sizeof(rpr_int),
+                   num_face_vertices, 12);
+
+        cube.setTransform(rprf_math::translation(rprf_math::float3(-2, 1, 0)), true);
+        scene.attachShape(cube);
+
+        // light
+        rprf::LightPoint pointLight(context);
+        pointLight.setTransform(rprf_math::translation(rprf_math::float3(2, 10, 2)), true);
+        pointLight.setRadianPower(150.0f, 150.0f, 150.0f);
+        scene.attachLight(pointLight);
+
+        // framebuffer
+        rprf::FrameBuffer frameBuffer(context, 800, 600);
+        rprf::FrameBuffer frameBufferResolved(frameBuffer.clone());
+
+        context.setAOV(frameBuffer);
+        context.setParameter1u(ContextInputType::Iterations, 60);
+
+        BOOST_LOG_TRIVIAL(debug) << "Render cube";
+        context.render();
+        BOOST_LOG_TRIVIAL(debug) << "Rendering done";
+
+        BOOST_LOG_TRIVIAL(debug) << "Resolve framebuffer";
+        context.resolve(&frameBuffer, &frameBufferResolved, false);
+        BOOST_LOG_TRIVIAL(debug) << "Framebuffer resolved";
+
+        if (!outfile.empty()) {
+            BOOST_LOG_TRIVIAL(debug) << "Save framebuffer to file " << outfile;
+            frameBufferResolved.saveToFile(outfile);
+            BOOST_LOG_TRIVIAL(debug) << "Save done";
+        }
     }
 
     jsonRoot.put("status", 0);
