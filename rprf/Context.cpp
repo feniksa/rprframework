@@ -152,7 +152,6 @@ std::string Context::getGpuName(int gpuIndex) const
     deviceName.reserve(dataSize-1);
     std::copy(buffer.begin(), buffer.end() - 1, std::back_inserter(deviceName));
 
-
     return deviceName;
 }
 

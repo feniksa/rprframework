@@ -26,6 +26,8 @@ enum ErrorCode {
 namespace
 {
 
+    const char* GenericComputeDeviceName = "Generic Compute Device";
+
 std::string allRenderEngines()
 {
    std::stringstream s;
@@ -67,15 +69,22 @@ std::string gpus_as_string(int creationFlags)
 
 int main(int argc, const char **argv) try
 {
+    bool probeName;
+    std::string renderName;
+    std::vector<unsigned int> gpuIndexes;
+    bool enableCPU;
+    unsigned int apiVersion;
+
     // Declare the supported options.
     po::options_description desc("Generic options");
     desc.add_options()
             ("help", "show help message")
-            ("engine", po::value<std::string>()->default_value("northstar"),("renderer from list " + allRenderEngines()).c_str())
-            ("gpu", po::value<std::vector<unsigned int>>(), "gpu indexes to probe")
-            ("cpu", po::value<bool>(), "use cpu cpu")
+            ("engine", po::value<std::string>(&renderName)->default_value("northstar"),("renderer from list " + allRenderEngines()).c_str())
+            ("gpu", po::value<std::vector<unsigned int>>(&gpuIndexes), "gpu indexes to probe")
+            ("cpu", po::value<bool>(&enableCPU)->default_value(false), "use cpu")
+            ("name", po::value<bool>(&probeName)->default_value(true), "get gpu name from context")
             ("verbosity", po::value<std::string>(), "verbosity")
-            ("api", po::value<int>()->default_value(RPR_API_VERSION), "force to use API version");
+            ("api", po::value<unsigned int>(&apiVersion)->default_value(RPR_API_VERSION), "force to use API version");
 
     po::variables_map vm;
     po::store(po::parse_command_line(argc, argv, desc), vm);
@@ -99,14 +108,6 @@ int main(int argc, const char **argv) try
     Plugin::Type renderer;
     int createFlags = 0;
 
-    // parse requirements for engine
-    if (!vm.contains("engine")) {
-        std::cerr << "Not enough params";
-        return NotEnoughParams;
-    }
-
-    std::string renderName = vm["engine"].as<std::string>();
-
     // to lower case
     std::transform(renderName.begin(), renderName.end(), renderName.begin(),
                    [](unsigned char c) { return std::tolower(c); });
@@ -119,32 +120,16 @@ int main(int argc, const char **argv) try
         return ErrorCode::BadDevice;
     }
 
-    std::vector<unsigned int> gpuIndexes;
-    if (vm.contains("gpu")) {
-        gpuIndexes = vm["gpu"].as<std::vector<unsigned int>>();
-        for (unsigned int index : gpuIndexes) {
-            if (index >= 16) {
-                std::cerr << "Bad gpu number " <<  index << ". GPU number should be in range [0-16]" << "\n";
-                return ErrorCode::BadDeviceIndex;
-            }
-            createFlags |= getContextCreationFlags(index);
+    for (unsigned int index : gpuIndexes) {
+        if (index >= 16) {
+            std::cerr << "Bad gpu number " <<  index << ". GPU number should be in range [0-16]" << "\n";
+            return ErrorCode::BadDeviceIndex;
         }
+        createFlags |= getContextCreationFlags(index);
     }
 
-    if (vm.contains("cpu")) {
-        bool enableCPU = vm["cpu"].as<bool>();
-        if (enableCPU) {
-            createFlags |= RPR_CREATION_FLAGS_ENABLE_CPU;
-        }
-    } else if (createFlags == 0) {
+    if (enableCPU) {
         createFlags |= RPR_CREATION_FLAGS_ENABLE_CPU;
-    }
-
-    unsigned int version;
-    if (vm.contains("api")) {
-        version = vm["api"] .as<int>();
-    } else {
-        version = RPR_API_VERSION;
     }
 
     BOOST_LOG_TRIVIAL(debug) << "Initialize library " << to_string(renderer);
@@ -153,7 +138,7 @@ int main(int argc, const char **argv) try
     BOOST_LOG_TRIVIAL(debug) << "OK";
 
     BOOST_LOG_TRIVIAL(debug) << "Create context on: " << gpus_as_string(createFlags);
-    rprf::Context context(plugin, "", createFlags, version);
+    rprf::Context context(plugin, "", createFlags, apiVersion);
     BOOST_LOG_TRIVIAL(debug) << "OK";
 
     boost::property_tree::ptree jsonRoot;
@@ -172,10 +157,15 @@ int main(int argc, const char **argv) try
 
     for (unsigned int gpuIndex : gpuIndexes) {
         boost::property_tree::ptree jsonChild;
+        std::string gpuName;
 
-        BOOST_LOG_TRIVIAL(debug) << "Get GPU name: " << gpuIndex;
-        std::string gpuName = context.getGpuName(gpuIndex);
-        BOOST_LOG_TRIVIAL(debug) << "OK";
+        if (probeName) {
+            BOOST_LOG_TRIVIAL(debug) << "Get GPU name: " << gpuIndex;
+            gpuName = context.getGpuName(gpuIndex);
+            BOOST_LOG_TRIVIAL(debug) << "OK";
+        } else {
+            gpuName = GenericComputeDeviceName;
+        }
 
         jsonChild.put(std::to_string(gpuIndex), gpuName);
         jsonRoot.add_child("gpus", jsonChild);
