@@ -1,4 +1,5 @@
 #include "riff/Context.h"
+
 #include "riff/ContextUtils.h"
 
 #include <boost/program_options.hpp>
@@ -40,12 +41,15 @@ std::string allComputeEngines()
 
 int main(int argc, const char **argv) try
 {
+    std::string computeName;
+    unsigned int deviceIndex;
+
     // Declare the supported options.
     po::options_description desc("Generic options");
     desc.add_options()
             ("help", "show help message")
-            ("compute", po::value<std::string>()->default_value("opencl"),("compute: " + allComputeEngines()).c_str())
-            ("device", po::value<unsigned int>(), "device index to probe")
+            ("compute", po::value<std::string>(&computeName)->default_value("opencl"),("compute: " + allComputeEngines()).c_str())
+            ("device", po::value<unsigned int>(&deviceIndex)->default_value(0), "device index to probe")
             ("verbosity", po::value<std::string>(), "verbosity")
             ("api", po::value<uint64_t>()->default_value(RIF_API_VERSION), "force to use API version");
 
@@ -69,15 +73,6 @@ int main(int argc, const char **argv) try
     }
 
     BackendType backendType = BackendType::Openc;
-    unsigned int deviceIndex = 0;
-
-    // parse requirements for engine
-    if (!vm.contains("compute")) {
-        std::cerr << "Not enough params";
-        return NotEnoughParams;
-    }
-
-    std::string computeName = vm["compute"].as<std::string>();
 
     // to lower case
     std::transform(computeName.begin(), computeName.end(), computeName.begin(),
@@ -91,12 +86,9 @@ int main(int argc, const char **argv) try
         return ErrorCode::BadCompute;
     }
 
-    if (vm.contains("device")) {
-        deviceIndex = vm["device"].as<unsigned int>();
-        if (deviceIndex >= 16) {
-            std::cerr << "Bad device number " << deviceIndex << ". Device number should be in range [0-16]" << "\n";
-            return ErrorCode::BadDeviceIndex;
-        }
+    if (deviceIndex >= 16) {
+        std::cerr << "Bad device number " << deviceIndex << ". Device number should be in range [0-16]" << "\n";
+        return ErrorCode::BadDeviceIndex;
     }
 
     uint64_t version;
