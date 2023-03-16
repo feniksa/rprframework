@@ -31,8 +31,9 @@ struct TestNorthstar : public ::testing::Test
 	std::unique_ptr<Plugin> m_plugin;
 	std::filesystem::path m_tempDir;
 	std::filesystem::path m_shaderCachePath;
+    const std::filesystem::path m_hipbinPath;
 
-	TestNorthstar()
+	TestNorthstar() : m_hipbinPath("hipbin")
 	{
 		m_tempDir = std::filesystem::temp_directory_path();
 		m_tempDir /= "RadeonProRenderTests";
@@ -89,7 +90,7 @@ TEST_F(TestNorthstar, context_creation)
 	auto gpus = getAvailableDevices(*m_plugin, "");
  	printAvailableDevices(gpus, std::cout);
 
-	Context context(*m_plugin, m_shaderCachePath, GetCreationFlags(gpus));
+	Context context(*m_plugin, m_shaderCachePath, m_hipbinPath, GetCreationFlags(gpus));
 	EXPECT_TRUE(context.instance());
 }
 
@@ -100,7 +101,7 @@ TEST_F(TestNorthstar, scene_creation)
 	ASSERT_TRUE(!m_tempDir.empty());
 
 	auto gpus = getAvailableDevices(*m_plugin, "");
-	Context context(*m_plugin, m_shaderCachePath, GetCreationFlags(gpus));
+	Context context(*m_plugin, m_shaderCachePath, m_hipbinPath, GetCreationFlags(gpus));
 
 	Scene scene(context);
 	context.setScene(scene);

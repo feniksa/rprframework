@@ -13,6 +13,7 @@
 
 #include <boost/program_options.hpp>
 #include <iostream>
+#include <filesystem>
 #include <boost/log/core.hpp>
 #include <boost/log/trivial.hpp>
 #include <boost/log/expressions.hpp>
@@ -87,6 +88,11 @@ int main(int argc, const char **argv) try
     unsigned int apiVersion;
     bool renderCube;
     std::string outfile;
+    std::string shadercache;
+    std::string hipbin;
+
+    std::filesystem::path currentDirectory = std::filesystem::path(argv[0]).remove_filename();
+    std::filesystem::path hipKernelsDirectory = currentDirectory / std::filesystem::path("hipbin");
 
     // Declare the supported options.
     po::options_description desc("Generic options");
@@ -98,6 +104,8 @@ int main(int argc, const char **argv) try
             ("name", po::value<bool>(&probeName)->default_value(true), "get gpu name from context")
             ("verbosity", po::value<std::string>(), "verbosity")
             ("renderCube", po::value<bool>(&renderCube)->default_value(false), "make actual render of cube")
+            ("shadercache", po::value<std::string>(&shadercache)->default_value(""), "directory to store shader cache")
+            ("hipbin", po::value<std::string>(&hipbin)->default_value(hipKernelsDirectory.string()), "directory for search precompiled hip kernels")
             ("out", po::value<std::string>(&outfile), "output filename (if renderCube is true)")
             ("api", po::value<unsigned int>(&apiVersion)->default_value(RPR_API_VERSION), "force to use API version");
 
@@ -153,7 +161,7 @@ int main(int argc, const char **argv) try
     BOOST_LOG_TRIVIAL(debug) << "OK";
 
     BOOST_LOG_TRIVIAL(debug) << "Create context on: " << gpus_as_string(createFlags);
-    rprf::Context context(plugin, "", createFlags, apiVersion);
+    rprf::Context context(plugin, shadercache, hipbin, createFlags, apiVersion);
     BOOST_LOG_TRIVIAL(debug) << "OK";
 
     boost::property_tree::ptree jsonRoot;

@@ -37,17 +37,25 @@ namespace
 namespace rprf
 {
 
-Context::Context(const Plugin& plugin, const std::filesystem::path& cachePath, int createFlags, unsigned int rprApiVersion)
+Context::Context(const Plugin& plugin, const std::filesystem::path& cachePath, const std::filesystem::path& hipKernelsPath,
+                 int createFlags, unsigned int rprApiVersion)
 : m_createFlags(createFlags)
 {
 	int status;
+
+    std::string hipPath = hipKernelsPath.string();
+    std::array<rpr_context_properties, 3> contextProperties {
+            reinterpret_cast<rpr_context_properties>(RPR_CONTEXT_PRECOMPILED_BINARY_PATH),
+            reinterpret_cast<rpr_context_properties>(hipPath.data()),
+            0
+    };
 
 	std::vector<int> ids;
 	ids.push_back(plugin.id());
 
 	rpr_context context;
 	status = rprCreateContext(rprApiVersion, ids.data(), ids.size(),
-							  m_createFlags, NULL, cachePath.string().c_str(), &context);
+							  m_createFlags, contextProperties.data(), cachePath.string().c_str(), &context);
 	check(status);
 
 	setInstance(std::move(context));
@@ -55,7 +63,6 @@ Context::Context(const Plugin& plugin, const std::filesystem::path& cachePath, i
 	status = rprContextSetActivePlugin(*this, ids.at(0));
 	check(status);
 }
-
 
 void Context::setScene(const Scene& scene)
 {
@@ -98,7 +105,6 @@ void Context::render()
 	status = rprContextRender(*this);
 	check(status);
 }
-
 
 void Context::resolve(FrameBuffer* src, FrameBuffer* dst, bool noDisplayGamma)
 {

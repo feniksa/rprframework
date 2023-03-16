@@ -1,6 +1,6 @@
 find_path(RPR_INCLUDE_DIR 
 	NAME RadeonProRender.h
-	HINTS /usr /usr/local/include 
+	HINTS /usr/include /usr/local/include 
 	"${RPR_SDK_ROOT}"
 	ENV RPR_SDK_ROOT
     	PATH_SUFFIXES RadeonProRender/inc
@@ -15,6 +15,15 @@ find_library(RPR_LIBRARY
 	PATH_SUFFIXES RadeonProRender/binUbuntu18 
 	              RadeonProRender/libWin64
 )
+find_path(RPR_HIP_KERNELS_DIR
+	NAME AllPreCompilations.json
+	HINTS /usr/share/prorender/hipkernels
+	"${RPR_SDK_ROOT}"
+	"${RPR_HIP_KERNELS}"
+	ENV RPR_SDK_ROOT 
+	ENV RPR_HIP_KERNELS
+)
+
 
 set(RadeonProRender_DLLS "")
 if (WIN32)
@@ -28,7 +37,6 @@ if (WIN32)
 	if (RadeonProRenderSDK_radeonprorender_dll)
 		list(APPEND RadeonProRender_DLLS ${RadeonProRenderSDK_radeonprorender_dll})
 	endif()
-
 endif()
 
 function(process_rpr_version)
@@ -203,13 +211,14 @@ endforeach()
 unset(component)
 
 find_package_handle_standard_args(RadeonProRenderSDK
-	REQUIRED_VARS RPR_LIBRARY RPR_INCLUDE_DIR
+	REQUIRED_VARS RPR_LIBRARY RPR_INCLUDE_DIR RPR_HIP_KERNELS_DIR
     VERSION_VAR RPR_VERSION_STRING
     HANDLE_COMPONENTS)
 
 if(RadeonProRenderSDK_FOUND)
 	set(RadeonProRenderSDK_INCLUDE_DIRS ${RPR_INCLUDE_DIR})
-	set(RadeonProRenderSDK_LIBRARIES ${RPR_LIBRARY})	
+	set(RadeonProRenderSDK_LIBRARIES ${RPR_LIBRARY})
+	set(RadeonProRenderSDK_HIP_KERNELS_DIRS ${RPR_HIP_KERNELS_DIR})
 	
 	if(NOT TARGET RadeonProRenderSDK::RPR)
 		add_library(RadeonProRenderSDK::RPR INTERFACE IMPORTED)

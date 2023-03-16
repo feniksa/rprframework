@@ -31,5 +31,4 @@ inline void check(rpr_int status, std::string_view message)
 		throw Error(status, message);
 }
 
-
 } // namespace

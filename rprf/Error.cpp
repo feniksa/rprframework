@@ -11,8 +11,8 @@ Error::Error(rpr_int status)
 {
 }
 Error::Error(rpr_int status, std::string_view message)
-	: std::runtime_error(getErrorMessage(message, status)),
-	m_status(status)
+: std::runtime_error(getErrorMessage(message, status)),
+  m_status(status)
 {
 }
 
@@ -31,7 +31,6 @@ std::string Error::getErrorMessage(std::string_view message, rpr_int status)
 	return s.str();
 }
 
-
 const char* Error::as_string(rpr_int status) noexcept
 {
 	static const std::unordered_map<int, const char*> ErrorMap
@@ -39,6 +38,7 @@ const char* Error::as_string(rpr_int status) noexcept
 		{ RPR_ERROR_COMPUTE_API_NOT_SUPPORTED,         "Compute API not supported"         },
 		{ RPR_ERROR_OUT_OF_SYSTEM_MEMORY,              "Out of system memory"              },
 		{ RPR_ERROR_OUT_OF_VIDEO_MEMORY,               "Out of video memory"               },
+		{ RPR_ERROR_SHADER_COMPILATION,                "Shader kernel error"               },
 		{ RPR_ERROR_INVALID_LIGHTPATH_EXPR,            "Invalid lightpaht expr"            },
 		{ RPR_ERROR_INVALID_IMAGE,                     "Invalid image"                     },
 		{ RPR_ERROR_INVALID_AA_METHOD,                 "Invalid AA method"                 },
@@ -63,11 +63,14 @@ const char* Error::as_string(rpr_int status) noexcept
 		{ RPR_ERROR_OPENCL,                            "OpenCL error"                      },
 		{ RPR_ERROR_NULLPTR ,                          "Nullptr error"                     },
 		{ RPR_ERROR_NODETYPE,                          "Invalid node type"                 },
-		{ RPR_ERROR_ABORTED,                           "Error: aborted"                    }
+		{ RPR_ERROR_ABORTED,                           "Error: aborted"                    },
 	};
 
+	const char* defaultErrorMessage = "RadeonProRender: Unknown Error";
+
 	auto iterator = ErrorMap.find(status);
-	return (iterator != ErrorMap.end()) ? iterator->second : "RadeonProRender: Unkown Error";
+	return (iterator != ErrorMap.end()) ? iterator->second: defaultErrorMessage;
 }
+
 
 } // namespace
