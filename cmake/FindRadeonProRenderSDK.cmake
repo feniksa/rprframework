@@ -24,7 +24,6 @@ find_path(RPR_HIP_KERNELS_DIR
 	ENV RPR_HIP_KERNELS
 )
 
-
 set(RadeonProRender_DLLS "")
 if (WIN32)
 	find_file(RadeonProRenderSDK_radeonprorender_dll 

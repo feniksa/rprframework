@@ -5,6 +5,7 @@
 #include "FrameBuffer.h"
 
 #include <vector>
+#include <sstream>
 
 namespace
 {
@@ -43,7 +44,8 @@ Context::Context(const Plugin& plugin, const std::filesystem::path& cachePath, c
 {
 	int status;
 
-    std::string hipPath = hipKernelsPath.string();
+    std::string hipPath = processHipKernelsPath(hipKernelsPath).string();
+
     std::array<rpr_context_properties, 3> contextProperties {
             reinterpret_cast<rpr_context_properties>(RPR_CONTEXT_PRECOMPILED_BINARY_PATH),
             reinterpret_cast<rpr_context_properties>(hipPath.data()),
@@ -159,6 +161,34 @@ std::string Context::getGpuName(int gpuIndex) const
     std::copy(buffer.begin(), buffer.end() - 1, std::back_inserter(deviceName));
 
     return deviceName;
+}
+
+std::ostream& operator<< (std::ostream& stream, const std::vector<std::filesystem::path>& dirs) {
+    for (const auto& d : dirs) {
+        stream << d << ", ";
+    }
+    return stream;
+}
+
+std::filesystem::path Context::processHipKernelsPath(const std::filesystem::path& hipKernelsPath) const
+{
+    const std::vector<std::filesystem::path> pathHints {
+        hipKernelsPath,
+        "hipbin",
+        "/usr/share/prorender/hipkernels"
+    };
+    const std::filesystem::path fileToCheck = "AllPreCompilations.json";
+
+    for (const auto& hipDirectory : pathHints) {
+        if (std::filesystem::exists(hipDirectory / fileToCheck)) {
+            return hipDirectory;
+        }
+    }
+
+    std::stringstream errorMessage;
+    errorMessage << "Can't find hip file \"" << fileToCheck << "\" in directories: [ " << pathHints << " ]";
+
+    throw Error(RPR_ERROR_IO_ERROR, errorMessage.str());
 }
 
 }

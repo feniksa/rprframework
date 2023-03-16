@@ -13,7 +13,7 @@ class FrameBuffer;
 class Context : public ContextObject<rpr_context>
 {
 public:
-	Context(const Plugin& plugin, const std::filesystem::path& cachePath = "", const std::filesystem::path& hipKernelsPath = "hipbin",
+	Context(const Plugin& plugin, const std::filesystem::path& cachePath = "", const std::filesystem::path& hipKernelsPath = "",
             int createFlags = RPR_CREATION_FLAGS_ENABLE_GPU0, unsigned int apiVersion = RPR_API_VERSION);
 
 	void setScene(const Scene& scene);
@@ -31,6 +31,8 @@ public:
 
 	int createFlags() const { return m_createFlags; }
 private:
+    std::filesystem::path processHipKernelsPath(const std::filesystem::path& path) const;
+
 	int m_createFlags;
 };
 
