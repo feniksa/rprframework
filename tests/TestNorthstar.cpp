@@ -90,8 +90,11 @@ TEST_F(TestNorthstar, context_creation)
 	auto gpus = getAvailableDevices(*m_plugin, "");
  	printAvailableDevices(gpus, std::cout);
 
-	Context context(*m_plugin, m_shaderCachePath, m_hipbinPath, GetCreationFlags(gpus));
+    int creationFlags = GetCreationFlags(gpus);
+	Context context(*m_plugin, m_shaderCachePath, m_hipbinPath, creationFlags);
 	EXPECT_TRUE(context.instance());
+
+    EXPECT_EQ(context.createFlags(), creationFlags);
 }
 
 TEST_F(TestNorthstar, scene_creation)

@@ -12,18 +12,20 @@ public:
 	enum class Type { Tahoe, Northstar, Hybrid, HybridPro };
 
 public:
-	explicit Plugin(const std::string_view& libraryName);
 	explicit Plugin(Type name);
 
-	const std::string& name() const  { return m_name;     }
-	int id() const                   { return m_pluginId; }
+	const std::string& name() const  noexcept { return GetDynamicLibraryName(m_type);     }
+	int id() const noexcept                   { return m_pluginId; }
+    Type type() const noexcept                { return m_type;     }
 
 	Plugin(const Plugin&)            = delete;
 	Plugin& operator=(const Plugin&) = delete;
+protected:
+    explicit Plugin(const std::string_view& libraryName);
 private:
-	static const char* GetDynamicLibraryName(Type type);
+	static const char* GetDynamicLibraryName(Type type) noexcept;
 
-	const std::string m_name;
+    Type m_type;
 	int m_pluginId;
 };
 

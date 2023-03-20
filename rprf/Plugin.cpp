@@ -8,12 +8,13 @@
 namespace rprf
 {
 
-Plugin::Plugin(const std::string_view& libraryName)
-: m_name(libraryName)
+Plugin::Plugin(Type type)
+: m_type(type)
 {
-	assert(!libraryName.empty());
+    const char* libraryName = GetDynamicLibraryName(m_type);
+    assert(strlen(libraryName) != 0);
 
-	m_pluginId = rprRegisterPlugin(libraryName.data());
+	m_pluginId = rprRegisterPlugin(libraryName);
 	if (m_pluginId == -1) {
 		std::stringstream s;
 		s << "RadeonProRender error: Can't load library \"" << libraryName << "\"";
@@ -22,13 +23,8 @@ Plugin::Plugin(const std::string_view& libraryName)
 	}
 }
 
-Plugin::Plugin(Type type)
-	: Plugin(GetDynamicLibraryName(type))
-{
-}
-
 #ifdef _WIN32
-const char* Plugin::GetDynamicLibraryName(Type type)
+const char* Plugin::GetDynamicLibraryName(Type type) noexcept
 {
 	switch (type)
 	{
@@ -46,7 +42,7 @@ const char* Plugin::GetDynamicLibraryName(Type type)
 	return "";
 }
 #else
-const char* Plugin::GetDynamicLibraryName(Type type)
+const char* Plugin::GetDynamicLibraryName(Type type) noexcept
 {
 	switch (type)
 	{

@@ -29,7 +29,7 @@ public:
     std::string getCpuName() const;
     std::string getGpuName(int index) const;
 
-	int createFlags() const { return m_createFlags; }
+	int createFlags() const;
 private:
     std::filesystem::path processHipKernelsPath(const std::filesystem::path& path) const;
 

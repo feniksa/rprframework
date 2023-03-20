@@ -62,7 +62,6 @@ gpu_list_t getAvailableDevices(const Plugin& plugin, const char* cachePath)
 	std::vector<int> ids;
 	ids.push_back(plugin.id());
 
-
 	for (size_t index = 0; index < DevicesList.size(); ++index) {
 		rpr_context contextPurePointer;
 		status = rprCreateContext(RPR_API_VERSION, ids.data(), ids.size(), DevicesList[index].first, nullptr, cachePath, &contextPurePointer);

@@ -44,13 +44,15 @@ Context::Context(const Plugin& plugin, const std::filesystem::path& cachePath, c
 {
 	int status;
 
-    std::string hipPath = processHipKernelsPath(hipKernelsPath).string();
+    std::vector<rpr_context_properties> contextProperties;
+    std::string hipPath;
 
-    std::array<rpr_context_properties, 3> contextProperties {
-            reinterpret_cast<rpr_context_properties>(RPR_CONTEXT_PRECOMPILED_BINARY_PATH),
-            reinterpret_cast<rpr_context_properties>(hipPath.data()),
-            0
-    };
+    if (plugin.type() == Plugin::Type::Northstar) {
+        hipPath = processHipKernelsPath(hipKernelsPath).string();
+        contextProperties.push_back(reinterpret_cast<rpr_context_properties>(RPR_CONTEXT_PRECOMPILED_BINARY_PATH));
+        contextProperties.push_back(reinterpret_cast<rpr_context_properties>(hipPath.data()));
+    }
+    contextProperties.push_back(0);
 
 	std::vector<int> ids;
 	ids.push_back(plugin.id());
@@ -189,6 +191,21 @@ std::filesystem::path Context::processHipKernelsPath(const std::filesystem::path
     errorMessage << "Can't find hip file \"" << fileToCheck << "\" in directories: [ " << pathHints << " ]";
 
     throw Error(RPR_ERROR_IO_ERROR, errorMessage.str());
+}
+
+int Context::createFlags() const
+{
+    int flags;
+    int status;
+
+    size_t dataSize;
+    status = rprContextGetInfo(*this, RPR_CONTEXT_CREATION_FLAGS, sizeof(flags), &flags, &dataSize);
+    check(status);
+
+    if (dataSize != sizeof(flags))
+        throw Error(RPR_ERROR_NULLPTR);
+
+    return flags;
 }
 
 }

@@ -232,7 +232,7 @@ int main(int argc, const char **argv) try
         rprf::FrameBuffer frameBufferResolved(frameBuffer.clone());
 
         context.setAOV(frameBuffer);
-        context.setParameter1u(ContextInputType::Iterations, 60);
+        context.setParameter1u(ContextInputType::Iterations, 100);
 
         BOOST_LOG_TRIVIAL(debug) << "Render cube";
         context.render();
