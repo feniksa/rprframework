@@ -17,11 +17,11 @@ find_library(RPR_LIBRARY
 )
 find_path(RPR_HIP_KERNELS_DIR
 	NAME AllPreCompilations.json
-	HINTS /usr/share/prorender/hipkernels
+	HINTS /usr/share/RadeonProRender/hipbin
 	"${RPR_SDK_ROOT}"
-	"${RPR_HIP_KERNELS}"
+	"${RPR_HIPBIN}"
 	ENV RPR_SDK_ROOT 
-	ENV RPR_HIP_KERNELS
+	ENV RPR_HIPBIN
 )
 
 set(RadeonProRender_DLLS "")
