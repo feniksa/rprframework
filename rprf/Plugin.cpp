@@ -12,8 +12,8 @@ namespace rprf
 Plugin::Plugin(Type type)
 : m_type(type)
 {
-    const char* libraryName = GetDynamicLibraryName(m_type);
-    assert(strlen(libraryName) != 0);
+	const char* libraryName = GetDynamicLibraryName(m_type);
+	assert(strlen(libraryName) != 0);
 
 	m_pluginId = rprRegisterPlugin(libraryName);
 	if (m_pluginId == -1) {
@@ -52,15 +52,14 @@ const char* Plugin::GetDynamicLibraryName(Type type) noexcept
 		case Type::Northstar:
 			return "libNorthstar64.so";
 		case Type::Hybrid:
-			return "libHybrid.so";
+			return "Hybrid.so";
 		case Type::HybridPro:
-			return "libHybridPro.so";
+			return "HybridPro.so";
 		default:
 			return "";
 	}
 	return "";
 }
-
 #endif
 
 // tools

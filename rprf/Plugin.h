@@ -14,7 +14,7 @@ public:
 public:
 	explicit Plugin(Type name);
 
-	const std::string& name() const  noexcept { return GetDynamicLibraryName(m_type);     }
+	const char* name() const noexcept         { return GetDynamicLibraryName(m_type); }
 	int id() const noexcept                   { return m_pluginId; }
     Type type() const noexcept                { return m_type;     }
 

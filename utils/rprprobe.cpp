@@ -44,7 +44,7 @@ std::string allRenderEngines()
 
    s << to_string(rprf::Plugin::Type::Northstar) << ", ";
    s << to_string(rprf::Plugin::Type::Hybrid)    << ", ";
-   s << to_string(rprf::Plugin::Type::HybridPro)    << ", ";
+   s << to_string(rprf::Plugin::Type::HybridPro) << ", ";
    s << to_string(rprf::Plugin::Type::Tahoe)     << "  ";
 
    return s.str();
@@ -90,6 +90,7 @@ int main(int argc, const char **argv) try
     std::string outfile;
     std::string shadercache;
     std::string hipbin;
+    bool forceOpenCL;
 
     std::filesystem::path currentDirectory = std::filesystem::path(argv[0]).remove_filename();
     std::filesystem::path hipKernelsDirectory = currentDirectory / std::filesystem::path("hipbin");
@@ -106,6 +107,7 @@ int main(int argc, const char **argv) try
             ("renderCube", po::value<bool>(&renderCube)->default_value(false), "make actual render of cube")
             ("shadercache", po::value<std::string>(&shadercache)->default_value(""), "directory to store shader cache")
             ("hipbin", po::value<std::string>(&hipbin)->default_value(hipKernelsDirectory.string()), "directory for search precompiled hip kernels")
+            ("forceOpenCL", po::value<bool>(&forceOpenCL)->default_value(false), "force enable OpenCL (deprecated)")
             ("out", po::value<std::string>(&outfile), "output filename (if renderCube is true)")
             ("api", po::value<unsigned int>(&apiVersion)->default_value(RPR_API_VERSION), "force to use API version");
 
@@ -153,6 +155,9 @@ int main(int argc, const char **argv) try
 
     if (enableCPU) {
         createFlags |= RPR_CREATION_FLAGS_ENABLE_CPU;
+    }
+    if (forceOpenCL) {
+        createFlags |= RPR_CREATION_FLAGS_ENABLE_OPENCL;
     }
 
     BOOST_LOG_TRIVIAL(debug) << "Initialize library " << to_string(renderer);

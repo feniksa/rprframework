@@ -9,31 +9,41 @@
 
 namespace
 {
-    int convertGpuName_index2rprflag(size_t gpuIndex)
-    {
-        static const std::array<int, 16> flagsTable
-        {
-            RPR_CONTEXT_GPU0_NAME,
-            RPR_CONTEXT_GPU1_NAME,
-            RPR_CONTEXT_GPU2_NAME,
-            RPR_CONTEXT_GPU3_NAME,
-            RPR_CONTEXT_GPU4_NAME,
-            RPR_CONTEXT_GPU5_NAME,
-            RPR_CONTEXT_GPU6_NAME,
-            RPR_CONTEXT_GPU7_NAME,
-            RPR_CONTEXT_GPU8_NAME,
-            RPR_CONTEXT_GPU9_NAME,
-            RPR_CONTEXT_GPU10_NAME,
-            RPR_CONTEXT_GPU11_NAME,
-            RPR_CONTEXT_GPU12_NAME,
-            RPR_CONTEXT_GPU13_NAME,
-            RPR_CONTEXT_GPU14_NAME,
-            RPR_CONTEXT_GPU15_NAME,
-        };
 
-        return flagsTable.at(gpuIndex);
-    }
+int convertGpuName_index2rprflag(size_t gpuIndex)
+{
+    static const std::array<int, 16> flagsTable
+    {
+        RPR_CONTEXT_GPU0_NAME,
+        RPR_CONTEXT_GPU1_NAME,
+        RPR_CONTEXT_GPU2_NAME,
+        RPR_CONTEXT_GPU3_NAME,
+        RPR_CONTEXT_GPU4_NAME,
+        RPR_CONTEXT_GPU5_NAME,
+        RPR_CONTEXT_GPU6_NAME,
+        RPR_CONTEXT_GPU7_NAME,
+        RPR_CONTEXT_GPU8_NAME,
+        RPR_CONTEXT_GPU9_NAME,
+        RPR_CONTEXT_GPU10_NAME,
+        RPR_CONTEXT_GPU11_NAME,
+        RPR_CONTEXT_GPU12_NAME,
+        RPR_CONTEXT_GPU13_NAME,
+        RPR_CONTEXT_GPU14_NAME,
+        RPR_CONTEXT_GPU15_NAME,
+    };
+
+    return flagsTable.at(gpuIndex);
 }
+
+std::ostream& operator<< (std::ostream& stream, const std::vector<std::filesystem::path>& dirs)
+{
+    for (const auto& d : dirs) {
+	    stream << d << ", ";
+    }
+	return stream;
+}
+
+} // namespace
 
 namespace rprf
 {
@@ -163,13 +173,6 @@ std::string Context::getGpuName(int gpuIndex) const
     std::copy(buffer.begin(), buffer.end() - 1, std::back_inserter(deviceName));
 
     return deviceName;
-}
-
-std::ostream& operator<< (std::ostream& stream, const std::vector<std::filesystem::path>& dirs) {
-    for (const auto& d : dirs) {
-        stream << d << ", ";
-    }
-    return stream;
 }
 
 std::filesystem::path Context::processHipKernelsPath(const std::filesystem::path& hipKernelsPath) const
