@@ -32,8 +32,6 @@ public:
 	int createFlags() const;
 private:
     std::filesystem::path processHipKernelsPath(const std::filesystem::path& path) const;
-
-	int m_createFlags;
 };
 
 }

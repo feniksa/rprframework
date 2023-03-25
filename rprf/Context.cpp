@@ -50,7 +50,6 @@ namespace rprf
 
 Context::Context(const Plugin& plugin, const std::filesystem::path& cachePath, const std::filesystem::path& hipKernelsPath,
                  int createFlags, unsigned int rprApiVersion)
-: m_createFlags(createFlags)
 {
 	int status;
 
@@ -69,7 +68,7 @@ Context::Context(const Plugin& plugin, const std::filesystem::path& cachePath, c
 
 	rpr_context context;
 	status = rprCreateContext(rprApiVersion, ids.data(), ids.size(),
-							  m_createFlags, contextProperties.data(), cachePath.string().c_str(), &context);
+							  createFlags, contextProperties.data(), cachePath.string().c_str(), &context);
 	check(status);
 
 	setInstance(std::move(context));
@@ -206,7 +205,7 @@ int Context::createFlags() const
     check(status);
 
     if (dataSize != sizeof(flags))
-        throw Error(RPR_ERROR_NULLPTR);
+        throw Error(RPR_ERROR_NULLPTR, "Can't get context creation flags");
 
     return flags;
 }
