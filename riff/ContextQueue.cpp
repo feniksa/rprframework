@@ -3,6 +3,7 @@
 #include "Image.h"
 #include "ImageFilter.h"
 #include <cassert>
+#include <algorithm>
 
 namespace riff
 {

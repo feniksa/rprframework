@@ -3,6 +3,7 @@
 #include "Image.h"
 #include "ContextQueue.h"
 
+#include <algorithm>
 #include <cassert>
 
 namespace riff
