@@ -288,4 +288,10 @@ TEST_F(TestNorthstar, scene_creation)
 	context.render();
 	context.resolve(&frameBuffer, &frameBufferResolved, false);
 	frameBufferResolved.saveToFile(m_tempDir / "scene_creation03.png");
+
+    // test for Material Get
+    const auto pins = emissive.readInputPins();
+    std::for_each(pins.begin(), pins.end(), [](const MaterialNodeInput& pin) {
+        //std::cout << pin << "\n";
+    });
 }

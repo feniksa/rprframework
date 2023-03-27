@@ -24,6 +24,18 @@ def make_name_node(s:str):
 
     return r
 
+def make_node_input_type_name(s:str):
+    r: str = ""
+    words = s.split('_')
+    for l in words:
+        r += l.capitalize()
+
+    if r.isnumeric():
+        r = "Type" + r
+
+    return r
+
+
 def make_name_context(s:str):
     r: str = ""
     words = s.split('_')
@@ -79,11 +91,14 @@ material_inputs = []
 material_nodetypes = []
 context_input_types = []
 shape_visibility_types = []
+material_node_input_types = []
 
 prog_material_input = re.compile('#define\s+RPR_MATERIAL_INPUT_([A-Za-z0-9_]+)\s+(0x[0-9abcdefABCDEF]+)')
 prog_material_node = re.compile('#define\s+RPR_MATERIAL_NODE_([A-Za-z0-9_]+)\s+(0x[0-9abcdefABCDEF]+)')
 prog_context = re.compile('#define\s+RPR_CONTEXT_([A-Za-z0-9_]+)\s+(0x[0-9abcdefABCDEF]+)')
 prog_shape_visibility = re.compile('#define\s+RPR_SHAPE_VISIBILITY_([A-Za-z0-9_]+)\s+(0x[0-9abcdefABCDEF]+)')
+prog_material_node_input_type = re.compile('#define\s+RPR_MATERIAL_NODE_INPUT_TYPE_([A-Za-z0-9_]+)')
+
 
 with open(args.input) as file:
     for line in file:
@@ -102,6 +117,13 @@ with open(args.input) as file:
             define_name = matches[1]
             hex_code = matches[2]
             material_nodetypes.append(define_name)
+    
+        # RPR_MATERIAL_NODE_INPYT_TYPE
+        matches = prog_material_node_input_type.match(txt)
+        if matches:
+            define_name = matches[1]
+            material_node_input_types.append(define_name)
+
 
         # RPR_CONTEXT_
         matches = prog_context.match(txt)
@@ -154,6 +176,12 @@ with open(args.output, "w") as fout:
     for n in shape_visibility_types:
         fout.write("\t\t{case}\t\t = RPR_SHAPE_VISIBILITY_{define},\n".format(case=make_shape_visibility(n), define=n))
     fout.write("\t};\n") # end class ShapeVisibilityType
+
+    fout.write("\tenum class MaterialNodeInputType {\n") # enum MaterialNodeTypeInput
+    for n in material_node_input_types:
+        fout.write("\t\t{case}\t\t = RPR_MATERIAL_NODE_INPUT_TYPE_{define},\n".format(case=make_node_input_type_name(n), define=n))
+    fout.write("\t};\n") # end class ShapeVisibilityType
+
 
 
     fout.write("} // namespace\n")

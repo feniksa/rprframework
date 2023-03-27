@@ -3,6 +3,7 @@
 #include "Image.h"
 #include "FrameBuffer.h"
 #include "Error.h"
+#include <cassert>
 
 namespace rprf
 {
@@ -16,7 +17,6 @@ MaterialNode::MaterialNode(MaterialSystem& matsys, MaterialNodeType type)
 
 	setInstance(std::move(node));
 }
-
 
 void MaterialNode::setParameter1u(MaterialInputType parameter, unsigned int x)
 {
@@ -51,6 +51,32 @@ void MaterialNode::setParameterFrameBuffer(MaterialInputType parameter, const Fr
 	rpr_int status;
 	status = rprMaterialNodeSetInputBufferDataByKey(*this, static_cast<int>(parameter), frameBuffer.instance());
 	check(status);
+}
+
+
+MaterialNode::InputPins MaterialNode::readInputPins() const
+{
+    InputPins pins;
+
+    rpr_int status;
+
+    size_t numParams = 0;
+    status = rprMaterialNodeGetInfo(*this, RPR_MATERIAL_NODE_INPUT_COUNT, sizeof(numParams), &numParams, nullptr);
+    check(status);
+
+    // get the material type.
+    rpr_material_node_type nodeType = 0;
+    status = rprMaterialNodeGetInfo(*this,RPR_MATERIAL_NODE_TYPE, sizeof(nodeType),&nodeType,nullptr);
+    check(status);
+
+    pins.reserve(numParams);
+
+    // for each parameter
+    for (size_t index = 0; index < numParams; ++index) {
+        pins.emplace_back(*this, index);
+    }
+
+    return pins;
 }
 
 }

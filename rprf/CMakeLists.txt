@@ -21,6 +21,7 @@ set(HEADERS
 	FrameBufferSysmem.h
 	MaterialSystem.h
 	MaterialNode.h
+	MaterialNodeInput.h
 	Image.h
 	RadeonProRenderEnums.h
 )
@@ -45,6 +46,7 @@ set(SOURCES
 	FrameBufferSysmem.cpp
 	MaterialSystem.cpp
 	MaterialNode.cpp
+	MaterialNodeInput.cpp
 	Image.cpp
 )
 
