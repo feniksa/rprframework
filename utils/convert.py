@@ -118,7 +118,7 @@ with open(args.input) as file:
             hex_code = matches[2]
             material_nodetypes.append(define_name)
     
-        # RPR_MATERIAL_NODE_INPYT_TYPE
+        # RPR_MATERIAL_NODE_INPUT_TYPE
         matches = prog_material_node_input_type.match(txt)
         if matches:
             define_name = matches[1]

@@ -73,4 +73,23 @@ std::vector<std::byte> MaterialNodeInput::readInputValue(const MaterialNode& nod
     return data;
 }
 
+std::ostream& operator<<(std::ostream& stream, const MaterialNodeInput& materialNodeInput)
+{
+    stream << "" << materialNodeInput.pinName() << "\n";
+
+    switch(materialNodeInput.type()) {
+        case MaterialNodeInputType::Float4:
+            stream << "float4(" << materialNodeInput.getFloat4() << ")\n";
+            break;
+        case MaterialNodeInputType::Node:
+            stream << "node(" << materialNodeInput.getMaterialNode() << ")\n";
+            break;
+        default:
+            stream << "unknown type\n";
+            break;
+    }
+
+    return stream;
+}
+
 }

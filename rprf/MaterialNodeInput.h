@@ -2,6 +2,7 @@
 
 #include "RadeonProRenderEnums.h"
 #include <vector>
+#include <ostream>
 
 namespace rprf
 {
@@ -14,7 +15,9 @@ public:
     explicit MaterialNodeInput() = default;
     explicit MaterialNodeInput(const MaterialNode& node, size_t index);
 
-    unsigned int getPinName() const { return m_pinName; }
+    unsigned int pinName() const { return m_pinName; }
+    MaterialNodeInputType type() const { return m_type; }
+
     float getFloat4() const;
     const rpr_material_node* getMaterialNode() const;
 
@@ -27,5 +30,7 @@ private:
     MaterialNodeInputType m_type;
     std::vector<std::byte> m_data;
 };
+
+std::ostream& operator<<(std::ostream& stream, const MaterialNodeInput& materialNodeInput);
 
 } // namespace
