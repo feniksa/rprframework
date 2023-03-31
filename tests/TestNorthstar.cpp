@@ -295,3 +295,16 @@ TEST_F(TestNorthstar, scene_creation)
         std::cout << pin << "\n";
     });
 }
+
+std::vector<int> initialize() {
+    std::vector<int> data;
+
+    for (size_t i = 0; i < 100000; ++i) {
+
+    }
+
+    return data;
+}
+
+void test() {
+}

@@ -15,19 +15,19 @@ public:
     explicit MaterialNodeInput() = default;
     explicit MaterialNodeInput(const MaterialNode& node, size_t index);
 
-    unsigned int pinName() const { return m_pinName; }
-    MaterialNodeInputType type() const { return m_type; }
+    MaterialInputType parameter() const noexcept { return m_parameter; }
+    MaterialNodeInputDataType dataType() const noexcept { return m_dataType; }
 
     float getFloat4() const;
     const rpr_material_node* getMaterialNode() const;
 
 private:
-    unsigned int readPinName(const MaterialNode& node, unsigned int index);
-    MaterialNodeInputType readInputType(const MaterialNode& node, unsigned  int index);
-    std::vector<std::byte> readInputValue(const MaterialNode& node, unsigned int index);
+    MaterialInputType readParameter(const MaterialNode& node, unsigned int index);
+    MaterialNodeInputDataType readDataType(const MaterialNode& node, unsigned  int index);
+    std::vector<std::byte> readData(const MaterialNode& node, unsigned int index);
 
-    unsigned int m_pinName;
-    MaterialNodeInputType m_type;
+    MaterialInputType m_parameter;
+    MaterialNodeInputDataType m_dataType;
     std::vector<std::byte> m_data;
 };
 

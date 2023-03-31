@@ -5,15 +5,15 @@
 namespace rprf
 {
 MaterialNodeInput::MaterialNodeInput(const MaterialNode& node, size_t index) :
- m_pinName(readPinName(node, index)),
- m_type(readInputType(node, index)),
- m_data(readInputValue(node, index))
+m_parameter(readParameter(node, index)),
+m_dataType(readDataType(node, index)),
+ m_data(readData(node, index))
 {
 }
 
 float MaterialNodeInput::getFloat4() const
 {
-    assert(m_type != MaterialNodeInputType::Float4);
+    assert(m_dataType == MaterialNodeInputDataType::Float4);
 
     const float* value = reinterpret_cast<const float*>(m_data.data());
     return *value;
@@ -21,13 +21,13 @@ float MaterialNodeInput::getFloat4() const
 
 const rpr_material_node* MaterialNodeInput::getMaterialNode() const
 {
-    assert(m_type != MaterialNodeInputType::Node);
+    assert(m_dataType == MaterialNodeInputDataType::Node);
 
     const rpr_material_node *mat = reinterpret_cast<const rpr_material_node *>(m_data.data());
     return mat;
 }
 
-unsigned int MaterialNodeInput::readPinName(const MaterialNode& node, unsigned int index)
+MaterialInputType MaterialNodeInput::readParameter(const MaterialNode& node, unsigned int index)
 {
     unsigned int pinName;
 
@@ -37,12 +37,12 @@ unsigned int MaterialNodeInput::readPinName(const MaterialNode& node, unsigned i
     status = rprMaterialNodeGetInputInfo(node.instance(), index, RPR_MATERIAL_NODE_INPUT_NAME, sizeof(pinName), &pinName, nullptr);
     check(status);
 
-    return pinName;
+    return static_cast<MaterialInputType>(pinName);
 }
 
-MaterialNodeInputType MaterialNodeInput::readInputType(const MaterialNode& node, unsigned  int index)
+MaterialNodeInputDataType MaterialNodeInput::readDataType(const MaterialNode& node, unsigned  int index)
 {
-    MaterialNodeInputType inputType;
+    MaterialNodeInputDataType inputType;
     rpr_status status;
 
     status = rprMaterialNodeGetInputInfo(node.instance(), index, RPR_MATERIAL_NODE_INPUT_TYPE, sizeof(inputType), &inputType, nullptr);
@@ -51,7 +51,7 @@ MaterialNodeInputType MaterialNodeInput::readInputType(const MaterialNode& node,
     return inputType;
 }
 
-std::vector<std::byte> MaterialNodeInput::readInputValue(const MaterialNode& node, unsigned int index)
+std::vector<std::byte> MaterialNodeInput::readData(const MaterialNode& node, unsigned int index)
 {
     rpr_status status;
 
@@ -75,13 +75,13 @@ std::vector<std::byte> MaterialNodeInput::readInputValue(const MaterialNode& nod
 
 std::ostream& operator<<(std::ostream& stream, const MaterialNodeInput& materialNodeInput)
 {
-    stream << "" << materialNodeInput.pinName() << "\n";
+    stream << "" << static_cast<int>(materialNodeInput.parameter()) << "\n";
 
-    switch(materialNodeInput.type()) {
-        case MaterialNodeInputType::Float4:
+    switch(materialNodeInput.dataType()) {
+        case MaterialNodeInputDataType::Float4:
             stream << "float4(" << materialNodeInput.getFloat4() << ")\n";
             break;
-        case MaterialNodeInputType::Node:
+        case MaterialNodeInputDataType::Node:
             stream << "node(" << materialNodeInput.getMaterialNode() << ")\n";
             break;
         default:
