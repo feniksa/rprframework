@@ -30,6 +30,7 @@ set(SOURCES
 	Camera.cpp
 	ContextUtils.cpp
 	Context.cpp
+    ContextObject.cpp
 	Error.cpp
 	Object.cpp
 	Renderer.cpp

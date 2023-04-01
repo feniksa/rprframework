@@ -568,7 +568,7 @@ namespace rprf
 		Light		 = RPR_SHAPE_VISIBILITY_LIGHT,
 		ReceiveShadow		 = RPR_SHAPE_VISIBILITY_RECEIVE_SHADOW,
 	};
-	enum class MaterialNodeInputDataType {
+	enum class MaterialNodeInputType {
 		Float4		 = RPR_MATERIAL_NODE_INPUT_TYPE_FLOAT4,
 		Uint		 = RPR_MATERIAL_NODE_INPUT_TYPE_UINT,
 		Node		 = RPR_MATERIAL_NODE_INPUT_TYPE_NODE,

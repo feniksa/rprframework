@@ -2,6 +2,7 @@
 #include "rprf/Context.h"
 #include "rprf/ContextUtils.h"
 #include "rprf/Scene.h"
+#include "rprf/Error.h"
 
 #include "rprf/Camera.h"
 #include "rprf/FrameBuffer.h"

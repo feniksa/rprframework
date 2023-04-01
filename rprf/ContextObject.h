@@ -1,10 +1,15 @@
 #pragma once
 
-#include "RadeonProRender.h"
-#include "Error.h"
-#include <exception>
+#include <type_traits>
 #include <stdexcept>
-#include <iostream>
+
+namespace rprf
+{
+    void __rprObjectDelete(void*);
+    void __rprObjectSetName(void*, void*);
+    void __printError(const char* what);
+    void __printError(const char* what, const char* err);
+}
 
 namespace rprf
 {
@@ -29,6 +34,8 @@ public:
 
 	operator T() const noexcept { return m_instance; }
 
+    void setName(const char* name);
+
 	void destroy();
 
 	// we don't allow to copy context object
@@ -52,10 +59,10 @@ ContextObject<T>::~ContextObject() noexcept
 	try {
 		destroy();
 	} catch(const std::exception& e) {
-		std::cerr << "RadeonProRender error: " << e.what() << std::endl;
+        __printError("ContextObject::~ContextObject(): ", e.what());
 	}
 	catch (...) {
-		std::cerr << "RadeonProRender error: unkown exception raised in ContextObject::~ContextObject()" << std::endl;
+        __printError("ContextObject::~ContextObject(): unknown error");
 	}
 }
 
@@ -90,11 +97,16 @@ void ContextObject<T>::destroy()
 	if (!m_instance)
 		return;
 
-	rpr_int status;
-	status = rprObjectDelete(m_instance);
-	check(status);
+    __rprObjectDelete(m_instance);
 
 	m_instance = nullptr;
+}
+
+template <class T>
+void ContextObject<T>::setName(const char* name)
+{
+    assert(m_instance);
+    __rprObjectSetName(m_instance, name);
 }
 
 } // namespace

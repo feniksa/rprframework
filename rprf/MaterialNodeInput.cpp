@@ -1,5 +1,6 @@
 #include "MaterialNodeInput.h"
 #include "MaterialNode.h"
+#include "Error.h"
 #include <cassert>
 
 namespace rprf
@@ -13,7 +14,7 @@ m_dataType(readDataType(node, index)),
 
 std::tuple<float, float, float, float> MaterialNodeInput::getFloat4() const
 {
-    assert(m_dataType == MaterialNodeInputDataType::Float4);
+    assert(m_dataType == MaterialNodeInputType::Float4);
 
     const float* float1 = reinterpret_cast<const float*>(m_data.data() + sizeof(float) * 0);
     const float* float2 = reinterpret_cast<const float*>(m_data.data() + sizeof(float) * 1);
@@ -25,7 +26,7 @@ std::tuple<float, float, float, float> MaterialNodeInput::getFloat4() const
 
 unsigned int MaterialNodeInput::getUInt() const
 {
-    assert(m_dataType == MaterialNodeInputDataType::Uint);
+    assert(m_dataType == MaterialNodeInputType::Uint);
 
     const unsigned int* number = reinterpret_cast<const unsigned int*>(m_data.data());
     return *number;
@@ -33,7 +34,7 @@ unsigned int MaterialNodeInput::getUInt() const
 
 const rpr_material_node* MaterialNodeInput::getMaterialNode() const
 {
-    assert(m_dataType == MaterialNodeInputDataType::Node);
+    assert(m_dataType == MaterialNodeInputType::Node);
 
     const rpr_material_node *mat = reinterpret_cast<const rpr_material_node *>(m_data.data());
     return mat;
@@ -52,9 +53,9 @@ MaterialInputType MaterialNodeInput::readParameter(const MaterialNode& node, uns
     return static_cast<MaterialInputType>(pinName);
 }
 
-MaterialNodeInputDataType MaterialNodeInput::readDataType(const MaterialNode& node, unsigned  int index)
+MaterialNodeInputType MaterialNodeInput::readDataType(const MaterialNode& node, unsigned  int index)
 {
-    MaterialNodeInputDataType inputType;
+    MaterialNodeInputType inputType;
     rpr_status status;
 
     status = rprMaterialNodeGetInputInfo(node.instance(), index, RPR_MATERIAL_NODE_INPUT_TYPE, sizeof(inputType), &inputType, nullptr);
@@ -90,18 +91,18 @@ std::ostream& operator<<(std::ostream& stream, const MaterialNodeInput& material
     stream << "" << static_cast<int>(materialNodeInput.parameter()) << "\n";
 
     switch(materialNodeInput.dataType()) {
-        case MaterialNodeInputDataType::Float4: {
+        case MaterialNodeInputType::Float4: {
             float r, g, b, a;
             std::tie(r, g, b, a) = materialNodeInput.getFloat4();
             stream << "float4(" << r << ", " << g << ", " << b << ", " << a << ")\n";
             break;
         }
-        case MaterialNodeInputDataType::Uint: {
+        case MaterialNodeInputType::Uint: {
             const unsigned int uintNumber = materialNodeInput.getUInt();
             stream << "uint(" << uintNumber << ")\n";
             break;
         }
-        case MaterialNodeInputDataType::Node: {
+        case MaterialNodeInputType::Node: {
             stream << "node(" << materialNodeInput.getMaterialNode() << ")\n";
             break;
         }

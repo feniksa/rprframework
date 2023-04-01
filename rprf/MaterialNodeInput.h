@@ -16,7 +16,7 @@ public:
     explicit MaterialNodeInput(const MaterialNode& node, size_t index);
 
     MaterialInputType parameter() const noexcept { return m_parameter; }
-    MaterialNodeInputDataType dataType() const noexcept { return m_dataType; }
+    MaterialNodeInputType dataType() const noexcept { return m_dataType; }
 
     std::tuple<float, float, float, float> getFloat4() const;
     unsigned int getUInt() const;
@@ -24,11 +24,11 @@ public:
 
 private:
     MaterialInputType readParameter(const MaterialNode& node, unsigned int index);
-    MaterialNodeInputDataType readDataType(const MaterialNode& node, unsigned  int index);
+    MaterialNodeInputType readDataType(const MaterialNode& node, unsigned  int index);
     std::vector<std::byte> readData(const MaterialNode& node, unsigned int index);
 
     MaterialInputType m_parameter;
-    MaterialNodeInputDataType m_dataType;
+    MaterialNodeInputType m_dataType;
     std::vector<std::byte> m_data;
 };
 

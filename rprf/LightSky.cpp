@@ -1,4 +1,5 @@
 #include "LightSky.h"
+#include "Error.h"
 
 namespace rprf
 {
