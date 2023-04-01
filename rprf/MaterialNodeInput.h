@@ -18,7 +18,8 @@ public:
     MaterialInputType parameter() const noexcept { return m_parameter; }
     MaterialNodeInputDataType dataType() const noexcept { return m_dataType; }
 
-    float getFloat4() const;
+    std::tuple<float, float, float, float> getFloat4() const;
+    unsigned int getUInt() const;
     const rpr_material_node* getMaterialNode() const;
 
 private:

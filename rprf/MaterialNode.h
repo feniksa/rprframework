@@ -11,6 +11,34 @@ class MaterialSystem;
 class Image;
 class FrameBuffer;
 
+class MaterialInputPin
+{
+public:
+    using InputPins = std::vector<MaterialNodeInput>;
+
+    MaterialInputPin() = default;
+    MaterialInputPin(MaterialInputPin&&) = default;
+
+    MaterialInputPin& operator=(const MaterialInputPin&) = default;
+    MaterialInputPin& operator=(MaterialInputPin&&) = default;
+
+    void reserve(size_t size)
+    {
+        m_inputPins.reserve(size);
+    }
+
+    template <class ... Args>
+    void emplace_back(Args&& ... args) {
+        m_inputPins.emplace_back(std::forward<Args>(args)...);
+    }
+
+
+
+
+private:
+    InputPins m_inputPins;
+};
+
 class MaterialNode : public ContextObject<rpr_material_node>
 {
 public:
@@ -25,7 +53,12 @@ public:
 	void setParameterImage(MaterialInputType paramter, const Image& image);
 	void setParameterFrameBuffer(MaterialInputType paramter, const FrameBuffer& frameBuffer);
 
-    InputPins readInputPins() const;
+    InputPins readMaterialParameters() const;
 };
+
+bool hasParameter(const MaterialNode::InputPins& inputPins, MaterialInputType parameter);
+std::tuple<float, float, float, float> getFloat4f(const MaterialNode::InputPins& inputPins,  MaterialInputType parameter);
+unsigned int getUInt(const MaterialNode::InputPins& inputPins,  MaterialInputType parameter);
+const rpr_material_node* getNode(const MaterialNode::InputPins& inputPins, MaterialInputType parameter);
 
 }

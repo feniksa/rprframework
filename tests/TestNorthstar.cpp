@@ -290,10 +290,19 @@ TEST_F(TestNorthstar, scene_creation)
 	frameBufferResolved.saveToFile(m_tempDir / "scene_creation03.png");
 
     // test for Material Get
-    const auto pins = emissive.readInputPins();
+    const auto pins = emissive.readMaterialParameters();
     std::for_each(pins.begin(), pins.end(), [](const MaterialNodeInput& pin) {
         std::cout << pin << "\n";
     });
+
+    EXPECT_TRUE(hasParameter(pins, rprf::MaterialInputType::Color));
+    EXPECT_FALSE(hasParameter(pins, rprf::MaterialInputType::Highlight2));
+    float r, g, b, a;
+    std::tie(r, g, b, a) = getFloat4f(pins, rprf::MaterialInputType::Color);
+    EXPECT_FLOAT_EQ(6.0f, r);
+    EXPECT_FLOAT_EQ(3.0f, g);
+    EXPECT_FLOAT_EQ(0.0f, b);
+    EXPECT_FLOAT_EQ(0.0f, a);
 }
 
 std::vector<int> initialize() {

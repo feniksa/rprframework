@@ -53,8 +53,7 @@ void MaterialNode::setParameterFrameBuffer(MaterialInputType parameter, const Fr
 	check(status);
 }
 
-
-MaterialNode::InputPins MaterialNode::readInputPins() const
+MaterialNode::InputPins MaterialNode::readMaterialParameters() const
 {
     InputPins pins;
 
@@ -77,6 +76,44 @@ MaterialNode::InputPins MaterialNode::readInputPins() const
     }
 
     return pins;
+}
+
+
+// helper functions
+bool hasParameter(const MaterialNode::InputPins& inputPins, MaterialInputType parameter)
+{
+    const auto iter = std::find_if(inputPins.begin(), inputPins.end(), [parameter](const MaterialNodeInput& input){ return input.parameter() == parameter; });
+    return (iter != inputPins.end()) ? true : false;
+}
+
+std::tuple<float, float, float, float> getFloat4f(const MaterialNode::InputPins& inputPins,  MaterialInputType parameter)
+{
+    const auto iter = std::find_if(inputPins.begin(), inputPins.end(), [parameter](const MaterialNodeInput& input){ return input.parameter() == parameter; });
+    if (iter == inputPins.end())  {
+        return {0.0f, 0.0f, 0.0f, 0.0f };
+    }
+
+    return iter->getFloat4();
+}
+
+const rpr_material_node* getNode(const MaterialNode::InputPins& inputPins, MaterialInputType parameter)
+{
+    const auto iter = std::find_if(inputPins.begin(), inputPins.end(), [parameter](const MaterialNodeInput& input){ return input.parameter() == parameter; });
+    if (iter == inputPins.end())  {
+        return nullptr;
+    }
+
+    return iter->getMaterialNode();
+}
+
+unsigned int getUInt(const MaterialNode::InputPins& inputPins,  MaterialInputType parameter)
+{
+    const auto iter = std::find_if(inputPins.begin(), inputPins.end(), [parameter](const MaterialNodeInput& input){ return input.parameter() == parameter; });
+    if (iter == inputPins.end())  {
+        return 0;
+    }
+
+    return iter->getUInt();
 }
 
 }

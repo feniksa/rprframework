@@ -11,12 +11,24 @@ m_dataType(readDataType(node, index)),
 {
 }
 
-float MaterialNodeInput::getFloat4() const
+std::tuple<float, float, float, float> MaterialNodeInput::getFloat4() const
 {
     assert(m_dataType == MaterialNodeInputDataType::Float4);
 
-    const float* value = reinterpret_cast<const float*>(m_data.data());
-    return *value;
+    const float* float1 = reinterpret_cast<const float*>(m_data.data() + sizeof(float) * 0);
+    const float* float2 = reinterpret_cast<const float*>(m_data.data() + sizeof(float) * 1);
+    const float* float3 = reinterpret_cast<const float*>(m_data.data() + sizeof(float) * 2);
+    const float* float4 = reinterpret_cast<const float*>(m_data.data() + sizeof(float) * 3);
+
+    return {*float1, *float2, *float3, *float4};
+}
+
+unsigned int MaterialNodeInput::getUInt() const
+{
+    assert(m_dataType == MaterialNodeInputDataType::Uint);
+
+    const unsigned int* number = reinterpret_cast<const unsigned int*>(m_data.data());
+    return *number;
 }
 
 const rpr_material_node* MaterialNodeInput::getMaterialNode() const
@@ -78,12 +90,21 @@ std::ostream& operator<<(std::ostream& stream, const MaterialNodeInput& material
     stream << "" << static_cast<int>(materialNodeInput.parameter()) << "\n";
 
     switch(materialNodeInput.dataType()) {
-        case MaterialNodeInputDataType::Float4:
-            stream << "float4(" << materialNodeInput.getFloat4() << ")\n";
+        case MaterialNodeInputDataType::Float4: {
+            float r, g, b, a;
+            std::tie(r, g, b, a) = materialNodeInput.getFloat4();
+            stream << "float4(" << r << ", " << g << ", " << b << ", " << a << ")\n";
             break;
-        case MaterialNodeInputDataType::Node:
+        }
+        case MaterialNodeInputDataType::Uint: {
+            const unsigned int uintNumber = materialNodeInput.getUInt();
+            stream << "uint(" << uintNumber << ")\n";
+            break;
+        }
+        case MaterialNodeInputDataType::Node: {
             stream << "node(" << materialNodeInput.getMaterialNode() << ")\n";
             break;
+        }
         default:
             stream << "unknown type\n";
             break;
