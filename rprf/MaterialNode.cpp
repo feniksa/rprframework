@@ -3,7 +3,7 @@
 #include "Image.h"
 #include "FrameBuffer.h"
 #include "Error.h"
-#include <cassert>
+#include <algorithm>
 
 namespace rprf
 {

@@ -3,6 +3,7 @@
 #include "RadeonProRenderEnums.h"
 #include <vector>
 #include <ostream>
+#include <tuple>
 
 namespace rprf
 {
