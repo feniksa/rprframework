@@ -88,7 +88,7 @@ std::vector<std::byte> MaterialNodeInput::readData(const MaterialNode& node, uns
 
 std::ostream& operator<<(std::ostream& stream, const MaterialNodeInput& materialNodeInput)
 {
-    stream << "" << static_cast<int>(materialNodeInput.parameter()) << "\n";
+    stream << "type: " << static_cast<int>(materialNodeInput.parameter()) << " ";
 
     switch(materialNodeInput.dataType()) {
         case MaterialNodeInputType::Float4: {

@@ -1,5 +1,6 @@
 #include "Camera.h"
 #include "Error.h"
+#include <cassert>
 
 namespace rprf
 {
@@ -21,12 +22,10 @@ void Camera::lookAt(float position_x, float position_y, float position_z, float 
 	check(status);
 }
 
-void Camera::setTransform(const rprf_math::matrix& _transform, bool transpose)
+void Camera::setTransform(const rprf_math::matrix& transform, bool transpose)
 {
-	m_transform = _transform;
-
 	rpr_int status;
-	status = rprCameraSetTransform(*this, transpose, &m_transform.m00);
+	status = rprCameraSetTransform(*this, transpose, &transform.m00);
 	check(status);
 }
 
@@ -84,6 +83,25 @@ void Camera::setLensShift(float width_mm, float height_mm)
 	rpr_int status;
 	status = rprCameraSetLensShift(*this, width_mm, height_mm);
 	check(status);
+}
+
+
+rprf_math::matrix Camera::getTransform() const
+{
+    rprf_math::matrix m;
+
+    rpr_int status;
+
+    rpr_camera_info info = RPR_CAMERA_TRANSFORM;
+
+    size_t returnSize;
+
+    status = rprCameraGetInfo(*this, info, sizeof(m.m), &m.m, &returnSize);
+    check(status);
+
+    assert(returnSize == sizeof(m.m));
+
+    return m;
 }
 
 }

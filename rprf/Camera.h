@@ -23,8 +23,7 @@ public:
 	void setSensorWidthHeight(float width_mm = 36.0f, float height_mm = 24.0f);
 	void setLensShift(float width_mm, float height_mm);
 
-private:
-	rprf_math::matrix m_transform;
+    rprf_math::matrix getTransform() const;
 };
 
 } // rpr

@@ -7,7 +7,6 @@
 #include "rprf/LightPoint.h"
 #include "rprf/LightEnvironment.h"
 #include "rprf/ContextUtils.h"
-#include "rprf/FrameBufferSysmem.h"
 #include "rprf/MaterialSystem.h"
 #include "rprf/MaterialNode.h"
 #include "rprf/Image.h"
@@ -33,6 +32,8 @@ struct TestNorthstar : public ::testing::Test
 	std::filesystem::path m_shaderCachePath;
     const std::filesystem::path m_hipbinPath;
 
+    gpu_list_t gpus;
+
 	TestNorthstar() : m_hipbinPath("hipbin")
 	{
 		m_tempDir = std::filesystem::temp_directory_path();
@@ -48,12 +49,12 @@ struct TestNorthstar : public ::testing::Test
 		}
 		m_shaderCachePath = m_tempDir / "cache";
 
-		std::cout << "Temporary directory: \t" << m_tempDir <<  "\n";
 	}
 
     void SetUp() override
     {
 		m_plugin = std::make_unique<Plugin>(Plugin::Type::Northstar);
+        gpus = getAvailableDevices(*m_plugin, "");
     }
 
     void TearDown() override
@@ -62,6 +63,9 @@ struct TestNorthstar : public ::testing::Test
 
         if (!::testing::Test::HasFailure()) {
             std::filesystem::remove_all(m_tempDir);
+        } else {
+            std::cout << "Temporary directory: \t" << m_tempDir <<  "\n";
+            printAvailableDevices(gpus, std::cout);
         }
     }
 
@@ -97,13 +101,94 @@ TEST_F(TestNorthstar, context_creation)
     EXPECT_EQ(context.createFlags(), creationFlags);
 }
 
+TEST_F(TestNorthstar, framebuffer_params)
+{
+    int creationFlags = GetCreationFlags(gpus);
+    Context context(*m_plugin, m_shaderCachePath, m_hipbinPath, creationFlags);
+
+    FrameBuffer frameBuffer(context, 800, 600);
+
+    // check framebuffer
+    const auto format = frameBuffer.getFormat();
+    EXPECT_EQ(format.numComponents, 4);
+    EXPECT_EQ(format.type, ComponentsType::Float32);
+
+    const auto desc = frameBuffer.getDesc();
+    EXPECT_EQ(desc.width, 800);
+    EXPECT_EQ(desc.height, 600);
+}
+
+
+TEST_F(TestNorthstar, camera_params)
+{
+    int creationFlags = GetCreationFlags(gpus);
+    Context context(*m_plugin, m_shaderCachePath, m_hipbinPath, creationFlags);
+
+    const auto transform = rprf_math::matrix(
+            1.0f, 2.0f, 3.0f, 4.0f,
+            5.0f, 6.0f, 7.0f, 8.0f,
+            9.0f, 10.0f, 11.0f, 12.0f,
+            13.0f, 14.0f, 15.0f, 16.0f
+    );
+
+    Camera camera(context);
+
+    camera.setTransform(transform, false);
+
+    const rprf_math::matrix m = camera.getTransform();
+    EXPECT_FLOAT_EQ(m.m00, 1.0f);
+    EXPECT_FLOAT_EQ(m.m01, 2.0f);
+    EXPECT_FLOAT_EQ(m.m02, 3.0f);
+    EXPECT_FLOAT_EQ(m.m03, 4.0f);
+    EXPECT_FLOAT_EQ(m.m10, 5.0f);
+    EXPECT_FLOAT_EQ(m.m11, 6.0f);
+    EXPECT_FLOAT_EQ(m.m12, 7.0f);
+    EXPECT_FLOAT_EQ(m.m13, 8.0f);
+    EXPECT_FLOAT_EQ(m.m20, 9.0f);
+    EXPECT_FLOAT_EQ(m.m21, 10.0f);
+    EXPECT_FLOAT_EQ(m.m22, 11.0f);
+    EXPECT_FLOAT_EQ(m.m23, 12.0f);
+    EXPECT_FLOAT_EQ(m.m30, 13.0f);
+    EXPECT_FLOAT_EQ(m.m31, 14.0f);
+    EXPECT_FLOAT_EQ(m.m32, 15.0f);
+    EXPECT_FLOAT_EQ(m.m33, 16.0f);
+}
+
+TEST_F(TestNorthstar, material_node_params)
+{
+    Context context(*m_plugin, m_shaderCachePath, m_hipbinPath, GetCreationFlags(gpus));
+
+    Scene scene(context);
+    context.setScene(scene);
+
+    MaterialSystem materialSystem(context);
+
+    // replace the material on cuve by an emissive one.
+    MaterialNode emissive(materialSystem, MaterialNodeType::Emissive);
+    emissive.setParameter4f(MaterialInputType::Color, 6.0f, 3.0f, 0.0f, 0.0f);
+
+    // test for Material Get
+    const auto pins = emissive.readMaterialParameters();
+    /*std::for_each(pins.begin(), pins.end(), [](const MaterialNodeInput& pin) {
+        std::cout << pin << "\n";
+    });*/
+
+    EXPECT_TRUE(hasParameter(pins, rprf::MaterialInputType::Color));
+    EXPECT_FALSE(hasParameter(pins, rprf::MaterialInputType::Highlight2));
+    float r, g, b, a;
+    std::tie(r, g, b, a) = getFloat4f(pins, rprf::MaterialInputType::Color);
+    EXPECT_FLOAT_EQ(6.0f, r);
+    EXPECT_FLOAT_EQ(3.0f, g);
+    EXPECT_FLOAT_EQ(0.0f, b);
+    EXPECT_FLOAT_EQ(0.0f, a);
+}
+
 TEST_F(TestNorthstar, scene_creation)
 {
 	ASSERT_TRUE(m_plugin);
 	ASSERT_TRUE(!m_shaderCachePath.empty());
 	ASSERT_TRUE(!m_tempDir.empty());
 
-	auto gpus = getAvailableDevices(*m_plugin, "");
 	Context context(*m_plugin, m_shaderCachePath, m_hipbinPath, GetCreationFlags(gpus));
 
 	Scene scene(context);
@@ -246,15 +331,6 @@ TEST_F(TestNorthstar, scene_creation)
 	context.render();
 	context.resolve(&frameBuffer, &frameBufferResolved, false);
 
-    // check framebuffer
-    const auto format = frameBuffer.getFormat();
-    EXPECT_EQ(format.numComponents, 4);
-    EXPECT_EQ(format.type, ComponentsType::Float32);
-
-    const auto desc = frameBuffer.getDesc();
-    EXPECT_EQ(desc.width, 800);
-    EXPECT_EQ(desc.height, 600);
-
 	frameBufferResolved.saveToFile(m_tempDir / "scene_creation02.png");
 
 	// ----------------------------------------------------------------------
@@ -297,32 +373,5 @@ TEST_F(TestNorthstar, scene_creation)
 	context.render();
 	context.resolve(&frameBuffer, &frameBufferResolved, false);
 	frameBufferResolved.saveToFile(m_tempDir / "scene_creation03.png");
-
-    // test for Material Get
-    const auto pins = emissive.readMaterialParameters();
-    std::for_each(pins.begin(), pins.end(), [](const MaterialNodeInput& pin) {
-        std::cout << pin << "\n";
-    });
-
-    EXPECT_TRUE(hasParameter(pins, rprf::MaterialInputType::Color));
-    EXPECT_FALSE(hasParameter(pins, rprf::MaterialInputType::Highlight2));
-    float r, g, b, a;
-    std::tie(r, g, b, a) = getFloat4f(pins, rprf::MaterialInputType::Color);
-    EXPECT_FLOAT_EQ(6.0f, r);
-    EXPECT_FLOAT_EQ(3.0f, g);
-    EXPECT_FLOAT_EQ(0.0f, b);
-    EXPECT_FLOAT_EQ(0.0f, a);
 }
 
-std::vector<int> initialize() {
-    std::vector<int> data;
-
-    for (size_t i = 0; i < 100000; ++i) {
-
-    }
-
-    return data;
-}
-
-void test() {
-}
