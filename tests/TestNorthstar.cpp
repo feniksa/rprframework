@@ -246,6 +246,15 @@ TEST_F(TestNorthstar, scene_creation)
 	context.render();
 	context.resolve(&frameBuffer, &frameBufferResolved, false);
 
+    // check framebuffer
+    const auto format = frameBuffer.getFormat();
+    EXPECT_EQ(format.numComponents, 4);
+    EXPECT_EQ(format.type, ComponentsType::Float32);
+
+    const auto desc = frameBuffer.getDesc();
+    EXPECT_EQ(desc.width, 800);
+    EXPECT_EQ(desc.height, 600);
+
 	frameBufferResolved.saveToFile(m_tempDir / "scene_creation02.png");
 
 	// ----------------------------------------------------------------------

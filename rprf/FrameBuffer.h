@@ -8,10 +8,27 @@
 namespace rprf
 {
 
+struct FrameBufferFormat
+{
+    ComponentsType type;
+    unsigned int numComponents;
+
+    rpr_framebuffer_format format() const { return {numComponents,static_cast<unsigned int>(type) }; }
+};
+
+struct FrameBufferDesc
+{
+    unsigned int width;
+    unsigned int height;
+
+    rpr_framebuffer_desc desc() const { return {width, height }; }
+};
+
 class FrameBuffer : public ContextObject<rpr_framebuffer>
 {
 public:
-	FrameBuffer(Context& context, const int width, const int height, int numComponets = 4, ComponentsType type = ComponentsType::Float32);
+	FrameBuffer(Context& context, unsigned int width, unsigned int height, unsigned int numComponets = 4, ComponentsType type = ComponentsType::Float32);
+    FrameBuffer(Context& context, const FrameBufferFormat& format, const FrameBufferDesc& desc);
 
 	size_t data(void* buffer, size_t size) const;
 	void data(std::vector<std::byte>* buffer) const;
@@ -22,16 +39,12 @@ public:
 
 	std::size_t bufferSize() const;
 
-	int numComponents() const            { return m_numComponents; }
-	ComponentsType componentType() const { return m_componentType; }
+    FrameBufferFormat getFormat() const;
+    FrameBufferDesc getDesc() const;
 
 	FrameBuffer clone() const;
 private:
 	Context& m_context;
-	int m_width;
-	int m_height;
-	int m_numComponents;
-	ComponentsType m_componentType;
 };
 
 } // namespace

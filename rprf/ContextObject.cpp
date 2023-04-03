@@ -3,30 +3,55 @@
 #include "RadeonProRender.h"
 #include "Error.h"
 #include <iostream>
+#include <cassert>
 
 namespace rprf
 {
-    void __rprObjectDelete(void* instance)
+    void __rprObjectDelete(void* instance) noexcept
     {
+        assert(instance);
+
+        try {
+            rpr_int status;
+            status = rprObjectDelete(instance);
+            check(status);
+        }
+        catch(const std::exception& e)
+        {
+            std::cerr << "ContextObject::destroy(): ", e.what();
+        }
+        catch (...)
+        {
+            std::cerr << "ContextObject::destroy(): unknown error";
+        }
+    }
+
+    void __rprObjectSetName(void* instance, const char* name)
+    {
+        assert(instance);
         rpr_int status;
-        status = rprObjectDelete(instance);
+        status = rprObjectSetName(instance, name);
         check(status);
     }
-    void __rprObjectSetName(void* node, const char* name)
+
+    void __rprObjectSetCustomPointer(void* instance, void* pointer)
     {
+        assert(instance);
         rpr_int status;
-        status = rprObjectSetName(node, name);
+        status = rprObjectSetCustomPointer(instance, pointer);
         check(status);
     }
 
-    void __printError(const char* what)
+    const void* __rprObjectGetCustomPointer(void* instance)
     {
-        std::cerr << what << "\n";
-    }
+        assert(instance);
 
-    void __printError(const char* what, const char* err)
-    {
+        const void* pointer;
 
-        std::cerr << what << err << "\n";
+        rpr_int status;
+        status = rprObjectGetCustomPointer(instance, &pointer);
+        check(status);
+
+        return pointer;
     }
 }

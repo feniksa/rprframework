@@ -12,11 +12,10 @@ class Context;
 class FrameBufferSysmem
 {
 public:
-	using BufferType = std::vector<std::byte>;
+	using ContainerType = std::vector<std::byte>;
 
-	FrameBufferSysmem(rprf::Context& context, unsigned int width = 0, unsigned int height = 0);
+	explicit FrameBufferSysmem(rprf::Context& context, const FrameBufferFormat& format, const FrameBufferDesc& desc);
 
-	void resize(unsigned int width, unsigned int height);
 	void update();
 	void clear();
 	void reset();
@@ -27,24 +26,18 @@ public:
 
 	bool save(const std::string_view& fileName) const;
 
-	unsigned int width()  const noexcept { return m_width;  }
-	unsigned int height() const noexcept { return m_height; }
-
-	int numComponents() const;
-	ComponentsType componentsType() const;
+	FrameBufferFormat format() const;
+	FrameBufferDesc desc() const;
 
 	const FrameBuffer& rprFrameBufferSysmem() const;
 	FrameBuffer& rprFrameBufferSysmem();
 
-	      BufferType& buffer()       { return m_buffer; }
-	const BufferType& buffer() const { return m_buffer; }
+	      ContainerType& buffer()       { return m_buffer; }
+	const ContainerType& buffer() const { return m_buffer; }
 private:
-	Context& m_context;
-	std::unique_ptr<FrameBuffer> m_frameBuffer;
+	FrameBuffer m_frameBuffer;
+	ContainerType m_buffer;
 
-	BufferType m_buffer;
-	unsigned int m_width;
-	unsigned int m_height;
 	unsigned int m_bufferVersion;
 	unsigned int m_bufferSysmemVersion;
 };

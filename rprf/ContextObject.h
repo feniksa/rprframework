@@ -5,10 +5,10 @@
 
 namespace rprf
 {
-    void __rprObjectDelete(void*);
-    void __rprObjectSetName(void*, void*);
-    void __printError(const char* what);
-    void __printError(const char* what, const char* err);
+    void __rprObjectDelete(void*) noexcept;
+    void __rprObjectSetName(void*, const char*);
+    void __rprObjectSetCustomPointer (void*, void*);
+    const void* __rprObjectGetCustomPointer (void*);
 }
 
 namespace rprf
@@ -20,10 +20,10 @@ class ContextObject
 public:
 	explicit ContextObject(T data = nullptr) noexcept;
 	ContextObject(ContextObject&& object)  noexcept;
+
 	virtual ~ContextObject() noexcept;
 
 	ContextObject& operator=(ContextObject&& context);
-	void setInstance(T&& instance);
 
 	// be carefull! No delete of instance
 	[[deprecated]]
@@ -35,12 +35,17 @@ public:
 	operator T() const noexcept { return m_instance; }
 
     void setName(const char* name);
+    void setCustomPointer(void* pointer);
+    const void* getCustomPointer() const;
 
-	void destroy();
+	void destroy() noexcept;
 
 	// we don't allow to copy context object
 	ContextObject(const ContextObject&)            = delete;
 	ContextObject& operator=(const ContextObject&) = delete;
+
+protected:
+    void setInstance(T&& instance);
 
 private:
 	T m_instance;
@@ -56,14 +61,7 @@ ContextObject<T>::ContextObject(T dataPointer) noexcept
 template <class T>
 ContextObject<T>::~ContextObject() noexcept
 {
-	try {
-		destroy();
-	} catch(const std::exception& e) {
-        __printError("ContextObject::~ContextObject(): ", e.what());
-	}
-	catch (...) {
-        __printError("ContextObject::~ContextObject(): unknown error");
-	}
+    destroy();
 }
 
 template <class T>
@@ -92,7 +90,7 @@ void ContextObject<T>::setInstance(T&& instance)
 }
 
 template <class T>
-void ContextObject<T>::destroy()
+void ContextObject<T>::destroy() noexcept
 {
 	if (!m_instance)
 		return;
@@ -105,8 +103,19 @@ void ContextObject<T>::destroy()
 template <class T>
 void ContextObject<T>::setName(const char* name)
 {
-    assert(m_instance);
     __rprObjectSetName(m_instance, name);
+}
+
+template <class T>
+void ContextObject<T>::setCustomPointer(void *pointer)
+{
+    __rprObjectSetCustomPointer(m_instance, pointer);
+}
+
+template <class T>
+const void* ContextObject<T>::getCustomPointer() const
+{
+    return __rprObjectGetCustomPointer(m_instance);
 }
 
 } // namespace
