@@ -4,10 +4,10 @@
 #include <cassert>
 #include <cstring>
 
-MemoryImage::MemoryImage(const char* path)
+MemoryImage::MemoryImage(const std::filesystem::path& path)
 {
     if (!load(path))
-        throw std::runtime_error("Can't load image: " + std::string(path));
+        throw std::runtime_error("Can't load image: " + path.string());
 }
 
 MemoryImage::MemoryImage(int width, int height, int channels_num) :
@@ -18,9 +18,9 @@ m_buffer(new unsigned char[std::max(0, size())])
 {
 }
 
-bool MemoryImage::load(const char* path)
+bool MemoryImage::load(const std::filesystem::path& path)
 {
-    stbi_uc* pixels = stbi_load(path, &m_width, &m_height, &m_channels_num, 0);
+    stbi_uc* pixels = stbi_load(path.string().c_str(), &m_width, &m_height, &m_channels_num, 0);
     if (!pixels) {
         return false;
     }
@@ -29,10 +29,10 @@ bool MemoryImage::load(const char* path)
     return true;
 }
 
-bool MemoryImage::save(const char* path) const
+bool MemoryImage::save(const std::filesystem::path& path) const
 {
     int status;
-    status = stbi_write_png(path, m_width, m_height, m_channels_num, m_buffer.get(), m_width * m_channels_num);
+    status = stbi_write_png(path.string().c_str(), m_width, m_height, m_channels_num, m_buffer.get(), m_width * m_channels_num);
     if (status == 0)
         return false;
 

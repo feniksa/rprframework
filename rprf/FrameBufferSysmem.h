@@ -3,6 +3,7 @@
 #include "FrameBuffer.h"
 #include <vector>
 #include <memory>
+#include <boost/noncopyable.hpp>
 
 namespace rprf
 {
@@ -14,32 +15,19 @@ class FrameBufferSysmem
 public:
 	using ContainerType = std::vector<std::byte>;
 
-	explicit FrameBufferSysmem(rprf::Context& context, const FrameBufferFormat& format, const FrameBufferDesc& desc);
+	explicit FrameBufferSysmem(const FrameBuffer& frameBuffer);
+
+	bool saveToFile(const std::filesystem::path& fileName) const;
 
 	void update();
-	void clear();
-	void reset();
 
-	void markDirty()         noexcept { ++m_bufferVersion; }
-	bool isDirty()     const noexcept { return m_bufferVersion != m_bufferSysmemVersion; }
-	void invalidateCounter() noexcept { m_bufferVersion = 0; m_bufferSysmemVersion = 0; }
+	const FrameBuffer& frameBuffer() const;
 
-	bool save(const std::string_view& fileName) const;
-
-	FrameBufferFormat format() const;
-	FrameBufferDesc desc() const;
-
-	const FrameBuffer& rprFrameBufferSysmem() const;
-	FrameBuffer& rprFrameBufferSysmem();
-
-	      ContainerType& buffer()       { return m_buffer; }
-	const ContainerType& buffer() const { return m_buffer; }
+	      ContainerType& data()       { return m_buffer; }
+	const ContainerType& data() const { return m_buffer; }
 private:
-	FrameBuffer m_frameBuffer;
+	const FrameBuffer& m_frameBuffer;
 	ContainerType m_buffer;
-
-	unsigned int m_bufferVersion;
-	unsigned int m_bufferSysmemVersion;
 };
 
 } // namespace

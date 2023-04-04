@@ -53,48 +53,24 @@ namespace
 namespace rprf
 {
 
-gpu_list_t getAvailableDevices(const Plugin& plugin, const char* cachePath)
+gpu_list_t getAvailableDevices(const Plugin& plugin, const std::filesystem::path& cachePath, const std::filesystem::path& hipBin)
 {
-	int status;
+	gpu_list_t devices;
 
-	std::map<int, std::string> devices;
-
-	std::vector<int> ids;
-	ids.push_back(plugin.id());
-
-	for (size_t index = 0; index < DevicesList.size(); ++index) {
-		rpr_context contextPurePointer;
-		status = rprCreateContext(RPR_API_VERSION, ids.data(), ids.size(), DevicesList[index].first, nullptr, cachePath, &contextPurePointer);
-		if (status != RPR_ERROR_UNSUPPORTED)
-			check(status);
-		else
-			continue;
-
-		ContextObject context(std::move(contextPurePointer));
-
-		size_t dataSize;
-		status = rprContextGetInfo(context, DevicesList[index].second, 0, nullptr, &dataSize);
-		check(status);
-
-		if (dataSize == 0)
-			continue;
-
-		std::string deviceName;
-		deviceName.resize(dataSize);
-
+    std::string deviceName = "generic GPU";
+    for (size_t index = 0; index < DevicesList.size(); ++index) {
 		try {
-			status = rprContextGetInfo(context, DevicesList[index].second,
-					deviceName.size(), deviceName.data(), &dataSize);
-			check(status);
-		}
-		catch(...)
-		{
-			continue;
-		}
+			Context testContext(plugin, cachePath, hipBin, DevicesList[index].first);
 
-		assert(!deviceName.empty());
+            if (plugin.type() == Plugin::Type::Northstar) {
+                std::string deviceName = testContext.getGpuName(index);
+            }
 
-		devices[DevicesList[index].first] = deviceName;
+            devices.emplace_back(std::make_pair(DevicesList[index].first, deviceName));
+        }
+        catch(...) {
+
+		}
 	} // end for
 
 	return devices;

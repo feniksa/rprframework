@@ -10,11 +10,11 @@ public:
     MemoryImage() = default;
     MemoryImage(MemoryImage&&) = default;
 
-    explicit MemoryImage(const char* path);
+    explicit MemoryImage(const std::filesystem::path& path);
     explicit MemoryImage(int width, int height, int channels_num);
 
-    bool load(const char* path);
-    bool save(const char* path) const;
+    bool load(const std::filesystem::path& path);
+    bool save(const std::filesystem::path& path) const;
     void clear();
 
     int width() const noexcept { return m_width; }

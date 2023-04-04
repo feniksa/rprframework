@@ -24,6 +24,7 @@ set(HEADERS
 	MaterialNodeInput.h
 	Image.h
 	RadeonProRenderEnums.h
+	Color4.h
 )
 
 set(SOURCES
@@ -61,6 +62,7 @@ target_link_libraries(rprf PUBLIC
 	Boost::program_options
 	Boost::log
 	RadeonProRenderSDK::RPR
+	stbimpl
 )
 
 add_executable(rpr ${SOURCES} ${HEADERS} main.cpp) 

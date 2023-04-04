@@ -10,6 +10,7 @@
 #include "rprf/MaterialSystem.h"
 #include "rprf/MaterialNode.h"
 #include "rprf/Image.h"
+#include "rprf/FrameBufferSysmem.h"
 
 #include "math/mathutils.h"
 
@@ -21,6 +22,8 @@
 #include <algorithm>
 #include <filesystem>
 
+#include "Utils.h"
+
 using namespace rprf;
 using namespace tests;
 
@@ -31,6 +34,9 @@ struct TestNorthstar : public ::testing::Test
 	std::filesystem::path m_tempDir;
 	std::filesystem::path m_shaderCachePath;
     const std::filesystem::path m_hipbinPath;
+
+    const bool enableMultiGPU = false;
+    const bool enableCPU = false;
 
     gpu_list_t gpus;
 
@@ -49,24 +55,24 @@ struct TestNorthstar : public ::testing::Test
 		}
 		m_shaderCachePath = m_tempDir / "cache";
 
+        m_plugin = std::make_unique<Plugin>(Plugin::Type::Northstar);
+        gpus = getAvailableDevices(*m_plugin, "", m_hipbinPath);
 	}
 
     void SetUp() override
     {
-		m_plugin = std::make_unique<Plugin>(Plugin::Type::Northstar);
-        gpus = getAvailableDevices(*m_plugin, "");
     }
 
     void TearDown() override
     {
-    	m_plugin.reset();
-
         if (!::testing::Test::HasFailure()) {
             std::filesystem::remove_all(m_tempDir);
         } else {
             std::cout << "Temporary directory: \t" << m_tempDir <<  "\n";
             printAvailableDevices(gpus, std::cout);
         }
+
+        //m_plugin.reset();
     }
 
 
@@ -74,14 +80,17 @@ struct TestNorthstar : public ::testing::Test
 	{
 		rpr_creation_flags flags = 0;
 
-		std::for_each(devices.begin(), devices.end(),
-			[&flags](const gpu_list_t::value_type& p) {
-				if (p.first != RPR_CREATION_FLAGS_ENABLE_CPU)
-					flags |= p.first;
-		});
+        for (size_t i = 0; i < devices.size(); ++i) {
+            unsigned int creationFlag = devices[i].first;
 
-		if (flags == 0)
-			flags = RPR_CREATION_FLAGS_ENABLE_CPU;
+            if (i > 0 && !enableMultiGPU) {
+                break;
+            }
+            flags |= creationFlag;
+        }
+
+		if (flags == 0 || enableCPU)
+			flags |= RPR_CREATION_FLAGS_ENABLE_CPU;
 
 		return flags;
 	}
@@ -91,8 +100,8 @@ TEST_F(TestNorthstar, context_creation)
 {
 	ASSERT_TRUE(m_plugin);
 
-	auto gpus = getAvailableDevices(*m_plugin, "");
- 	printAvailableDevices(gpus, std::cout);
+    auto gpus = getAvailableDevices(*m_plugin, "", m_hipbinPath);
+ 	//printAvailableDevices(gpus, std::cout);
 
     int creationFlags = GetCreationFlags(gpus);
 	Context context(*m_plugin, m_shaderCachePath, m_hipbinPath, creationFlags);
@@ -184,7 +193,7 @@ TEST_F(TestNorthstar, material_node_params)
     EXPECT_FLOAT_EQ(0.0f, a);
 
     // test node get
-    MaterialNode someNode(materialSystem, MaterialNodeType::Diffuse);
+    MaterialNode someNode(materialSystem, MaterialNodeType::Emissive);
     someNode.setParameterNode(MaterialInputType::Color, emissive);
 
     const auto pins2 = someNode.readMaterialParameters();
@@ -448,3 +457,96 @@ TEST_F(TestNorthstar, scene_creation)
 	frameBufferResolved.saveToFile(m_tempDir / "scene_creation03.png");
 }
 
+TEST_F(TestNorthstar, framebuffer_info)
+{
+    Context context(*m_plugin, m_shaderCachePath, m_hipbinPath, GetCreationFlags(gpus));
+
+    Scene scene(context);
+    context.setScene(scene);
+
+    // camera
+    Camera camera(context);
+    camera.lookAt(
+            0, 5, 10,
+            0, 0, 0,
+            0, 1, 0);
+    scene.setCamera(camera);
+
+    Shape cube(context,
+               reinterpret_cast<rpr_float const*>(&cube_data[0]), 24, sizeof(vertex),
+               reinterpret_cast<rpr_float const*>((char*)&cube_data[0] + sizeof(rpr_float) * 3), 24, sizeof(vertex),
+               reinterpret_cast<rpr_float const*>((char*)&cube_data[0] + sizeof(rpr_float) * 6), 24, sizeof(vertex),
+               static_cast<rpr_int const*>(indices), sizeof(rpr_int),
+               static_cast<rpr_int const*>(indices), sizeof(rpr_int),
+               static_cast<rpr_int const*>(indices), sizeof(rpr_int),
+               num_face_vertices, 12);
+
+    cube.setTransform(rprf_math::translation(rprf_math::float3(-2, 1, 0)), true);
+    scene.attachShape(cube);
+
+    // light
+    LightPoint pointLight(context);
+    pointLight.setTransform(rprf_math::translation(rprf_math::float3(2, 10, 2)), true);
+    pointLight.setRadianPower(150.0f, 150.0f, 150.0f);
+    scene.attachLight(pointLight);
+
+    // framebuffer
+    FrameBuffer frameBuffer(context, 800, 600);
+    FrameBuffer frameBufferResolved(frameBuffer.clone());
+
+    context.setAOV(frameBuffer);
+    context.setParameter1u(ContextInputType::Iterations, 60);
+
+    context.render();
+    context.resolve(&frameBuffer, &frameBufferResolved, false);
+
+    frameBufferResolved.saveToFile(m_tempDir / "scene_creation00.png");
+
+    //------------------------------------------------------------------------------------------
+    Shape plane(context,
+                reinterpret_cast<rpr_float const*>(&plane_data[0]), 4, sizeof(vertex),
+                reinterpret_cast<rpr_float const*>((char*)&plane_data[0] + sizeof(rpr_float) * 3), 4, sizeof(vertex),
+                reinterpret_cast<rpr_float const*>((char*)&plane_data[0] + sizeof(rpr_float) * 6), 4, sizeof(vertex),
+                static_cast<rpr_int const*>(indices), sizeof(rpr_int),
+                static_cast<rpr_int const*>(indices), sizeof(rpr_int),
+                static_cast<rpr_int const*>(indices), sizeof(rpr_int),
+                num_face_vertices, 2);
+
+    scene.attachShape(plane);
+
+    Shape cubeInstance(cube);
+    cubeInstance.setTransform(
+            rprf_math::translation(rprf_math::float3(2, 1, -3)) *
+            rprf_math::rotation_y(0.5), true);
+    scene.attachShape(cubeInstance);
+
+    MaterialSystem materialSystem(context);
+
+    MaterialNode diffuse1(materialSystem, MaterialNodeType::Diffuse);
+    diffuse1.setParameter4f(MaterialInputType::Color, 0.6f, 0.4f, 1.0f, 0.0f);
+    cube.setMaterial(diffuse1);
+
+    MaterialNode diffuse2(materialSystem, MaterialNodeType::Diffuse);
+    diffuse2.setParameter4f(MaterialInputType::Color, 1.0f, 0.5f, 0.0f, 0.0f);
+    cubeInstance.setMaterial(diffuse2);
+
+    MaterialNode diffuse3(materialSystem, MaterialNodeType::Diffuse);
+    diffuse3.setParameter4f(MaterialInputType::Color, 0.1f, 0.8f, 1.0f, 0.0f);
+    plane.setMaterial(diffuse3);
+
+    frameBuffer.clear();
+
+    context.render();
+    context.resolve(&frameBuffer, &frameBufferResolved, true);
+    frameBufferResolved.saveToFile(m_tempDir / "scene_creation01.png");
+
+    FrameBufferSysmem frameBufferSysmem(frameBufferResolved);
+    frameBufferSysmem.update();
+
+    bool writeStatus = frameBufferSysmem.saveToFile(m_tempDir / "scene_creation02.png");
+    EXPECT_TRUE(writeStatus);
+
+    /*MemoryImage image1(m_tempDir / "scene_creation01.png");
+    MemoryImage image2(m_tempDir / "scene_creation02.png");
+    EXPECT_TRUE(image1 == image2);*/
+}
