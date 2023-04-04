@@ -50,6 +50,7 @@ set(SOURCES
 	MaterialNode.cpp
 	MaterialNodeInput.cpp
 	Image.cpp
+	Color4.cpp
 )
 
 add_library(rprf STATIC ${SOURCES} ${HEADERS})

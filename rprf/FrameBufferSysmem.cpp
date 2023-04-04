@@ -21,16 +21,7 @@ const FrameBuffer& FrameBufferSysmem::frameBuffer()  const
 	return m_frameBuffer;
 }
 
-void float4f_to_float4b(const Color4f* src, const Color4f* end, Color4b* dst)
-{
-    for (;src != end; ++src, ++dst)
-    {
-        dst->r = src->r * 255.0f;
-        dst->g = src->g * 255.0f;
-        dst->b = src->b * 255.0f;
-        dst->a = src->a * 255.0f;
-    }
-}
+
 
 bool FrameBufferSysmem::saveToFile(const std::filesystem::path& fileName) const
 {
@@ -44,33 +35,20 @@ bool FrameBufferSysmem::saveToFile(const std::filesystem::path& fileName) const
     if (format.numComponents != 4)
         throw Error(RPR_ERROR_INTERNAL_ERROR);
 
-    std::vector<char> dstBuffer(m_buffer.size());
+    static_assert(sizeof(float) == 4);
+
+    std::vector<std::byte> dstBuffer(m_buffer.size() / 4); // rgba, 1 byte for each channel
 
     const Color4f* src_begin = reinterpret_cast<const Color4f*>(m_buffer.data());
-    const Color4f* src_end = src_begin + m_buffer.size() / sizeof(float) / 4;
+    const Color4f* src_end = reinterpret_cast<const Color4f*>(m_buffer.data() + m_buffer.size());
+
     Color4b* dst_begin = reinterpret_cast<Color4b*>(dstBuffer.data());
-    Color4b* dst_end = reinterpret_cast<Color4b*>(dstBuffer.data() + dstBuffer.size() / sizeof(char) / 4);
+    Color4b* dst_end = reinterpret_cast<Color4b*>(dstBuffer.data() + dstBuffer.size());
 
     if (m_buffer.size() <= 64 * 64) {
-        float4f_to_float4b(src_begin, src_end, dst_begin);
+        float4f_to_float4b(src_begin, src_end, dst_begin, dst_end);
     } else {
-        const unsigned int threadsNum = std::thread::hardware_concurrency();
-
-        const unsigned int srcBucketSize = std::distance(src_begin, src_end) / threadsNum;
-        const unsigned int dstBucketSize = std::distance(dst_begin, dst_end) / threadsNum;
-
-        std::vector<std::thread> threadPool;
-        for (unsigned int t = 0; t < threadsNum; ++t) {
-            const auto _begin = src_begin + t * srcBucketSize;
-            const auto _end = std::min(_begin + srcBucketSize, src_end);
-            auto _dst = dst_begin + t * dstBucketSize;
-
-            threadPool.emplace_back(float4f_to_float4b, _begin, _end, _dst);
-        }
-
-        for (unsigned int t = 0; t < threadsNum; ++t) {
-            threadPool[t].join();
-        }
+        float4f_to_float4b_parallel(src_begin, src_end, dst_begin, dst_end);
     }
 
     status = stbi_write_png(filename.c_str(), desc.width, desc.height,
