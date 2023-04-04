@@ -21,7 +21,7 @@ public:
 
     std::tuple<float, float, float, float> getFloat4() const;
     unsigned int getUInt() const;
-    const rpr_material_node* getMaterialNode() const;
+    MaterialNode* getMaterialNode() const;
 
 private:
     MaterialInputType readParameter(const MaterialNode& node, unsigned int index);

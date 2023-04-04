@@ -35,7 +35,6 @@ public:
 	operator T() const noexcept { return m_instance; }
 
     void setName(const char* name);
-    void setCustomPointer(void* pointer);
     const void* getCustomPointer() const;
 
 	void destroy() noexcept;
@@ -45,6 +44,7 @@ public:
 	ContextObject& operator=(const ContextObject&) = delete;
 
 protected:
+    void setCustomPointer(void* pointer);
     void setInstance(T&& instance);
 
 private:
@@ -69,14 +69,21 @@ ContextObject<T>::ContextObject(ContextObject&& object) noexcept
 {
 	m_instance = object.m_instance;
 	object.m_instance = nullptr;
+
+    setCustomPointer(this);
 }
 
 template <class T>
-ContextObject<T>& ContextObject<T>::operator=(ContextObject&& context)
+ContextObject<T>& ContextObject<T>::operator=(ContextObject&& object)
 {
 	destroy();
 
-    std::swap(m_instance, context.m_instance);
+    std::swap(m_instance, object.m_instance);
+
+#ifndef NDEBUG
+    object.setCustomPointer(nullptr);
+#endif
+    setCustomPointer(this);
 
 	return *this;
 }

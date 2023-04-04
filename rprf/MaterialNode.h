@@ -54,11 +54,13 @@ public:
 	void setParameterFrameBuffer(MaterialInputType paramter, const FrameBuffer& frameBuffer);
 
     InputPins readMaterialParameters() const;
+    std::string name() const;
+    void setName(const char* name);
 };
 
 bool hasParameter(const MaterialNode::InputPins& inputPins, MaterialInputType parameter);
 std::tuple<float, float, float, float> getFloat4f(const MaterialNode::InputPins& inputPins,  MaterialInputType parameter);
 unsigned int getUInt(const MaterialNode::InputPins& inputPins,  MaterialInputType parameter);
-const rpr_material_node* getNode(const MaterialNode::InputPins& inputPins, MaterialInputType parameter);
+MaterialNode* getNode(const MaterialNode::InputPins& inputPins, MaterialInputType parameter);
 
 }

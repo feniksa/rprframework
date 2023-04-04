@@ -4,6 +4,7 @@
 #include "FrameBuffer.h"
 #include "Error.h"
 #include <algorithm>
+#include <cassert>
 
 namespace rprf
 {
@@ -16,6 +17,7 @@ MaterialNode::MaterialNode(MaterialSystem& matsys, MaterialNodeType type)
 	check(status);
 
 	setInstance(std::move(node));
+    setCustomPointer(this);
 }
 
 void MaterialNode::setParameter1u(MaterialInputType parameter, unsigned int x)
@@ -51,6 +53,34 @@ void MaterialNode::setParameterFrameBuffer(MaterialInputType parameter, const Fr
 	rpr_int status;
 	status = rprMaterialNodeSetInputBufferDataByKey(*this, static_cast<int>(parameter), frameBuffer.instance());
 	check(status);
+}
+
+void MaterialNode::setName(const char* name)
+{
+    ContextObject<rpr_material_node>::setName(name);
+}
+
+std::string MaterialNode::name() const
+{
+    int status;
+
+    size_t stringSize = 0;
+    status = rprMaterialNodeGetInfo(*this, RPR_MATERIAL_NODE_NAME, 0, nullptr, &stringSize);
+    check(status);
+
+    std::string name;
+    name.resize(stringSize);
+
+    size_t readBytes = 0;
+    status = rprMaterialNodeGetInfo(*this, RPR_MATERIAL_NODE_NAME, name.size(), name.data(), &readBytes);
+    check(status);
+
+    assert(readBytes == name.size());
+    if (readBytes > 0) {
+        name.resize(name.size() - 1);
+    }
+
+    return name;
 }
 
 MaterialNode::InputPins MaterialNode::readMaterialParameters() const
@@ -96,14 +126,15 @@ std::tuple<float, float, float, float> getFloat4f(const MaterialNode::InputPins&
     return iter->getFloat4();
 }
 
-const rpr_material_node* getNode(const MaterialNode::InputPins& inputPins, MaterialInputType parameter)
+MaterialNode* getNode(const MaterialNode::InputPins& inputPins, MaterialInputType parameter)
 {
     const auto iter = std::find_if(inputPins.begin(), inputPins.end(), [parameter](const MaterialNodeInput& input){ return input.parameter() == parameter; });
     if (iter == inputPins.end())  {
         return nullptr;
     }
 
-    return iter->getMaterialNode();
+    MaterialNode* node = iter->getMaterialNode();
+    return node;
 }
 
 unsigned int getUInt(const MaterialNode::InputPins& inputPins,  MaterialInputType parameter)

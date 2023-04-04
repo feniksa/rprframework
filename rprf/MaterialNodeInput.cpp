@@ -32,12 +32,19 @@ unsigned int MaterialNodeInput::getUInt() const
     return *number;
 }
 
-const rpr_material_node* MaterialNodeInput::getMaterialNode() const
+MaterialNode* MaterialNodeInput::getMaterialNode() const
 {
     assert(m_dataType == MaterialNodeInputType::Node);
 
-    const rpr_material_node *mat = reinterpret_cast<const rpr_material_node *>(m_data.data());
-    return mat;
+    if (m_data.empty())
+        return nullptr;
+
+    rpr_material_node* node = reinterpret_cast<rpr_material_node*>(const_cast<std::byte*>(m_data.data()));
+    if (!node)
+        return nullptr;
+
+    MaterialNode* materialNode  = reinterpret_cast<MaterialNode*>(const_cast<void*>(__rprObjectGetCustomPointer(*node)));
+    return materialNode;
 }
 
 MaterialInputType MaterialNodeInput::readParameter(const MaterialNode& node, unsigned int index)

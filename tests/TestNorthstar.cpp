@@ -166,6 +166,7 @@ TEST_F(TestNorthstar, material_node_params)
     // replace the material on cuve by an emissive one.
     MaterialNode emissive(materialSystem, MaterialNodeType::Emissive);
     emissive.setParameter4f(MaterialInputType::Color, 6.0f, 3.0f, 0.0f, 0.0f);
+    emissive.setName("emissive_name");
 
     // test for Material Get
     const auto pins = emissive.readMaterialParameters();
@@ -181,6 +182,78 @@ TEST_F(TestNorthstar, material_node_params)
     EXPECT_FLOAT_EQ(3.0f, g);
     EXPECT_FLOAT_EQ(0.0f, b);
     EXPECT_FLOAT_EQ(0.0f, a);
+
+    // test node get
+    MaterialNode someNode(materialSystem, MaterialNodeType::Diffuse);
+    someNode.setParameterNode(MaterialInputType::Color, emissive);
+
+    const auto pins2 = someNode.readMaterialParameters();
+    EXPECT_TRUE(hasParameter(pins2, MaterialInputType::Color));
+
+    void* emissiveAddress = &emissive;
+    const MaterialNode* node = getNode(pins2, MaterialInputType::Color);
+
+    EXPECT_EQ(node, emissiveAddress);
+    EXPECT_EQ(node->name(), emissive.name());
+}
+
+TEST_F(TestNorthstar, material_node_list)
+{
+    Context context(*m_plugin, m_shaderCachePath, m_hipbinPath, GetCreationFlags(gpus));
+
+    Scene scene(context);
+    context.setScene(scene);
+
+    Shape plane(context,
+                reinterpret_cast<rpr_float const*>(&plane_data[0]), 4, sizeof(vertex),
+                reinterpret_cast<rpr_float const*>((char*)&plane_data[0] + sizeof(rpr_float) * 3), 4, sizeof(vertex),
+                reinterpret_cast<rpr_float const*>((char*)&plane_data[0] + sizeof(rpr_float) * 6), 4, sizeof(vertex),
+                static_cast<rpr_int const*>(indices), sizeof(rpr_int),
+                static_cast<rpr_int const*>(indices), sizeof(rpr_int),
+                static_cast<rpr_int const*>(indices), sizeof(rpr_int),
+                num_face_vertices, 2);
+
+    scene.attachShape(plane);
+
+    MaterialSystem materialSystem(context);
+
+    const std::string materialName = "_emissive01";
+    // replace the material on cuve by an emissive one.
+    MaterialNode emissive(materialSystem, MaterialNodeType::Emissive);
+    emissive.setParameter4f(MaterialInputType::Color, 6.0f, 3.0f, 0.0f, 0.0f);
+    emissive.setName(materialName.c_str());
+
+    MaterialNode* originalAddress = &emissive;
+
+    EXPECT_EQ(emissive.name(), materialName);
+
+    plane.setMaterial(emissive);
+
+    auto nodeList = materialSystem.getNodeList();
+    EXPECT_EQ(nodeList.size(), 1);
+
+    MaterialNode* node = nodeList[0];
+    EXPECT_EQ(node, originalAddress);
+    EXPECT_EQ(node->name(), materialName);
+
+    // same with iterator
+    for (auto iter = nodeList.begin(); iter != nodeList.end(); ++iter) {
+        EXPECT_EQ(iter->name(), materialName);
+    }
+
+    const auto nodeList2 = materialSystem.getNodeList();
+    // same with const iterator
+    for (auto iter = nodeList2.begin(); iter != nodeList2.end(); ++iter) {
+        EXPECT_EQ(iter->name(), materialName);
+    }
+
+    // add second material
+    const std::string materialName2 = "diffuse";
+    MaterialNode diffuse(materialSystem, MaterialNodeType::Diffuse);
+    diffuse.setParameter4f(MaterialInputType::Color, 1.0f, 2.0f, 3.0f, 0.0f);
+    diffuse.setName(materialName2.c_str());
+    EXPECT_EQ(diffuse.name(), materialName2);
+
 }
 
 TEST_F(TestNorthstar, scene_creation)
