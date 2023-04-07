@@ -1,6 +1,8 @@
 #include "ContextUtils.h"
 #include "Error.h"
+
 #include <RadeonImageFilters.h>
+
 #include <iomanip>
 #include <iostream>
 #include <cassert>
