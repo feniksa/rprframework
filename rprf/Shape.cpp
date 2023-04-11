@@ -12,8 +12,7 @@ Shape::Shape(Context& context,
 		rpr_int const * vertex_indices, rpr_int vidx_stride,
 		rpr_int const * normal_indices, rpr_int nidx_stride,
 		rpr_int const * texcoord_indices, rpr_int tidx_stride,
-		rpr_int const * num_face_vertices, size_t num_faces,
-		bool visibilty)
+		rpr_int const * num_face_vertices, size_t num_faces)
 : m_context(context)
 {
 	int status;
@@ -29,8 +28,6 @@ Shape::Shape(Context& context,
 	check(status);
 
 	setInstance(std::move(mesh));
-
-	setVisibility(visibilty);
 }
 
 Shape::Shape(const Shape& other)

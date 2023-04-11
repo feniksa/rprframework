@@ -18,8 +18,7 @@ public:
 		rpr_int const * vertex_indices, rpr_int vidx_stride,
 		rpr_int const * normal_indices, rpr_int nidx_stride,
 		rpr_int const * texcoord_indices, rpr_int tidx_stride,
-		rpr_int const * num_face_vertices, size_t num_faces,
-		bool visibility = true);
+		rpr_int const * num_face_vertices, size_t num_faces);
 
 	Shape(const Shape& other);
 	void setTransform(const rprf_math::matrix& transform, bool transpose);

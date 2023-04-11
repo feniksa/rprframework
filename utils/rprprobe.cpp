@@ -91,6 +91,7 @@ int main(int argc, const char **argv) try
     std::string outfile;
     std::string shadercache;
     std::string hipbin;
+    unsigned int iterations;
     bool forceOpenCL;
 
     std::filesystem::path currentDirectory = std::filesystem::path(argv[0]).remove_filename();
@@ -106,6 +107,7 @@ int main(int argc, const char **argv) try
             ("name", po::value<bool>(&probeName)->default_value(true), "get gpu name from context")
             ("verbosity", po::value<std::string>(), "verbosity")
             ("renderCube", po::value<bool>(&renderCube)->default_value(false), "make actual render of cube")
+            ("iterations", po::value<unsigned int>(&iterations)->default_value(100), "how many iterations to render (only if renderCube is 1)")
             ("shadercache", po::value<std::string>(&shadercache)->default_value(""), "directory to store shader cache")
             ("hipbin", po::value<std::string>(&hipbin)->default_value(hipKernelsDirectory.string()), "directory for search precompiled hip kernels")
             ("forceOpenCL", po::value<bool>(&forceOpenCL)->default_value(false), "force enable OpenCL (deprecated)")
@@ -238,7 +240,7 @@ int main(int argc, const char **argv) try
         rprf::FrameBuffer frameBufferResolved(frameBuffer.clone());
 
         context.setAOV(frameBuffer);
-        context.setParameter1u(ContextInputType::Iterations, 100);
+        context.setParameter1u(ContextInputType::Iterations, iterations);
 
         BOOST_LOG_TRIVIAL(debug) << "Render cube";
         context.render();
