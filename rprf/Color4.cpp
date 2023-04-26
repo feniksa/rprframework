@@ -1,6 +1,5 @@
-#pragma once
-
 #include "Color4.h"
+
 #include <thread>
 #include <vector>
 #include <cassert>
