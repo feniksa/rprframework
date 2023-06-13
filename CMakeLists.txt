@@ -10,13 +10,14 @@ option(FORCE_COLORED_OUTPUT "Always produce ANSI-colored output (GNU/Clang only)
 option(FORCE_UPDATE_ENUMS "Update Contants.h file" FALSE)
 option(ENABLE_TESTING "Enable testing" TRUE)
 option(BUILD_UTILS "Build utils" TRUE)
+option(BUILD_VIEWER "Build viewer" TRUE)
 
 include("${CMAKE_SOURCE_DIR}/cmake/CompileOptions.cmake")
 
 #add_definitions(-DBOOST_LOG_DYN_LINK)
 find_package(Boost 1.79 REQUIRED COMPONENTS thread system filesystem
 	program_options log)
-find_package(RadeonProRenderSDK 3.1.0 REQUIRED COMPONENTS northstar tahoe hybrid hybridpro)
+find_package(RadeonProRenderSDK 3.1.1 REQUIRED COMPONENTS northstar tahoe hybrid hybridpro)
 find_package(RadeonImageFilter REQUIRED)
 
 add_subdirectory(ThirdParty/miniz)
@@ -27,6 +28,9 @@ add_subdirectory(rprf)
 add_subdirectory(riff)
 if (BUILD_UTILS)
 	add_subdirectory(utils)
+endif()
+if (BUILD_VIEWER)
+	add_subdirectory(viewer)
 endif()
 
 if (ENABLE_TESTING)
