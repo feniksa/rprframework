@@ -76,6 +76,23 @@ std::string gpus_as_string(int creationFlags)
     return s.str();
 }
 
+std::string defaultApiVersion(unsigned int api = RPR_API_VERSION)
+{
+    std::stringstream sstream;
+
+    sstream << std::hex << api;
+
+    return sstream.str();
+}
+
+unsigned int parseApiVersion(const std::string& str)
+{
+    std::istringstream converter(str);
+    unsigned int value;
+    converter >> std::hex >> value;
+    return value;
+}
+
 } // end of namespace
 
 int main(int argc, const char **argv) try
@@ -86,7 +103,7 @@ int main(int argc, const char **argv) try
     std::string renderName;
     std::vector<unsigned int> gpuIndexes;
     bool enableCPU;
-    unsigned int apiVersion;
+    std::string apiVersion;
     bool renderCube;
     std::string outfile;
     std::string shadercache;
@@ -96,6 +113,7 @@ int main(int argc, const char **argv) try
 
     std::filesystem::path currentDirectory = std::filesystem::path(argv[0]).remove_filename();
     std::filesystem::path hipKernelsDirectory = currentDirectory / std::filesystem::path("hipbin");
+
 
     // Declare the supported options.
     po::options_description desc("Generic options");
@@ -112,7 +130,7 @@ int main(int argc, const char **argv) try
             ("hipbin", po::value<std::string>(&hipbin)->default_value(hipKernelsDirectory.string()), "directory for search precompiled hip kernels")
             ("forceOpenCL", po::value<bool>(&forceOpenCL)->default_value(false), "force enable OpenCL (deprecated)")
             ("out", po::value<std::string>(&outfile), "output filename (if renderCube is true)")
-            ("api", po::value<unsigned int>(&apiVersion)->default_value(RPR_API_VERSION), "force to use API version");
+            ("api", po::value<std::string>(&apiVersion)->default_value(defaultApiVersion()), "force to use API version");
 
     po::variables_map vm;
     po::store(po::parse_command_line(argc, argv, desc), vm);
@@ -169,7 +187,8 @@ int main(int argc, const char **argv) try
     BOOST_LOG_TRIVIAL(debug) << "OK";
 
     BOOST_LOG_TRIVIAL(debug) << "Create context on: " << gpus_as_string(createFlags);
-    rprf::Context context(plugin, shadercache, hipbin, createFlags, apiVersion);
+    unsigned int contextApiVersion = parseApiVersion(apiVersion);
+    rprf::Context context(plugin, shadercache, hipbin, createFlags, contextApiVersion);
     BOOST_LOG_TRIVIAL(debug) << "OK";
 
     boost::property_tree::ptree jsonRoot;
