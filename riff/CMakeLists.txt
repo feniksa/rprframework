@@ -22,7 +22,7 @@ set(SOURCES
 	RadeonImageFilterEnums.cpp
 )
 
-add_library(riff STATIC ${SOURCES} ${HEADERS})
+add_library(riff STATIC ${SOURCES} ${HEADERS} ${VERSION_RC})
 target_include_directories(riff PUBLIC "${CMAKE_SOURCE_DIR}" "${CMAKE_SOURCE_DIR}/ThirdParty")
 target_link_libraries(riff PUBLIC
 		Boost::system

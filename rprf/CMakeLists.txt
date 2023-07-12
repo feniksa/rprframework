@@ -53,7 +53,7 @@ set(SOURCES
 	Color4.cpp
 )
 
-add_library(rprf STATIC ${SOURCES} ${HEADERS})
+add_library(rprf STATIC ${SOURCES} ${HEADERS} ${VERSION_RC})
 target_include_directories(rprf PUBLIC "${CMAKE_SOURCE_DIR}" Boost::log)
 target_link_libraries(rprf PUBLIC 
 	rprf_math

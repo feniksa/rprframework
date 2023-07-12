@@ -1,4 +1,4 @@
-add_executable(rpr_probe rprprobe.cpp CubeData.cpp)
+add_executable(rpr_probe rprprobe.cpp CubeData.cpp ${VERSION_RC})
 target_link_libraries(rpr_probe
 	rprf
 	Boost::log
@@ -8,7 +8,7 @@ target_link_libraries(rpr_probe
 	Boost::program_options
 )
 
-add_executable(riff_probe riffprobe.cpp)
+add_executable(riff_probe riffprobe.cpp ${VERSION_RC})
 target_link_libraries(riff_probe
 	riff
 	Boost::log
