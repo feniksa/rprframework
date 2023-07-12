@@ -37,12 +37,30 @@ std::string allComputeEngines()
    return s.str();
 }
 
+std::string defaultApiVersion(uint64_t api = RIF_API_VERSION)
+{
+    std::stringstream sstream;
+
+    sstream << std::hex << api;
+
+    return sstream.str();
+}
+
+uint64_t parseApiVersion(const std::string& str)
+{
+    std::istringstream converter(str);
+    uint64_t value;
+    converter >> std::hex >> value;
+    return value;
+}
+
 }
 
 int main(int argc, const char **argv) try
 {
     std::string computeName;
     unsigned int deviceIndex;
+    std::string apiVersion;
 
     // Declare the supported options.
     po::options_description desc("Generic options");
@@ -51,7 +69,7 @@ int main(int argc, const char **argv) try
             ("compute", po::value<std::string>(&computeName)->default_value("opencl"),("compute: " + allComputeEngines()).c_str())
             ("device", po::value<unsigned int>(&deviceIndex)->default_value(0), "device index to probe")
             ("verbosity", po::value<std::string>(), "verbosity")
-            ("api", po::value<uint64_t>()->default_value(RIF_API_VERSION), "force to use API version");
+            ("api", po::value<std::string>(&apiVersion)->default_value(defaultApiVersion()), "force to use API version");
 
     po::variables_map vm;
     po::store(po::parse_command_line(argc, argv, desc), vm);
@@ -91,12 +109,7 @@ int main(int argc, const char **argv) try
         return ErrorCode::BadDeviceIndex;
     }
 
-    uint64_t version;
-    if (vm.contains("api")) {
-        version = vm["api"] .as<uint64_t>();
-    } else {
-        version = RIF_API_VERSION;
-    }
+    uint64_t version = parseApiVersion(apiVersion);
 
     boost::property_tree::ptree jsonRoot;
 
