@@ -13,6 +13,7 @@ set (TESTS
 	Dummy
 	Renderer
 	Northstar
+	HybridPro
 	Riff
 	Utils
 )
