@@ -18,7 +18,7 @@ find_library(RPR_LIBRARY
 find_path(RPR_HIP_KERNELS_DIR
 	NAME AllPreCompilations.json
 	HINTS /usr/share/RadeonProRender/hipbin
-	"${RPR_SDK_ROOT}"
+	"${RPR_SDK_ROOT}/hipbin"
 	"${RPR_HIPBIN}"
 	ENV RPR_SDK_ROOT 
 	ENV RPR_HIPBIN
@@ -220,10 +220,39 @@ if(RadeonProRenderSDK_FOUND)
 	set(RadeonProRenderSDK_HIP_KERNELS_DIRS ${RPR_HIP_KERNELS_DIR})
 	
 	if(NOT TARGET RadeonProRenderSDK::RPR)
-		add_library(RadeonProRenderSDK::RPR INTERFACE IMPORTED)
+		add_library(RadeonProRenderSDK::RPR IMPORTED SHARED)
 		set_target_properties(RadeonProRenderSDK::RPR PROPERTIES
-			IMPORTED_LINK_INTERFACE_LANGUAGES "C"
-			INTERFACE_INCLUDE_DIRECTORIES "${RPR_INCLUDE_DIR}"
-			INTERFACE_LINK_LIBRARIES "${RPR_LIBRARY}")
+			INTERFACE_INCLUDE_DIRECTORIES ${RPR_INCLUDE_DIR}
+			IMPORTED_IMPLIB ${RPR_LIBRARY}
+			IMPORTED_LOCATION "${RadeonProRender_DLLS}"
+			)
 	endif()
 endif()
+
+# ---------------------------------------------------------
+# util functions
+# ---------------------------------------------------------
+function(populate_rprsdk target)
+        foreach(dll ${RadeonProRender_DLLS})
+                get_filename_component(file_name "${dll}" NAME)
+                add_custom_command(
+                        TARGET ${target} POST_BUILD
+                        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                        ${dll}
+                        $<TARGET_FILE_DIR:${target}>)
+        endforeach()
+endfunction()
+
+function(populate_rprsdk_kernels target)
+        file(GLOB hipkernels "${RadeonProRenderSDK_HIP_KERNELS_DIRS}/*")
+        foreach(hipkernel ${hipkernels})
+                get_filename_component(file_name "${hipkernel}" NAME)
+                add_custom_command(
+                        TARGET ${target} POST_BUILD
+                        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                        "${hipkernel}"
+                        "$<TARGET_FILE_DIR:${target}>/hipbin/${file_name}")
+                        
+        endforeach()
+endfunction()
+
