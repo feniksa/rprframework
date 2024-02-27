@@ -1,7 +1,6 @@
 #pragma once
 
 #include <string>
-#include <array>
 
 namespace rprf
 {
@@ -16,16 +15,16 @@ public:
 
 	const char* name() const noexcept         { return GetDynamicLibraryName(m_type); }
 	int id() const noexcept                   { return m_pluginId; }
-    Type type() const noexcept                { return m_type;     }
+	Type type() const noexcept                { return m_type;     }
 
 	Plugin(const Plugin&)            = delete;
 	Plugin& operator=(const Plugin&) = delete;
 protected:
-    explicit Plugin(const std::string_view& libraryName);
+	explicit Plugin(const std::string_view& libraryName);
 private:
 	static const char* GetDynamicLibraryName(Type type) noexcept;
 
-    Type m_type;
+	Type m_type;
 	int m_pluginId;
 };
 

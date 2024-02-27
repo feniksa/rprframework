@@ -4,6 +4,7 @@
 #include "Scene.h"
 #include "FrameBuffer.h"
 
+#include <array>
 #include <vector>
 #include <sstream>
 

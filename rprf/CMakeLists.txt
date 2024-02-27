@@ -1,3 +1,5 @@
+add_subdirectory(math)
+
 set(HEADERS
 	CameraType.h
 	Camera.h
@@ -53,7 +55,7 @@ set(SOURCES
 )
 
 add_library(rprf STATIC ${SOURCES} ${HEADERS} ${VERSION_RC})
-target_include_directories(rprf PUBLIC "${CMAKE_SOURCE_DIR}")
+target_include_directories(rprf PUBLIC ${CMAKE_SOURCE_DIR})
 target_link_libraries(rprf PUBLIC 
 	Boost::system
 	Boost::filesystem

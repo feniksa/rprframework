@@ -12,7 +12,9 @@ class Camera : public ContextObject<rpr_camera>
 public:
 	Camera(Context& context);
 
-	void lookAt(float position_x, float position_y, float position_z, float aimedAt_x, float aimedAt_y, float aimedAt_z, float up_x, float up_y, float up_z);
+	void lookAt(float position_x, float position_y, float position_z, 
+	            float aimedAt_x, float aimedAt_y, float aimedAt_z, 
+	            float up_x, float up_y, float up_z);
 	void setTransform(const rprf_math::matrix& transform, bool transpose);
 	void setFocalLength(float length_mm = 35.0f);
 	void setType(CameraType type);
@@ -23,7 +25,8 @@ public:
 	void setSensorWidthHeight(float width_mm = 36.0f, float height_mm = 24.0f);
 	void setLensShift(float width_mm, float height_mm);
 
-    rprf_math::matrix getTransform() const;
+	[[nodiscard]]
+	rprf_math::matrix getTransform() const;
 };
 
-} // rpr
+} // namespace rprf

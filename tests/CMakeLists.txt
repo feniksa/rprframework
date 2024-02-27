@@ -1,13 +1,16 @@
 find_package(GTest REQUIRED)
 
 set(HEADERS
-	StreamRedirector.h
+	StreamRedirect.h
 	CommonData.h
-    Utils.h)
+	Utils.h
+)
 
 set(SOURCES
+	StreamRedirect.cpp
 	CommonData.cpp
-	Utils.cpp)
+	Utils.cpp
+)
 
 set (TESTS
 	Dummy
@@ -27,7 +30,7 @@ foreach(test ${TESTS})
 		set (TEST_SOURCES ${TEST_SOURCES} Test${test}.cpp)
 endforeach()
 
-add_executable(tests_main ${TEST_SOURCES} ${HEADERS} ${SOURCES})
+add_executable(tests_main ${HEADERS} ${SOURCES} ${TEST_SOURCES})
 target_link_libraries(tests_main 
 	rprf
 	riff

@@ -4,6 +4,7 @@
 
 namespace rprf
 {
+
 Camera::Camera(Context& context)
 {
 	rpr_int status;

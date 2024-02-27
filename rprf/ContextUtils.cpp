@@ -13,6 +13,8 @@
 
 namespace
 {
+    const char* GenericGpuTranslate = "Generic GPU";
+
 	static const std::vector<std::pair<int, int>> DevicesList
 	{
 		{ RPR_CREATION_FLAGS_ENABLE_CPU,  RPR_CONTEXT_CPU_NAME },
@@ -39,8 +41,8 @@ namespace
 		if (rpr_gpu_index == RPR_CREATION_FLAGS_ENABLE_CPU)
 			return "CPU";
 
-		auto i = std::ranges::find(DevicesList.begin(), DevicesList.end(), rpr_gpu_index,
-                            &std::pair<int, int>::first);
+		const auto i = std::ranges::find(DevicesList.begin(), DevicesList.end(), rpr_gpu_index,
+                                         &std::pair<int, int>::first);
 
 
 		std::size_t index = std::distance(DevicesList.begin(), i) - 1;
@@ -57,16 +59,17 @@ gpu_list_t getAvailableDevices(const Plugin& plugin, const std::filesystem::path
 {
 	gpu_list_t devices;
 
-    std::string deviceName = "generic GPU";
     for (size_t index = 0; index < DevicesList.size(); ++index) {
 		try {
 			Context testContext(plugin, cachePath, hipBin, DevicesList[index].first);
 
             if (plugin.type() == Plugin::Type::Northstar) {
-                std::string deviceName = testContext.getGpuName(index);
+                const std::string deviceName = testContext.getGpuName(index);
+                devices.emplace_back(std::make_pair(DevicesList[index].first, deviceName));
             }
-
-            devices.emplace_back(std::make_pair(DevicesList[index].first, deviceName));
+            else {
+                devices.emplace_back(std::make_pair(DevicesList[index].first, GenericGpuTranslate));
+            }
         }
         catch(...) {
 
@@ -83,7 +86,6 @@ std::ostream& printAvailableDevices(const gpu_list_t& devices, std::ostream& str
 	}
 	return stream;
 }
-
 
 int getContextCreationFlags(int gpu_number)
 {

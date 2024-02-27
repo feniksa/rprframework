@@ -5,7 +5,7 @@
 
 namespace rprf
 {
-    class MaterialNode;
+class MaterialNode;
 
 class MaterialSystem : public ContextObject<rpr_material_system>
 {

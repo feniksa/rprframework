@@ -7,7 +7,7 @@
 class MemoryImage
 {
 public:
-    MemoryImage() = default;
+    MemoryImage()              = default;
     MemoryImage(MemoryImage&&) = default;
 
     explicit MemoryImage(const std::filesystem::path& path);
@@ -17,10 +17,10 @@ public:
     bool save(const std::filesystem::path& path) const;
     void clear();
 
-    int width() const noexcept { return m_width; }
-    int height() const noexcept { return m_height; }
+    int width() const noexcept   { return m_width;  }
+    int height() const noexcept  { return m_height; }
     int channels_num() const noexcept { return m_channels_num; }
-    int size() const noexcept { return m_width * m_height * m_channels_num; }
+    int size() const noexcept    { return m_width * m_height * m_channels_num; }
 
     unsigned char& operator[] (size_t index) { return m_buffer.get()[index];}
     const unsigned char& operator[] (size_t index) const { return m_buffer.get()[index]; }
@@ -35,7 +35,6 @@ private:
     int m_height;
     int m_channels_num;
     std::unique_ptr<unsigned char> m_buffer;
-
 };
 
 bool operator==(const MemoryImage& image1, const MemoryImage& image2);

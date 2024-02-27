@@ -15,3 +15,5 @@ set(SOURCES
 )
 
 add_library(rprf_math STATIC ${SOURCES} ${HEADERS})
+target_include_directories(rprf_math PUBLIC ${CMAKE_SOURCE_DIR}/rprf)
+

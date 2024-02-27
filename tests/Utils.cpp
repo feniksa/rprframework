@@ -119,7 +119,7 @@ bool get_image_diff(const std::filesystem::path& image_path1, const std::filesys
         result &= buffer3[i] != 0;
     }
 
-    if (!diff.save(image_diff.string().c_str()))
+    if (!diff.save(image_diff))
         throw std::runtime_error("get_image_diff: can't save diff image to file: " + image_diff.string());
 
     return result;
