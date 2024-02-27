@@ -1,4 +1,3 @@
-
 set(HEADERS
 	CameraType.h
 	Camera.h
@@ -31,7 +30,7 @@ set(SOURCES
 	Camera.cpp
 	ContextUtils.cpp
 	Context.cpp
-    ContextObject.cpp
+	ContextObject.cpp
 	Error.cpp
 	Object.cpp
 	Renderer.cpp
@@ -54,15 +53,15 @@ set(SOURCES
 )
 
 add_library(rprf STATIC ${SOURCES} ${HEADERS} ${VERSION_RC})
-target_include_directories(rprf PUBLIC "${CMAKE_SOURCE_DIR}" Boost::log)
+target_include_directories(rprf PUBLIC "${CMAKE_SOURCE_DIR}")
 target_link_libraries(rprf PUBLIC 
-	rprf_math
 	Boost::system
 	Boost::filesystem
 	Boost::thread
 	Boost::program_options
 	Boost::log
 	RadeonProRenderSDK::RPR
+	rprf_math
 	stbimpl
 )
 

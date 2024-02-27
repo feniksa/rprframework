@@ -1,6 +1,4 @@
 #include "ContextObject.h"
-
-#include "RadeonProRender.h"
 #include "Error.h"
 #include <iostream>
 #include <cassert>
@@ -18,7 +16,7 @@ namespace rprf
         }
         catch(const std::exception& e)
         {
-            std::cerr << "ContextObject::destroy(): ", e.what();
+            std::cerr << "ContextObject::destroy(): " << e.what();
         }
         catch (...)
         {

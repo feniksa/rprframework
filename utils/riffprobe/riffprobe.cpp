@@ -1,5 +1,4 @@
 #include "riff/Context.h"
-
 #include "riff/ContextUtils.h"
 
 #include <boost/program_options.hpp>

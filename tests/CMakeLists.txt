@@ -43,30 +43,14 @@ target_include_directories(tests_main
 configure_file(Environment.h.in ${CMAKE_CURRENT_BINARY_DIR}/Environment.h @ONLY)
 configure_file(testconfig.ini.in ${CMAKE_CURRENT_BINARY_DIR}/testconfig.ini @ONLY)
 
-foreach(dll ${RadeonProRender_DLLS})	
-	get_filename_component(file_name "${dll}" NAME)
-	add_custom_command(
-                TARGET tests_main POST_BUILD
-                COMMAND ${CMAKE_COMMAND} -E copy_if_different "${dll}" "${CMAKE_CURRENT_BINARY_DIR}/${file_name}"
-                COMMENT "Copying rpr dll's: ${dll}")    
-endforeach()
+# automatically copy all dll's deps.
+add_custom_command(TARGET tests_main POST_BUILD
+  COMMAND ${CMAKE_COMMAND} -E copy -t $<TARGET_FILE_DIR:tests_main> $<TARGET_RUNTIME_DLLS:tests_main>
+  COMMAND_EXPAND_LISTS
+)
 
-foreach(dll ${RadeonImageFilter_DLLS})
-	get_filename_component(file_name "${dll}" NAME)
-	add_custom_command(
-                TARGET tests_main POST_BUILD
-                COMMAND ${CMAKE_COMMAND} -E copy_if_different "${dll}" "${CMAKE_CURRENT_BINARY_DIR}/${file_name}"
-                COMMENT "Copying rif dll's: ${dll}")
-endforeach()
-
-file(GLOB hipkernels "${RadeonProRenderSDK_HIP_KERNELS_DIRS}/*")
-foreach(hipkernel ${hipkernels})
-	get_filename_component(file_name "${hipkernel}" NAME)
-	add_custom_command(
-			TARGET tests_main POST_BUILD
-			COMMAND ${CMAKE_COMMAND} -E copy_if_different "${hipkernel}" "${CMAKE_CURRENT_BINARY_DIR}/hipbin/${file_name}"
-			COMMENT "Copying hip kernel: ${hipkernel}")
-endforeach()
+# copy hip kernels
+populate_rprsdk_kernels(tests_main)
 
 file(GLOB RESOURCES_textures resources/textures/*)
 foreach(resource ${RESOURCES_textures})
