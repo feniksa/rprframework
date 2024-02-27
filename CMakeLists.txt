@@ -1,7 +1,7 @@
 cmake_minimum_required (VERSION 3.18)
-project (rprframework VERSION 2.1.0.1 LANGUAGES CXX)
+project (rprframework VERSION 2.2.0.1 LANGUAGES CXX)
 
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")

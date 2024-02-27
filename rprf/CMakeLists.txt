@@ -65,9 +65,6 @@ target_link_libraries(rprf PUBLIC
 	stbimpl
 )
 
-add_executable(rpr ${SOURCES} ${HEADERS} main.cpp) 
-target_link_libraries(rpr rprf)
-
 if(FORCE_UPDATE_ENUMS)
 	add_custom_command(		
 		OUTPUT "${CMAKE_CURRENT_SOURCE_DIR}/RadeonProRenderEnums.h" 
