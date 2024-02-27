@@ -39,7 +39,6 @@ target_link_libraries(tests_main
 )
 target_include_directories(tests_main
 	PRIVATE
-	"${CMAKE_SOURCE_DIR}"
 	"${CMAKE_CURRENT_BINARY_DIR}"
 )
 

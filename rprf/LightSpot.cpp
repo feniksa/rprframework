@@ -1,5 +1,5 @@
-#include "LightSpot.h"
-#include "Error.h"
+#include "rprf/LightSpot.h"
+#include "rprf/Error.h"
 
 namespace rprf
 {
@@ -12,21 +12,21 @@ LightSpot::LightSpot(Context& context)
 	status = rprContextCreateSpotLight(context.instance(), &light);
 	check(status);
 
-	setInstance(std::move(light));
+	setInstance(light);
 }
 
 void LightSpot::setRadianPower(float r, float g, float b)
 {
 	int status;
 
-	status = rprSpotLightSetRadiantPower3f(*this, r, g, b);
+	status = rprSpotLightSetRadiantPower3f(instance(), r, g, b);
 	check(status);
 }
 
 void LightSpot::setConeShape(float iangle, float oangle)
 {
 	int status;
-	status = rprSpotLightSetConeShape(*this, iangle, oangle);
+	status = rprSpotLightSetConeShape(instance(), iangle, oangle);
 	check(status);
 }
 

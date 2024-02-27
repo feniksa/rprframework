@@ -1,6 +1,6 @@
-#include "Shape.h"
-#include "MaterialNode.h"
-#include "Error.h"
+#include "rprf/Shape.h"
+#include "rprf/MaterialNode.h"
+#include "rprf/Error.h"
 
 namespace rprf
 {
@@ -27,11 +27,11 @@ Shape::Shape(Context& context,
 		num_face_vertices, num_faces, &mesh);
 	check(status);
 
-	setInstance(std::move(mesh));
+	setInstance(mesh);
 }
 
 Shape::Shape(const Shape& other)
-: ContextObject<rpr_shape>(nullptr),
+: ContextObject(nullptr),
   m_context(other.m_context)
 {
 	int status;
@@ -42,34 +42,34 @@ Shape::Shape(const Shape& other)
 	status = rprContextCreateInstance(m_context.instance(), otherMesh, &mesh);
 	check(status);
 
-	setInstance(std::move(mesh));
+	setInstance(mesh);
 }
 
 void Shape::setTransform(const rprf_math::matrix& transform, bool transpose)
 {
 	int status;
-	status = rprShapeSetTransform(*this, transpose, &transform.m00);
+	status = rprShapeSetTransform(instance(), transpose, &transform.m00);
 	check(status);
 }
 
 void Shape::setMaterial(const MaterialNode& node)
 {
 	int status;
-	status = rprShapeSetMaterial(*this, node.instance());
+	status = rprShapeSetMaterial(instance(), node.instance());
 	check(status);
 }
 
 void Shape::setVisibility(bool visibility)
 {
 	int status;
-	status = rprShapeSetVisibility(*this, visibility);
+	status = rprShapeSetVisibility(instance(), visibility);
 	check(status);
 }
 
 void Shape::setVisibilityType(ShapeVisibilityType parameter, bool visible)
 {
 	int status;
-	status = rprShapeSetVisibilityFlag(*this, static_cast<unsigned int>(parameter), visible);
+	status = rprShapeSetVisibilityFlag(instance(), static_cast<unsigned int>(parameter), visible);
 	check(status);
 }
 

@@ -1,4 +1,4 @@
-#include "Plugin.h"
+#include "rprf/Plugin.h"
 #include <RadeonProRender.h>
 #include <stdexcept>
 #include <sstream>
@@ -64,7 +64,7 @@ const char* Plugin::GetDynamicLibraryName(Type type) noexcept
 
 // tools
 
-std::string to_string(const Plugin::Type type)
+std::string to_string(Plugin::Type type)
 {
 	switch(type)
 	{

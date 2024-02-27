@@ -161,6 +161,8 @@ namespace rprf
 		FirstIterationTimeCallbackData		 = RPR_CONTEXT_FIRST_ITERATION_TIME_CALLBACK_DATA,
 		ImageFilterRadius		 = RPR_CONTEXT_IMAGE_FILTER_RADIUS,
 		PrecompiledBinaryPath		 = RPR_CONTEXT_PRECOMPILED_BINARY_PATH,
+		ReflectionEnergyCompensationEnabled		 = RPR_CONTEXT_REFLECTION_ENERGY_COMPENSATION_ENABLED,
+		NormalizeLightIntensityEnabled		 = RPR_CONTEXT_NORMALIZE_LIGHT_INTENSITY_ENABLED,
 	};
 
 	enum class MaterialInputType {

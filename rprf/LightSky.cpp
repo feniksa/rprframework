@@ -1,5 +1,5 @@
-#include "LightSky.h"
-#include "Error.h"
+#include "rprf/LightSky.h"
+#include "rprf/Error.h"
 
 namespace rprf
 {
@@ -12,7 +12,7 @@ LightSky::LightSky(Context& context)
 	status = rprContextCreateSkyLight(context.instance(), &light);
 	check(status);
 
-	setInstance(std::move(light));
+	setInstance(light);
 }
 
 void LightSky::setTurbidity(float turbidity)

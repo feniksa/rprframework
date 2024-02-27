@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Light.h"
+#include "rprf/Light.h"
 
 namespace rprf
 {
@@ -8,7 +8,7 @@ namespace rprf
 class LightSky : public Light
 {
 public:
-	LightSky(Context& context);
+	explicit LightSky(Context& context);
 
 	void setTurbidity(float turbidity);
 	void setAlbedo(float albedo);

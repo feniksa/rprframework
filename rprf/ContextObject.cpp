@@ -1,55 +1,75 @@
-#include "ContextObject.h"
-#include "Error.h"
-#include <iostream>
-#include <cassert>
+#include "rprf/ContextObject.h"
+#include "rprf/GlobalFunctions.h"
+#include <algorithm>
 
 namespace rprf
 {
-    void __rprObjectDelete(void* instance) noexcept
-    {
-        assert(instance);
 
-        try {
-            rpr_int status;
-            status = rprObjectDelete(instance);
-            check(status);
-        }
-        catch(const std::exception& e)
-        {
-            std::cerr << "ContextObject::destroy(): " << e.what();
-        }
-        catch (...)
-        {
-            std::cerr << "ContextObject::destroy(): unknown error";
-        }
-    }
+ContextObject::ContextObject(void* dataPointer) noexcept
+		: m_instance(dataPointer)
+{
+}
 
-    void __rprObjectSetName(void* instance, const char* name)
-    {
-        assert(instance);
-        rpr_int status;
-        status = rprObjectSetName(instance, name);
-        check(status);
-    }
+ContextObject::~ContextObject() noexcept
+{
+	destroy();
+}
 
-    void __rprObjectSetCustomPointer(void* instance, void* pointer)
-    {
-        assert(instance);
-        rpr_int status;
-        status = rprObjectSetCustomPointer(instance, pointer);
-        check(status);
-    }
+ContextObject::ContextObject(ContextObject&& object) noexcept
+{
+	m_instance = object.m_instance;
+	object.m_instance = nullptr;
 
-    const void* __rprObjectGetCustomPointer(void* instance)
-    {
-        assert(instance);
+	setCustomPointer(this);
+}
 
-        const void* pointer;
+ContextObject& ContextObject::operator=(ContextObject&& object) noexcept
+{
+	if (&object == this)
+		return *this;
 
-        rpr_int status;
-        status = rprObjectGetCustomPointer(instance, &pointer);
-        check(status);
+	destroy();
 
-        return pointer;
-    }
+	std::swap(m_instance, object.m_instance);
+
+#ifndef NDEBUG
+	object.setCustomPointer(nullptr);
+#endif
+	setCustomPointer(this);
+
+	return *this;
+}
+
+void ContextObject::setInstance(void* instance)
+{
+	destroy();
+
+	m_instance = instance;
+}
+
+void ContextObject::destroy() noexcept
+{
+	if (!m_instance)
+		return;
+
+	__rprObjectDelete(m_instance);
+
+	m_instance = nullptr;
+}
+
+void ContextObject::setName(const char* name)
+{
+	__rprObjectSetName(m_instance, name);
+}
+
+void ContextObject::setCustomPointer(void *pointer)
+{
+	__rprObjectSetCustomPointer(m_instance, pointer);
+}
+
+const void* ContextObject::getCustomPointer() const
+{
+	return __rprObjectGetCustomPointer(m_instance);
+}
+
 }

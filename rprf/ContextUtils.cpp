@@ -1,21 +1,18 @@
-#include "ContextUtils.h"
-#include "Plugin.h"
-#include "Context.h"
-#include "Error.h"
+#include "rprf/ContextUtils.h"
+#include "rprf/Plugin.h"
+#include "rprf/Context.h"
+#include "rprf/Error.h"
 #include <iterator>
 #include <string>
 #include <vector>
 #include <cassert>
-#include <cstring>
-#include <ranges>
-#include <algorithm>
 #include <sstream>
 
 namespace
 {
     const char* GenericGpuTranslate = "Generic GPU";
 
-	static const std::vector<std::pair<int, int>> DevicesList
+	const std::vector<std::pair<int, int>> DevicesList
 	{
 		{ RPR_CREATION_FLAGS_ENABLE_CPU,  RPR_CONTEXT_CPU_NAME },
 		{ RPR_CREATION_FLAGS_ENABLE_GPU0,  RPR_CONTEXT_GPU0_NAME },

@@ -1,5 +1,5 @@
-#include "LightDirectional.h"
-#include "Error.h"
+#include "rprf/LightDirectional.h"
+#include "rprf/Error.h"
 
 namespace rprf
 {
@@ -12,14 +12,14 @@ LightDirectional::LightDirectional(Context& context)
 	status = rprContextCreateDirectionalLight(context.instance(), &light);
 	check(status);
 
-	setInstance(std::move(light));
+	setInstance(light);
 }
 
 void LightDirectional::setRadianPower(float r, float g, float b)
 {
 	int status;
 
-	status = rprDirectionalLightSetRadiantPower3f(*this, r, g, b);
+	status = rprDirectionalLightSetRadiantPower3f(instance(), r, g, b);
 	check(status);
 }
 
@@ -27,7 +27,7 @@ void LightDirectional::setShadowSoftness(float coeff)
 {
 	int status;
 
-	status = rprDirectionalLightSetShadowSoftnessAngle(*this, coeff);
+	status = rprDirectionalLightSetShadowSoftnessAngle(instance(), coeff);
 	check(status);
 }
 

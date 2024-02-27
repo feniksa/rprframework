@@ -1,5 +1,5 @@
-#include "Image.h"
-#include "Error.h"
+#include "rprf/Image.h"
+#include "rprf/Error.h"
 #include <cassert>
 
 namespace rprf
@@ -18,7 +18,7 @@ Image::Image(Context& context, const std::filesystem::path& fileName)
 	setInstance(std::move(image));
 }
 
-Image::Image(Context& context, const int width, const int height, int numComponets, ComponentsType type, void* data)
+Image::Image(Context& context, int width, int height, int numComponets, ComponentsType type, void* data)
 {
 	int status;
 	rpr_image image;

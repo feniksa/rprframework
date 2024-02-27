@@ -1,8 +1,8 @@
-#include "MaterialNode.h"
-#include "MaterialSystem.h"
-#include "Image.h"
-#include "FrameBuffer.h"
-#include "Error.h"
+#include "rprf/MaterialNode.h"
+#include "rprf/MaterialSystem.h"
+#include "rprf/Image.h"
+#include "rprf/FrameBuffer.h"
+#include "rprf/Error.h"
 #include <algorithm>
 #include <cassert>
 
@@ -16,48 +16,43 @@ MaterialNode::MaterialNode(MaterialSystem& matsys, MaterialNodeType type)
 	status = rprMaterialSystemCreateNode(matsys.instance(), static_cast<int>(type), &node);
 	check(status);
 
-	setInstance(std::move(node));
+	setInstance(node);
     setCustomPointer(this);
 }
 
 void MaterialNode::setParameter1u(MaterialInputType parameter, unsigned int x)
 {
 	rpr_int status;
-	status = rprMaterialNodeSetInputUByKey(*this, static_cast<int>(parameter), x);
+	status = rprMaterialNodeSetInputUByKey(instance(), static_cast<int>(parameter), x);
 	check(status);
 }
 
 void MaterialNode::setParameter4f(MaterialInputType parameter, float x, float y, float z, float w)
 {
 	rpr_int status;
-	status = rprMaterialNodeSetInputFByKey(*this, static_cast<int>(parameter), x, y, z, w);
+	status = rprMaterialNodeSetInputFByKey(instance(), static_cast<int>(parameter), x, y, z, w);
 	check(status);
 }
 
 void MaterialNode::setParameterNode(MaterialInputType parameter, const MaterialNode& node)
 {
 	rpr_int status;
-	status = rprMaterialNodeSetInputNByKey(*this, static_cast<int>(parameter), node.instance());
+	status = rprMaterialNodeSetInputNByKey(instance(), static_cast<int>(parameter), node.instance());
 	check(status);
 }
 
 void MaterialNode::setParameterImage(MaterialInputType parameter, const Image& image)
 {
 	rpr_int status;
-	status = rprMaterialNodeSetInputImageDataByKey(*this, static_cast<int>(parameter), image.instance());
+	status = rprMaterialNodeSetInputImageDataByKey(instance(), static_cast<int>(parameter), image.instance());
 	check(status);
 }
 
 void MaterialNode::setParameterFrameBuffer(MaterialInputType parameter, const FrameBuffer& frameBuffer)
 {
 	rpr_int status;
-	status = rprMaterialNodeSetInputBufferDataByKey(*this, static_cast<int>(parameter), frameBuffer.instance());
+	status = rprMaterialNodeSetInputBufferDataByKey(instance(), static_cast<int>(parameter), frameBuffer.instance());
 	check(status);
-}
-
-void MaterialNode::setName(const char* name)
-{
-    ContextObject<rpr_material_node>::setName(name);
 }
 
 std::string MaterialNode::name() const
@@ -65,14 +60,14 @@ std::string MaterialNode::name() const
     int status;
 
     size_t stringSize = 0;
-    status = rprMaterialNodeGetInfo(*this, RPR_MATERIAL_NODE_NAME, 0, nullptr, &stringSize);
+    status = rprMaterialNodeGetInfo(instance(), RPR_MATERIAL_NODE_NAME, 0, nullptr, &stringSize);
     check(status);
 
     std::string name;
     name.resize(stringSize);
 
     size_t readBytes = 0;
-    status = rprMaterialNodeGetInfo(*this, RPR_MATERIAL_NODE_NAME, name.size(), name.data(), &readBytes);
+    status = rprMaterialNodeGetInfo(instance(), RPR_MATERIAL_NODE_NAME, name.size(), name.data(), &readBytes);
     check(status);
 
     assert(readBytes == name.size());
@@ -90,12 +85,12 @@ MaterialNode::InputPins MaterialNode::readMaterialParameters() const
     rpr_int status;
 
     size_t numParams = 0;
-    status = rprMaterialNodeGetInfo(*this, RPR_MATERIAL_NODE_INPUT_COUNT, sizeof(numParams), &numParams, nullptr);
+    status = rprMaterialNodeGetInfo(instance(), RPR_MATERIAL_NODE_INPUT_COUNT, sizeof(numParams), &numParams, nullptr);
     check(status);
 
     // get the material type.
     rpr_material_node_type nodeType = 0;
-    status = rprMaterialNodeGetInfo(*this,RPR_MATERIAL_NODE_TYPE, sizeof(nodeType),&nodeType,nullptr);
+    status = rprMaterialNodeGetInfo(instance(), RPR_MATERIAL_NODE_TYPE, sizeof(nodeType),&nodeType,nullptr);
     check(status);
 
     pins.reserve(numParams);
@@ -108,12 +103,11 @@ MaterialNode::InputPins MaterialNode::readMaterialParameters() const
     return pins;
 }
 
-
 // helper functions
 bool hasParameter(const MaterialNode::InputPins& inputPins, MaterialInputType parameter)
 {
     const auto iter = std::find_if(inputPins.begin(), inputPins.end(), [parameter](const MaterialNodeInput& input){ return input.parameter() == parameter; });
-    return (iter != inputPins.end()) ? true : false;
+    return iter != inputPins.end();
 }
 
 std::tuple<float, float, float, float> getFloat4f(const MaterialNode::InputPins& inputPins,  MaterialInputType parameter)

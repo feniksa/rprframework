@@ -1,7 +1,6 @@
-#include "FrameBuffer.h"
-#include "Error.h"
+#include "rprf/FrameBuffer.h"
+#include "rprf/Error.h"
 #include <cassert>
-
 
 namespace rprf
 {
@@ -20,7 +19,7 @@ m_context(context)
     status = rprContextCreateFrameBuffer(context.instance(), format, &desc, &frame_buffer);
     check(status);
 
-    setInstance(std::move(frame_buffer));
+    setInstance(frame_buffer);
 }
 
 FrameBuffer::FrameBuffer(Context& context, unsigned int width, unsigned int height, unsigned int _numComponets, ComponentsType _type)

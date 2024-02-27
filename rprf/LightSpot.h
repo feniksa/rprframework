@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Light.h"
+#include "rprf/Light.h"
 
 namespace rprf
 {
@@ -8,9 +8,13 @@ namespace rprf
 class LightSpot : public Light
 {
 public:
-	LightSpot(Context& context);
+	RPRF_API
+	explicit LightSpot(Context& context);
 
+	RPRF_API
 	void setRadianPower(float r, float g, float b);
+
+	RPRF_API
 	void setConeShape(float iangle, float oangle);
 };
 

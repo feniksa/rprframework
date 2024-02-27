@@ -36,8 +36,7 @@ enum ErrorCode {
 
 namespace
 {
-
-    const char* GenericComputeDeviceName = "Generic Compute Device";
+const char* GenericComputeDeviceName = "Generic Compute Device";
 
 std::string allRenderEngines()
 {

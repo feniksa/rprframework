@@ -1,10 +1,12 @@
-#include "FrameBufferSysmem.h"
-#include "Context.h"
-#include <cassert>
+#include "rprf/FrameBufferSysmem.h"
+#include "rprf/Context.h"
+#include "rprf/Color4.h"
+#include "rprf/Error.h"
+
 #include "ThirdParty/stb/stb_image.h"
 #include "ThirdParty/stb/stb_image_write.h"
-#include "Color4.h"
-#include "Error.h"
+
+#include <cassert>
 
 namespace rprf
 {
@@ -12,7 +14,7 @@ namespace rprf
 FrameBufferSysmem::FrameBufferSysmem(const FrameBuffer& frameBuffer)
 : m_frameBuffer(frameBuffer)
 {
-    assert(frameBuffer);
+    assert(m_frameBuffer.instance());
     m_buffer.resize(m_frameBuffer.bufferSize());
 }
 
@@ -20,8 +22,6 @@ const FrameBuffer& FrameBufferSysmem::frameBuffer()  const
 {
 	return m_frameBuffer;
 }
-
-
 
 bool FrameBufferSysmem::saveToFile(const std::filesystem::path& fileName) const
 {
@@ -39,11 +39,11 @@ bool FrameBufferSysmem::saveToFile(const std::filesystem::path& fileName) const
 
     std::vector<std::byte> dstBuffer(m_buffer.size() / 4); // rgba, 1 byte for each channel
 
-    const Color4f* src_begin = reinterpret_cast<const Color4f*>(m_buffer.data());
-    const Color4f* src_end = reinterpret_cast<const Color4f*>(m_buffer.data() + m_buffer.size());
+    const auto src_begin = reinterpret_cast<const Color4f*>(m_buffer.data());
+    const auto src_end = reinterpret_cast<const Color4f*>(m_buffer.data() + m_buffer.size());
 
-    Color4b* dst_begin = reinterpret_cast<Color4b*>(dstBuffer.data());
-    Color4b* dst_end = reinterpret_cast<Color4b*>(dstBuffer.data() + dstBuffer.size());
+    auto dst_begin = reinterpret_cast<Color4b*>(dstBuffer.data());
+    auto dst_end = reinterpret_cast<Color4b*>(dstBuffer.data() + dstBuffer.size());
 
     if (m_buffer.size() <= 64 * 64) {
         float4f_to_float4b(src_begin, src_end, dst_begin, dst_end);
@@ -59,7 +59,7 @@ bool FrameBufferSysmem::saveToFile(const std::filesystem::path& fileName) const
 
 void FrameBufferSysmem::update()
 {
-	if (!m_frameBuffer)
+	if (!m_frameBuffer.instance())
 		return;
 
 	if (m_buffer.empty())

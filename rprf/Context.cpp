@@ -1,8 +1,8 @@
-#include "Context.h"
-#include "Plugin.h"
-#include "Error.h"
-#include "Scene.h"
-#include "FrameBuffer.h"
+#include "rprf/Context.h"
+#include "rprf/Plugin.h"
+#include "rprf/Error.h"
+#include "rprf/Scene.h"
+#include "rprf/FrameBuffer.h"
 
 #include <array>
 #include <vector>
@@ -72,58 +72,58 @@ Context::Context(const Plugin& plugin, const std::filesystem::path& cachePath, c
 							  createFlags, contextProperties.data(), cachePath.string().c_str(), &context);
 	check(status);
 
-	setInstance(std::move(context));
+	setInstance(context);
 
-	status = rprContextSetActivePlugin(*this, ids.at(0));
+	status = rprContextSetActivePlugin(instance(), ids.at(0));
 	check(status);
 }
 
 void Context::setScene(const Scene& scene)
 {
 	int status;
-	status = rprContextSetScene(*this, scene.instance());
+	status = rprContextSetScene(instance(), scene.instance());
 	check(status);
 }
 
 void Context::setAOV(const FrameBuffer& frameBuffer)
 {
 	int status;
-	status = rprContextSetAOV(*this, RPR_AOV_COLOR, frameBuffer.instance());
+	status = rprContextSetAOV(instance(), RPR_AOV_COLOR, frameBuffer.instance());
 	check(status);
 }
 
 void Context::unsetAOV()
 {
 	int status;
-	status = rprContextSetAOV(*this, RPR_AOV_COLOR, nullptr);
+	status = rprContextSetAOV(instance(), RPR_AOV_COLOR, nullptr);
 	check(status);
 }
 
 void Context::setParameter1u(ContextInputType parameter, unsigned int value)
 {
 	int status;
-	status = rprContextSetParameterByKey1u(*this, static_cast<int>(parameter), value);
+	status = rprContextSetParameterByKey1u(instance(), static_cast<int>(parameter), value);
 	check(status);
 }
 
 void Context::setParameter1f(ContextInputType parameter, float value)
 {
 	int status;
-	status = rprContextSetParameterByKey1f(*this, static_cast<int>(parameter), value);
+	status = rprContextSetParameterByKey1f(instance(), static_cast<int>(parameter), value);
 	check(status);
 }
 
 void Context::render()
 {
 	int status;
-	status = rprContextRender(*this);
+	status = rprContextRender(instance());
 	check(status);
 }
 
 void Context::resolve(FrameBuffer* src, FrameBuffer* dst, bool noDisplayGamma)
 {
 	int status;
-	status = rprContextResolveFrameBuffer(*this, src->instance(), dst->instance(), noDisplayGamma);
+	status = rprContextResolveFrameBuffer(instance(), src->instance(), dst->instance(), noDisplayGamma);
 	check(status);
 }
 
@@ -132,14 +132,14 @@ std::string Context::getCpuName() const
     int status;
 
     size_t dataSize;
-    status = rprContextGetInfo(*this, RPR_CONTEXT_CPU_NAME, 0, nullptr, &dataSize);
+    status = rprContextGetInfo(instance(), RPR_CONTEXT_CPU_NAME, 0, nullptr, &dataSize);
     check(status);
 
     if (dataSize == 0)
         return "";
 
     std::vector<char> buffer(dataSize);
-    status = rprContextGetInfo(*this, RPR_CONTEXT_CPU_NAME,
+    status = rprContextGetInfo(instance(), RPR_CONTEXT_CPU_NAME,
             buffer.size(), buffer.data(), &dataSize);
     check(status);
 
@@ -157,14 +157,14 @@ std::string Context::getGpuName(int gpuIndex) const
     int rprFlag = convertGpuName_index2rprflag(gpuIndex);
 
     size_t dataSize;
-    status = rprContextGetInfo(*this, rprFlag, 0, nullptr, &dataSize);
+    status = rprContextGetInfo(instance(), rprFlag, 0, nullptr, &dataSize);
     check(status);
 
     if (dataSize == 0)
         return "";
 
     std::vector<char> buffer(dataSize);
-    status = rprContextGetInfo(*this, rprFlag,
+    status = rprContextGetInfo(instance(), rprFlag,
             buffer.size(), buffer.data(), &dataSize);
     check(status);
 
@@ -202,7 +202,7 @@ int Context::createFlags() const
     int status;
 
     size_t dataSize;
-    status = rprContextGetInfo(*this, RPR_CONTEXT_CREATION_FLAGS, sizeof(flags), &flags, &dataSize);
+    status = rprContextGetInfo(instance(), RPR_CONTEXT_CREATION_FLAGS, sizeof(flags), &flags, &dataSize);
     check(status);
 
     if (dataSize != sizeof(flags))

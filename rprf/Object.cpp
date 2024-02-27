@@ -1,5 +1,5 @@
-#include "Object.h"
-#include "Error.h"
+#include "rprf/Object.h"
+#include "rprf/Error.h"
 #include <RadeonProRender.h>
 #include <exception>
 #include <iostream>
@@ -20,25 +20,10 @@ Object::Object(Object&& object) noexcept
 
 Object::~Object()
 {
-	try {
-		destroy();
-	}
-	catch (const std::exception& e)	{
-		std::cerr << "RadeonProRender error: " << e.what() << std::endl;
-	}
-	catch(...) {
-		std::cerr << "RadeonProRender error: unkown exception raised in Object::~Object()" << std::endl;
-	}
+	destroy();
 }
 
-
-void Object::own(void*&& instance)
-{
-	m_instance = instance;
-	instance = nullptr;
-}
-
-void Object::destroy()
+void Object::destroy() noexcept try
 {
 	if (!m_instance)
 		return;
@@ -49,8 +34,17 @@ void Object::destroy()
 
 	m_instance = nullptr;
 }
+// error
+catch (const std::exception& e)	{
+	std::cerr << "RadeonProRender error: " << e.what() << "\n";
+	m_instance = nullptr;
+}
+catch(...) {
+	std::cerr << "RadeonProRender error: unkown exception raised in Object::~Object()\n";
+	m_instance = nullptr;
+}
 
-Object& Object::operator=(Object&& other)
+Object& Object::operator=(Object&& other) noexcept
 {
 	destroy();
 

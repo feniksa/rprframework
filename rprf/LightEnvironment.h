@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Light.h"
+#include "rprf/Light.h"
 
 namespace rprf
 {
@@ -10,8 +10,13 @@ class Image;
 class LightEnvironment : public Light
 {
 public:
-	LightEnvironment(Context& context);
+	RPRF_API
+	explicit LightEnvironment(Context& context);
+
+	RPRF_API
 	void setIntensityScale(float intensity);
+
+	RPRF_API
 	void setImage(Image& image);
 };
 

@@ -1,42 +1,42 @@
 #pragma once
 
-#include <type_traits>
-#include <stdexcept>
-
-namespace rprf
-{
-    void __rprObjectDelete(void*) noexcept;
-    void __rprObjectSetName(void*, const char*);
-    void __rprObjectSetCustomPointer (void*, void*);
-    const void* __rprObjectGetCustomPointer (void*);
-}
+#include "rprf/rprf.h"
 
 namespace rprf
 {
 
-template <class T>
 class ContextObject
 {
 public:
-	explicit ContextObject(T data = nullptr) noexcept;
+	RPRF_API
+	explicit ContextObject(void* data = nullptr) noexcept;
+
+	RPRF_API
 	ContextObject(ContextObject&& object)  noexcept;
 
+	RPRF_API
 	virtual ~ContextObject() noexcept;
 
-	ContextObject& operator=(ContextObject&& context);
+	RPRF_API
+	ContextObject& operator=(ContextObject&& context) noexcept;
 
 	// be carefull! No delete of instance
 	[[deprecated]]
+	RPRF_API
 	void setInstanceToNull() { m_instance = nullptr; }
 
-	T& instance() noexcept { return m_instance; }
-	const T& instance() const noexcept { return m_instance; }
+	[[nodiscard]]
+	RPRF_API
+	void* instance() const noexcept { return m_instance; }
 
-	operator T() const noexcept { return m_instance; }
-
+	RPRF_API
     void setName(const char* name);
+
+	[[nodiscard]]
+	RPRF_API
     const void* getCustomPointer() const;
 
+	RPRF_API
 	void destroy() noexcept;
 
 	// we don't allow to copy context object
@@ -45,84 +45,10 @@ public:
 
 protected:
     void setCustomPointer(void* pointer);
-    void setInstance(T&& instance);
+    void setInstance(void* instance);
 
 private:
-	T m_instance;
+	void* m_instance;
 };
-
-template <class T>
-ContextObject<T>::ContextObject(T dataPointer) noexcept
-: m_instance(dataPointer)
-{
-    static_assert(std::is_pointer<T>::value);
-}
-
-template <class T>
-ContextObject<T>::~ContextObject() noexcept
-{
-    destroy();
-}
-
-template <class T>
-ContextObject<T>::ContextObject(ContextObject&& object) noexcept
-{
-	m_instance = object.m_instance;
-	object.m_instance = nullptr;
-
-    setCustomPointer(this);
-}
-
-template <class T>
-ContextObject<T>& ContextObject<T>::operator=(ContextObject&& object)
-{
-	destroy();
-
-    std::swap(m_instance, object.m_instance);
-
-#ifndef NDEBUG
-    object.setCustomPointer(nullptr);
-#endif
-    setCustomPointer(this);
-
-	return *this;
-}
-
-template <class T>
-void ContextObject<T>::setInstance(T&& instance)
-{
-	destroy();
-
-    std::swap(m_instance, instance);
-}
-
-template <class T>
-void ContextObject<T>::destroy() noexcept
-{
-	if (!m_instance)
-		return;
-
-    __rprObjectDelete(m_instance);
-
-	m_instance = nullptr;
-}
-
-template <class T>
-void ContextObject<T>::setName(const char* name)
-{
-    __rprObjectSetName(m_instance, name);
-}
-
-template <class T>
-void ContextObject<T>::setCustomPointer(void *pointer)
-{
-    __rprObjectSetCustomPointer(m_instance, pointer);
-}
-
-template <class T>
-const void* ContextObject<T>::getCustomPointer() const
-{
-    return __rprObjectGetCustomPointer(m_instance);
-}
 
 } // namespace

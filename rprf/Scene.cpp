@@ -1,8 +1,8 @@
-#include "Scene.h"
-#include "Error.h"
-#include "Shape.h"
-#include "LightPoint.h"
-#include "Camera.h"
+#include "rprf/Scene.h"
+#include "rprf/Error.h"
+#include "rprf/Shape.h"
+#include "rprf/LightPoint.h"
+#include "rprf/Camera.h"
 
 namespace rprf
 {
@@ -14,41 +14,41 @@ Scene::Scene(Context& context)
 	status = rprContextCreateScene(context.instance(), &scene);
 	check(status);
 
-	setInstance(std::move(scene));
+	setInstance(scene);
 }
 
 void Scene::attachShape(const Shape& shape)
 {
 	int status;
-	status = rprSceneAttachShape(*this, shape.instance());
+	status = rprSceneAttachShape(instance(), shape.instance());
 	check(status);
 }
 
 void Scene::attachLight(const Light& light)
 {
 	int status;
-	status = rprSceneAttachLight(*this, light.instance());
+	status = rprSceneAttachLight(instance(), light.instance());
 	check(status);
 }
 
 void Scene::setCamera(const Camera& camera)
 {
 	int status;
-	status = rprSceneSetCamera(*this, camera.instance());
+	status = rprSceneSetCamera(instance(), camera.instance());
 	check(status);
 }
 
 void Scene::detachShape(const Shape& light)
 {
 	int status;
-	status = rprSceneDetachShape(*this, light.instance());
+	status = rprSceneDetachShape(instance(), light.instance());
 	check(status);
 }
 
 void Scene::detachLight(const Light& light)
 {
 	int status;
-	status = rprSceneDetachLight(*this, light.instance());
+	status = rprSceneDetachLight(instance(), light.instance());
 	check(status);
 }
 

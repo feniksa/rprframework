@@ -1,5 +1,5 @@
-#include "Light.h"
-#include "Error.h"
+#include "rprf/Light.h"
+#include "rprf/Error.h"
 
 namespace rprf
 {
@@ -7,7 +7,7 @@ namespace rprf
 void Light::setTransform(const rprf_math::matrix& transform, bool transpose)
 {
 	int status;
-	status = rprLightSetTransform(*this, transpose, &transform.m00);
+	status = rprLightSetTransform(instance(), transpose, &transform.m00);
 	check(status);
 }
 

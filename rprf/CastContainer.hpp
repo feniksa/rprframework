@@ -1,5 +1,6 @@
 #pragma once
 
+#include "rprf/GlobalFunctions.h"
 #include <vector>
 
 namespace rprf

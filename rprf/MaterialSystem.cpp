@@ -1,5 +1,5 @@
-#include "MaterialSystem.h"
-#include "Error.h"
+#include "rprf/MaterialSystem.h"
+#include "rprf/Error.h"
 #include <cassert>
 
 namespace rprf
@@ -13,7 +13,7 @@ MaterialSystem::MaterialSystem(Context& context)
 	status = rprContextCreateMaterialSystem(context.instance(), 0, &matsys);
 	check(status);
 
-	setInstance(std::move(matsys));
+	setInstance(matsys);
 }
 
 CastContainer<MaterialNode> MaterialSystem::getNodeList() const
