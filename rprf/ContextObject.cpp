@@ -52,24 +52,24 @@ void ContextObject::destroy() noexcept
 	if (!m_instance)
 		return;
 
-	__rprObjectDelete(m_instance);
+	sdk::rprObjectDelete(m_instance);
 
 	m_instance = nullptr;
 }
 
 void ContextObject::setName(const char* name)
 {
-	__rprObjectSetName(m_instance, name);
+	sdk::rprObjectSetName(m_instance, name);
 }
 
 void ContextObject::setCustomPointer(void *pointer)
 {
-	__rprObjectSetCustomPointer(m_instance, pointer);
+	sdk::rprObjectSetCustomPointer(m_instance, pointer);
 }
 
 const void* ContextObject::getCustomPointer() const
 {
-	return __rprObjectGetCustomPointer(m_instance);
+	return sdk::rprObjectGetCustomPointer(m_instance);
 }
 
 }

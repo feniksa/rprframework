@@ -8,7 +8,7 @@
 #include "rprf/FrameBuffer.h"
 #include "rprf/Shape.h"
 #include "rprf/LightPoint.h"
-#include "math/mathutils.h"
+#include "rprf/math/mathutils.h"
 
 #include "CubeData.h"
 

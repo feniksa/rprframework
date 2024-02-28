@@ -5,51 +5,56 @@
 
 namespace rprf
 {
-	void __rprObjectDelete(void* instance) noexcept
+	namespace sdk
 	{
-		assert(instance);
+		void rprObjectDelete(void* instance) noexcept
+		{
+			assert(instance);
 
-		try {
+			try {
+				rpr_int status;
+				status = ::rprObjectDelete(instance);
+				check(status);
+			}
+			catch(const std::exception& e)
+			{
+				std::cerr << "ContextObject::destroy(): " << e.what();
+			}
+			catch (...)
+			{
+				std::cerr << "ContextObject::destroy(): unknown error";
+			}
+		}
+
+		void rprObjectSetName(void* instance, const char* name)
+		{
+			assert(instance);
+
 			rpr_int status;
-			status = rprObjectDelete(instance);
+			status = ::rprObjectSetName(instance, name);
 			check(status);
 		}
-		catch(const std::exception& e)
+
+		void rprObjectSetCustomPointer(void* instance, void* pointer)
 		{
-			std::cerr << "ContextObject::destroy(): " << e.what();
+			assert(instance);
+
+			rpr_int status;
+			status = ::rprObjectSetCustomPointer(instance, pointer);
+			check(status);
 		}
-		catch (...)
+
+		const void* rprObjectGetCustomPointer(void* instance)
 		{
-			std::cerr << "ContextObject::destroy(): unknown error";
+			assert(instance);
+
+			const void* pointer;
+
+			rpr_int status;
+			status = ::rprObjectGetCustomPointer(instance, &pointer);
+			check(status);
+
+			return pointer;
 		}
-	}
-
-	void __rprObjectSetName(void* instance, const char* name)
-	{
-		assert(instance);
-		rpr_int status;
-		status = rprObjectSetName(instance, name);
-		check(status);
-	}
-
-	void __rprObjectSetCustomPointer(void* instance, void* pointer)
-	{
-		assert(instance);
-		rpr_int status;
-		status = rprObjectSetCustomPointer(instance, pointer);
-		check(status);
-	}
-
-	const void* __rprObjectGetCustomPointer(void* instance)
-	{
-		assert(instance);
-
-		const void* pointer;
-
-		rpr_int status;
-		status = rprObjectGetCustomPointer(instance, &pointer);
-		check(status);
-
-		return pointer;
 	}
 }

@@ -20,11 +20,6 @@ public:
 	RPRF_API
 	ContextObject& operator=(ContextObject&& context) noexcept;
 
-	// be carefull! No delete of instance
-	[[deprecated]]
-	RPRF_API
-	void setInstanceToNull() { m_instance = nullptr; }
-
 	[[nodiscard]]
 	RPRF_API
 	void* instance() const noexcept { return m_instance; }

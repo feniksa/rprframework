@@ -86,6 +86,6 @@ if(FORCE_UPDATE_ENUMS)
 		DEPENDS "${RPR_INCLUDE_DIR}/RadeonProRender.h" "${CMAKE_SOURCE_DIR}/utils/convert.py"
 	)
 endif()
-
+include(GNUInstallDirs)
 install(TARGETS rprf RUNTIME PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/rprf)
 

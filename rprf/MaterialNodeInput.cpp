@@ -45,7 +45,7 @@ MaterialNode* MaterialNodeInput::getMaterialNode() const
     if (!node)
         return nullptr;
 
-    auto materialNode  = reinterpret_cast<MaterialNode*>(const_cast<void*>(__rprObjectGetCustomPointer(*node)));
+    auto materialNode  = reinterpret_cast<MaterialNode*>(const_cast<void*>(sdk::rprObjectGetCustomPointer(*node)));
     return materialNode;
 }
 

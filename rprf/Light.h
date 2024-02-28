@@ -2,7 +2,7 @@
 
 #include "rprf/Object.h"
 #include "rprf/Context.h"
-#include <math/matrix.h>
+#include "rprf/math/matrix.h"
 
 namespace rprf
 {

@@ -4,17 +4,18 @@
 
 namespace rprf
 {
+	namespace sdk
+	{
+		RPRF_API
+		void rprObjectDelete(void*) noexcept;
 
-RPRF_API
-void __rprObjectDelete(void*) noexcept;
+		RPRF_API
+		void rprObjectSetName(void*, const char*);
 
-RPRF_API
-void __rprObjectSetName(void*, const char*);
+		RPRF_API
+		void rprObjectSetCustomPointer(void*, void*);
 
-RPRF_API
-void __rprObjectSetCustomPointer(void*, void*);
-
-RPRF_API
-const void* __rprObjectGetCustomPointer (void*);
-
+		RPRF_API
+		const void* rprObjectGetCustomPointer (void*);
+	}
 } // namespace rprf

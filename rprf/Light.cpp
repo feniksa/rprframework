@@ -11,4 +11,4 @@ void Light::setTransform(const rprf_math::matrix& transform, bool transpose)
 	check(status);
 }
 
-} // namespace
+} // namespace rprf

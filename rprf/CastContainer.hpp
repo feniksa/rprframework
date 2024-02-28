@@ -12,37 +12,40 @@ class CastContainer
 public:
     using container_type = std::vector<void*>;
 
-    explicit CastContainer() noexcept = default;
+    CastContainer() noexcept = default;
     explicit CastContainer(size_t count) noexcept : m_container(count) {}
 
     explicit CastContainer(const std::vector<void*>& rawPointers)
     : m_container(rawPointers)
     {
     }
+
     explicit CastContainer(std::vector<void*>&& rawPointers)
     : m_container(std::move(rawPointers))
     {
     }
 
-    CastContainer(CastContainer&& other) noexcept = default;
+    CastContainer(CastContainer&& other) noexcept            = default;
     CastContainer& operator=(CastContainer&& other) noexcept = default;
 
+	[[nodiscard]]
     size_t size() const noexcept { return m_container.size(); }
 
-    container_type::value_type* data() {
+    container_type::value_type* data()
+	{
         return m_container.data();
     }
 
     T* ref(void* rprObject)
     {
-        const void* ptr = __rprObjectGetCustomPointer(rprObject);
+        const void* ptr = sdk::rprObjectGetCustomPointer(rprObject);
         void* p = const_cast<void*>(ptr);
         return reinterpret_cast<T*>(p);
     }
 
     const T* cref(void* rprObject) const
     {
-        const void* ptr = __rprObjectGetCustomPointer(rprObject);
+        const void* ptr = sdk::rprObjectGetCustomPointer(rprObject);
         return reinterpret_cast<const T*>(ptr);
     }
 
@@ -69,20 +72,20 @@ struct CastContainer<T>::Iterator : public CastContainer<T>::container_type::ite
 {
     using iter_impl = CastContainer<T>::container_type::iterator;
 
-    explicit Iterator() noexcept = default;
-    explicit Iterator(Iterator&&) noexcept = default;
-    explicit Iterator(const Iterator&) noexcept = default;
+    Iterator()                noexcept = default;
+    Iterator(Iterator&&)      noexcept = default;
+    Iterator(const Iterator&) noexcept = default;
 
     explicit Iterator(const iter_impl& iter) : iter_impl(iter) {}
     explicit Iterator(iter_impl&& iter) : iter_impl(iter) {}
 
     Iterator& operator=(const Iterator&) noexcept = default;
-    Iterator& operator=(Iterator&&) noexcept = default;
+    Iterator& operator=(Iterator&&)      noexcept = default;
 
     T* operator->() noexcept
     {
         void* rprObject = iter_impl::operator*();
-        const void* ptr = __rprObjectGetCustomPointer(rprObject);
+        const void* ptr = sdk::rprObjectGetCustomPointer(rprObject);
         void* p = const_cast<void*>(ptr);
         return reinterpret_cast<T*>(p);
     }
@@ -90,7 +93,7 @@ struct CastContainer<T>::Iterator : public CastContainer<T>::container_type::ite
     T& operator*() noexcept
     {
         void* rprObject = iter_impl::operator*();
-        const void* ptr = __rprObjectGetCustomPointer(rprObject);
+        const void* ptr = sdk::rprObjectGetCustomPointer(rprObject);
         return *reinterpret_cast<T*>(ptr);
     }
 };
@@ -100,28 +103,28 @@ struct CastContainer<T>::ConstIterator : public CastContainer<T>::container_type
 {
     using iter_impl = CastContainer<T>::container_type::const_iterator;
 
-    explicit ConstIterator() noexcept = default;
-    explicit ConstIterator(ConstIterator&&) noexcept = default;
-    explicit ConstIterator(const ConstIterator&) noexcept = default;
+    ConstIterator()                     noexcept = default;
+    ConstIterator(ConstIterator&&)      noexcept = default;
+    ConstIterator(const ConstIterator&) noexcept = default;
 
     explicit ConstIterator(const iter_impl& iter) : iter_impl(iter) {}
     explicit ConstIterator(iter_impl&& iter) : iter_impl(iter) {}
 
     ConstIterator& operator=(const ConstIterator&) noexcept = default;
-    ConstIterator& operator=(ConstIterator&&) noexcept = default;
+    ConstIterator& operator=(ConstIterator&&)      noexcept = default;
 
     const T* operator->() noexcept
     {
         void* rprObject = iter_impl::operator*();
-        const void* ptr = __rprObjectGetCustomPointer(rprObject);
-        void* p = const_cast<void*>(ptr);
+        const void* ptr = sdk::rprObjectGetCustomPointer(rprObject);
+        //void* p = const_cast<void*>(ptr);
         return reinterpret_cast<const T*>(ptr);
     }
 
     const T& operator*() noexcept
     {
         void* rprObject = iter_impl::operator*();
-        const void* ptr = __rprObjectGetCustomPointer(rprObject);
+        const void* ptr = sdk::rprObjectGetCustomPointer(rprObject);
         return *reinterpret_cast<const T*>(ptr);
     }
 };
