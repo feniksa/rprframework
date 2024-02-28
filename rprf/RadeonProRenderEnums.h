@@ -580,4 +580,8 @@ namespace rprf
 		Data		 = RPR_MATERIAL_NODE_INPUT_TYPE_DATA,
 		Light		 = RPR_MATERIAL_NODE_INPUT_TYPE_LIGHT,
 	};
+	enum class UberMaterialEmissionMode {
+		Singlesided		 = RPR_UBER_MATERIAL_EMISSION_MODE_SINGLESIDED,
+		Doublesided		 = RPR_UBER_MATERIAL_EMISSION_MODE_DOUBLESIDED,
+	};
 } // namespace

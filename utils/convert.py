@@ -92,12 +92,14 @@ material_nodetypes = []
 context_input_types = []
 shape_visibility_types = []
 material_node_input_types = []
+uber_material_emission_modes = []
 
 prog_material_input = re.compile('#define\s+RPR_MATERIAL_INPUT_([A-Za-z0-9_]+)\s+(0x[0-9abcdefABCDEF]+)')
 prog_material_node = re.compile('#define\s+RPR_MATERIAL_NODE_([A-Za-z0-9_]+)\s+(0x[0-9abcdefABCDEF]+)')
 prog_context = re.compile('#define\s+RPR_CONTEXT_([A-Za-z0-9_]+)\s+(0x[0-9abcdefABCDEF]+)')
 prog_shape_visibility = re.compile('#define\s+RPR_SHAPE_VISIBILITY_([A-Za-z0-9_]+)\s+(0x[0-9abcdefABCDEF]+)')
 prog_material_node_input_type = re.compile('#define\s+RPR_MATERIAL_NODE_INPUT_TYPE_([A-Za-z0-9_]+)')
+prog_uber_material_emission_mode = re.compile('#define\s+RPR_UBER_MATERIAL_EMISSION_MODE_([A-Za-z0-9_]+)')
 
 
 with open(args.input) as file:
@@ -138,6 +140,12 @@ with open(args.input) as file:
             define_name = matches[1]
             hex_code = matches[2]
             shape_visibility_types.append(define_name)
+
+        # RPR_UBER_MATERIAL_EMISSION_MODE_
+        matches = prog_uber_material_emission_mode.match(txt)
+        if matches:
+            define_name = matches[1]
+            uber_material_emission_modes.append(define_name)
 
 
 
@@ -182,7 +190,10 @@ with open(args.output, "w") as fout:
         fout.write("\t\t{case}\t\t = RPR_MATERIAL_NODE_INPUT_TYPE_{define},\n".format(case=make_node_input_type_name(n), define=n))
     fout.write("\t};\n") # end class ShapeVisibilityType
 
-
+    fout.write("\tenum class UberMaterialEmissionMode {\n") # enum MaterialNodeTypeInput
+    for n in uber_material_emission_modes:
+        fout.write("\t\t{case}\t\t = RPR_UBER_MATERIAL_EMISSION_MODE_{define},\n".format(case=make_node_input_type_name(n), define=n))
+    fout.write("\t};\n") # end class UberMaterialEmissionMode
 
     fout.write("} // namespace\n")
 

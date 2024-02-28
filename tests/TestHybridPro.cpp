@@ -8,7 +8,7 @@
 #include "rprf/LightEnvironment.h"
 #include "rprf/ContextUtils.h"
 #include "rprf/MaterialSystem.h"
-#include "rprf/MaterialNode.h"
+#include "rprf/UberMaterial.h"
 #include "rprf/Image.h"
 #include "rprf/FrameBufferSysmem.h"
 
@@ -71,8 +71,8 @@ struct TestHybridPro : public ::testing::Test
         //m_plugin.reset();
     }
 
-
-	int GetCreationFlags(const gpu_list_t& devices)
+	[[nodiscard]]
+	int GetCreationFlags(const gpu_list_t& devices) const
 	{
 		rpr_creation_flags flags = 0;
 
@@ -251,10 +251,11 @@ TEST_F(TestHybridPro, material_node_list)
 
     // add second material
     const std::string materialName2 = "diffuse";
-    MaterialNode diffuse(materialSystem, MaterialNodeType::Diffuse);
-    diffuse.setParameter4f(MaterialInputType::Color, 1.0f, 2.0f, 3.0f, 0.0f);
-    diffuse.setName(materialName2.c_str());
-    EXPECT_EQ(diffuse.name(), materialName2);
+    MaterialNode uber2(materialSystem, MaterialNodeType::Uberv2);
+    uber2.setParameter4f(MaterialInputType::UberDiffuseColor, 0.5f, 0.25f, 0.0f, 1.0f);
+	uber2.setParameter4f(MaterialInputType::UberDiffuseWeight, 1.0f, 1.0f, 1.0f, 1.0f);
+    uber2.setName(materialName2.c_str());
+    EXPECT_EQ(uber2.name(), materialName2);
 
 }
 
@@ -327,16 +328,16 @@ TEST_F(TestHybridPro, scene_creation)
 
 	MaterialSystem materialSystem(context);
 
-	MaterialNode diffuse1(materialSystem, MaterialNodeType::Diffuse);
-	diffuse1.setParameter4f(MaterialInputType::Color, 0.6f, 0.4f, 1.0f, 0.0f);
+	UberMaterial diffuse1(materialSystem);
+	diffuse1.SetDiffuseColor(0.6f, 0.4f, 1.0f, 0.0f);
 	cube.setMaterial(diffuse1);
 
-	MaterialNode diffuse2(materialSystem, MaterialNodeType::Diffuse);
-	diffuse2.setParameter4f(MaterialInputType::Color, 1.0f, 0.5f, 0.0f, 0.0f);
+	UberMaterial diffuse2(materialSystem);
+	diffuse2.SetDiffuseColor(1.0f, 0.5f, 0.0f, 0.0f);
 	cubeInstance.setMaterial(diffuse2);
 
-	MaterialNode diffuse3(materialSystem, MaterialNodeType::Diffuse);
-	diffuse3.setParameter4f(MaterialInputType::Color, 0.1f, 0.8f, 1.0f, 0.0f);
+	UberMaterial diffuse3(materialSystem);
+	diffuse3.SetDiffuseColor(0.1f, 0.8f, 1.0f, 0.0f);
 	plane.setMaterial(diffuse3);
 
 	frameBuffer.clear();
@@ -352,8 +353,8 @@ TEST_F(TestHybridPro, scene_creation)
 	MaterialNode imageMaterial1(materialSystem, MaterialNodeType::ImageTexture);
 	imageMaterial1.setParameterImage(MaterialInputType::Data, image1);
 
-	MaterialNode diffuse4(materialSystem, MaterialNodeType::Diffuse);
-	diffuse4.setParameterNode(MaterialInputType::Color, imageMaterial1);
+	UberMaterial diffuse4(materialSystem);
+	diffuse4.SetDiffuseColor(imageMaterial1);
 
 	cube.setMaterial(diffuse4);
 
@@ -363,8 +364,8 @@ TEST_F(TestHybridPro, scene_creation)
 	MaterialNode imageMaterial2(materialSystem, MaterialNodeType::ImageTexture);
 	imageMaterial2.setParameterImage(MaterialInputType::Data, image2);
 
-	MaterialNode diffuse5(materialSystem, MaterialNodeType::Diffuse);
-	diffuse5.setParameterNode(MaterialInputType::Color, imageMaterial2);
+	UberMaterial diffuse5(materialSystem);
+	diffuse5.SetDiffuseColor(imageMaterial2);
 
 
 	// allocate a Lookup material and define it as a "UV Lookup" meaning the output of this material is the UV from the shape.
@@ -386,8 +387,8 @@ TEST_F(TestHybridPro, scene_creation)
 	plane.setMaterial(diffuse5);
 
 	// allocate a simple reflection material and apply it on the cube_instance
-	MaterialNode reflection1(materialSystem, MaterialNodeType::Reflection);
-	reflection1.setParameter4f(MaterialInputType::Color,1.0f, 1.0f, 1.0f, 0.0f);
+	UberMaterial reflection1(materialSystem);
+	reflection1.SetReflectionColor(1.0f, 1.0f, 1.0f, 0.0f);
 	cubeInstance.setMaterial(reflection1);
 
 	scene.detachLight(pointLight);
@@ -425,8 +426,8 @@ TEST_F(TestHybridPro, scene_creation)
 	uv_scaled_node.setParameter4f(MaterialInputType::Color1, 10.0f, 20.0f, 0.0f, 0.0f);
 
 	// replace the material on cuve by an emissive one.
-	MaterialNode emissive(materialSystem, MaterialNodeType::Emissive);
-	emissive.setParameter4f(MaterialInputType::Color, 6.0f, 3.0f, 0.0f, 0.0f);
+	UberMaterial emissive(materialSystem);
+	emissive.SetEmissionColor(6.0f, 3.0f, 0.0f, 0.0f);
 
 	cube.setMaterial(emissive);
 	cube.setTransform(
@@ -515,16 +516,16 @@ TEST_F(TestHybridPro, framebuffer_info)
 
     MaterialSystem materialSystem(context);
 
-    MaterialNode diffuse1(materialSystem, MaterialNodeType::Diffuse);
-    diffuse1.setParameter4f(MaterialInputType::Color, 0.6f, 0.4f, 1.0f, 0.0f);
+    UberMaterial diffuse1(materialSystem);
+    diffuse1.SetDiffuseColor(0.6f, 0.4f, 1.0f, 0.0f);
     cube.setMaterial(diffuse1);
 
-    MaterialNode diffuse2(materialSystem, MaterialNodeType::Diffuse);
-    diffuse2.setParameter4f(MaterialInputType::Color, 1.0f, 0.5f, 0.0f, 0.0f);
+    UberMaterial diffuse2(materialSystem);
+    diffuse2.SetDiffuseColor(1.0f, 0.5f, 0.0f, 0.0f);
     cubeInstance.setMaterial(diffuse2);
 
-    MaterialNode diffuse3(materialSystem, MaterialNodeType::Diffuse);
-    diffuse3.setParameter4f(MaterialInputType::Color, 0.1f, 0.8f, 1.0f, 0.0f);
+    UberMaterial diffuse3(materialSystem);
+    diffuse3.SetDiffuseColor(0.1f, 0.8f, 1.0f, 0.0f);
     plane.setMaterial(diffuse3);
 
     frameBuffer.clear();
